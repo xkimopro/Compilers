@@ -1,6 +1,6 @@
-#line 2 "hello.cpp"
+#line 2 "lexer.cpp"
 
-#line 4 "hello.cpp"
+#line 4 "lexer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -467,8 +467,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "hello.l"
-#line 4 "hello.l"
+#line 1 "lexer.l"
+#line 4 "lexer.l"
 #define T_eof 0
 #define T_for 1001
 #define T_print 1002
@@ -480,8 +480,8 @@ char *yytext;
 #define T_end 1008
 #define T_id 1009
 #define T_const 1010
-#line 484 "hello.cpp"
-#line 485 "hello.cpp"
+#line 484 "lexer.cpp"
+#line 485 "lexer.cpp"
 
 #define INITIAL 0
 
@@ -698,10 +698,10 @@ YY_DECL
 		}
 
 	{
-#line 21 "hello.l"
+#line 21 "lexer.l"
 
 
-#line 705 "hello.cpp"
+#line 705 "lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -760,74 +760,74 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 23 "hello.l"
+#line 23 "lexer.l"
 { return T_for; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "hello.l"
+#line 24 "lexer.l"
 { return T_print; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 "hello.l"
+#line 25 "lexer.l"
 { return T_let; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 26 "hello.l"
+#line 26 "lexer.l"
 { return T_if; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "hello.l"
+#line 27 "lexer.l"
 { return T_then; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 28 "hello.l"
+#line 28 "lexer.l"
 { return T_do; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 29 "hello.l"
+#line 29 "lexer.l"
 { return T_begin; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 30 "hello.l"
+#line 30 "lexer.l"
 { return T_end; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 32 "hello.l"
+#line 32 "lexer.l"
 { return T_id; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 33 "hello.l"
+#line 33 "lexer.l"
 { return T_const; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 35 "hello.l"
+#line 35 "lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 37 "hello.l"
+#line 37 "lexer.l"
 { /* nothing */ }
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 38 "hello.l"
+#line 38 "lexer.l"
 { /* nothing' */ }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 40 "hello.l"
+#line 40 "lexer.l"
 { fprintf(stderr, "Illegal character with code %d",
                   yytext[0]);
           exit(1);
@@ -835,10 +835,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 45 "hello.l"
+#line 45 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 842 "hello.cpp"
+#line 842 "lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1843,7 +1843,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 45 "hello.l"
+#line 45 "lexer.l"
 
 
 #ifdef yyFlexLexer

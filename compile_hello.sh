@@ -1,1 +1,1 @@
-rm hello.cpp && flex -o hello.cpp hello.l && rm hello && c++ hello.cpp -o hello
+rm lexer.cpp && flex -o lexer.cpp lexer.l && rm lexer && c++ lexer.cpp -o lexer
