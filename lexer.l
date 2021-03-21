@@ -43,6 +43,7 @@
 #define T_int_expr 1037
 #define T_float_expr 1038
 #define T_char_expr 1039
+#define T_str_expr 1040
 
 
 %}
@@ -55,7 +56,7 @@ W [ \t\r\n]
 HEX x[0-9A-Fa-f][0-9A-Fa-f]
 ESC_CHAR \\([ntr0\\\'\"]|{HEX})
 SIMPLE_CHAR [^\'\"\x00-\x19\x80-\xff]
-
+CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 
 %%
@@ -104,7 +105,10 @@ SIMPLE_CHAR [^\'\"\x00-\x19\x80-\xff]
 [a-z][A-Za-z_0-9]*   { return T_var; }
 [0-9]+\.[0-9]+([eE][\-+][0-9]+)? { return T_float_expr; }
  
-\'{SIMPLE_CHAR}\'|\'{ESC_CHAR}\' { return T_char_expr; }
+\'{CHAR}\' { return T_char_expr; }
+
+\"{CHAR}*\" { return T_str_expr; }
+
 
 {D}+                {return T_int_expr; }
 
