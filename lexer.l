@@ -138,13 +138,17 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 "!=" { return T_diff_op; }
 ":=" { return T_assign_op; }
 
-\-\-.*\n  { /* nothing' */ }
+\-\-.*  { /* nothing' */ }
+
 
 [()\[\],:=|+\-*\/!;<>]  { return yytext[0]; }
 
 {W}+    { /* nothing */ }
 
 \(\*([^*]+|\*+[^*)])*\*+\)  { /* nothing' */ }
+
+
+
 
 . {  fprintf(stderr, "Illegal character with code %d", yytext[0]); exit(1); }
 
