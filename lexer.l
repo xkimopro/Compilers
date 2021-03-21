@@ -45,6 +45,20 @@
 #define T_char_expr 1039
 #define T_str_expr 1040
 
+#define T_arrow_op 1041
+#define T_plus_op 1042
+#define T_minus_op 1043
+#define T_mult_op 1044
+#define T_div_op 1045
+#define T_pow_op 1046
+#define T_and_op 1047
+#define T_or_op 1048
+#define T_struct_diff_op 1049
+#define T_leq_op 1050
+#define T_geq_op 1051
+#define T_eq_op 1052
+#define T_diff_op 1053
+#define T_assign_op 1054
 
 %}
 
@@ -60,8 +74,6 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 
 %%
-
-
 
 
 
@@ -109,15 +121,30 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 \"{CHAR}*\" { return T_str_expr; }
 
-
 {D}+                {return T_int_expr; }
 
-[()+\-/%*=]   { return yytext[0]; }
+"->"  {return T_arrow_op; }
+"+."  {return T_plus_op; }
+"-."  {return T_minus_op; }
+"*."  {return T_mult_op; }
+"/."  {return T_div_op; }
+"**"  {return T_pow_op; }
+"&&"  {return T_and_op; }
+"||" { return T_or_op; }
+"<>" { return T_struct_diff_op; }
+"<=" { return T_leq_op; }
+">=" { return T_geq_op; }
+"==" { return T_eq_op; }
+"!=" { return T_diff_op; }
+":=" { return T_assign_op; }
+
+\-\-.*\n  { /* nothing' */ }
+
+[()\[\],:=|+\-*\/!;<>]  { return yytext[0]; }
 
 {W}+    { /* nothing */ }
 
-
-\-\-.*\n  { /* nothing' */ }
+\(\*([^*]+|\*+[^*)])*\*+\)  { /* nothing' */ }
 
 . {  fprintf(stderr, "Illegal character with code %d", yytext[0]); exit(1); }
 
