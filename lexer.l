@@ -76,7 +76,6 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 %%
 
 
-
 "and"   { return T_and; }
 "dim" { return T_dim; }
 "false"   { return T_false; }
@@ -112,7 +111,6 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 "not"    { return T_not; }
 "true"  { return T_true; }
 
-
 [A-Z][A-Za-z_0-9]* { return T_constr; }
 [a-z][A-Za-z_0-9]*   { return T_var; }
 [0-9]+\.[0-9]+([eE][\-+][0-9]+)? { return T_float_expr; }
@@ -140,15 +138,11 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 \-\-.*  { /* nothing' */ }
 
-
 [()\[\],:=|+\-*\/!;<>]  { return yytext[0]; }
 
 {W}+    { /* nothing */ }
 
 \(\*([^*]+|\*+[^*)])*\*+\)  { /* nothing' */ }
-
-
-
 
 . {  fprintf(stderr, "Illegal character with code %d", yytext[0]); exit(1); }
 
