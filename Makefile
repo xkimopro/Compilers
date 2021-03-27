@@ -9,6 +9,5 @@ lexer.cpp: lexer.l
 lexer: lexer.cpp 
 	c++ lexer.cpp -o lexer
 
-
 clean:
 	$(RM) lexer.cpp lexer

@@ -1,4 +1,5 @@
 %option noyywrap
+%x COMMENT
 
 %{
 
@@ -60,13 +61,16 @@
 #define T_diff_op 1053
 #define T_assign_op 1054
 
+int lineno = 1;
+int commentno = 0;
+
 %}
 
 
 l [a-z]
 L [A-Z]
 D [0-9]
-W [ \t\r\n]
+W [ \t\r]
 HEX x[0-9A-Fa-f][0-9A-Fa-f]
 ESC_CHAR \\([ntr0\\\'\"]|{HEX})
 SIMPLE_CHAR [^\'\"\x00-\x19\x80-\xff]
@@ -74,7 +78,6 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 
 %%
-
 
 "and"   { return T_and; }
 "dim" { return T_dim; }
@@ -138,13 +141,19 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 \-\-.*  { /* nothing' */ }
 
+"(*"  { BEGIN(COMMENT); commentno++; }
+<COMMENT>"(*"  { commentno++; }
+<COMMENT>"*)" { if (--commentno <= 0) BEGIN(INITIAL); }
+<COMMENT>\n { lineno++; }
+<COMMENT>"*"  { /* nothing */ }
+<COMMENT>[^*\n]  { /* nothing */ }
+
 [()\[\],:=|+\-*\/!;<>]  { return yytext[0]; }
 
 {W}+    { /* nothing */ }
+\n  { lineno++; }
 
-\(\*([^*]+|\*+[^*)])*\*+\)  { /* nothing' */ }
-
-. {  fprintf(stderr, "Illegal character with code %d", yytext[0]); exit(1); }
+. {  fprintf(stderr, "Illegal character with code '%c' (ASCII: %d) at line %d\n", yytext[0], yytext[0], lineno); exit(1); }
 
 
 %%
@@ -165,5 +174,6 @@ int main () {
     token = yylex();
     printf("token=%d, lexeme=\"%s\"\n", token, yytext);
   } while (token != T_eof);
+  if (commentno) printf("error\n");
 }
 #endif

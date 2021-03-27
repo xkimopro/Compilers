@@ -4,7 +4,7 @@ let main =
         print_string source;
         print_string " to ";
         print_string target;    (*
-        aosdasdioasd daijsdjjo ***( XASD
+        aosdasdioasd daijsdjjo (* djshkldfj(**)*)
         ajsdiajsdi
         *)
         print_string "\n" in
@@ -17,4 +17,4 @@ let rec hanoi rings source target auxil =
     end in
 print_string "Please, give the number of rings: ";
 let n = read_int () in
-hanoi n "left" "right" "middle"  --iXXXu\xFF ""as' 
+hanoi n "left" "right" "middle"  --iXXXu\xFF ""as'
