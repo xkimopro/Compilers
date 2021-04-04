@@ -1039,12 +1039,12 @@ YY_RULE_SETUP
 case 35:
 YY_RULE_SETUP
 #line 65 "lexer.l"
-{ return T_constr; }
+{ return T_Id; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 66 "lexer.l"
-{ return T_var; }
+{ return T_id; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP

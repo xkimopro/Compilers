@@ -62,8 +62,8 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 "not"    { return T_not; }
 "true"  { return T_true; }
 
-[A-Z][A-Za-z_0-9]* { return T_constr; }
-[a-z][A-Za-z_0-9]*   { return T_var; }
+[A-Z][A-Za-z_0-9]* { return T_Id; }
+[a-z][A-Za-z_0-9]*   { return T_id; }
 [0-9]+\.[0-9]+([eE][\-+][0-9]+)? { return T_float_expr; }
  
 \'{CHAR}\' { return T_char_expr; }

@@ -83,8 +83,8 @@ extern int yydebug;
     T_int = 289,
     T_not = 290,
     T_true = 291,
-    T_constr = 292,
-    T_var = 293,
+    T_Id = 292,
+    T_id = 293,
     T_int_expr = 294,
     T_float_expr = 295,
     T_char_expr = 296,
@@ -102,7 +102,16 @@ extern int yydebug;
     T_geq_op = 308,
     T_eq_op = 309,
     T_diff_op = 310,
-    T_assign_op = 311
+    T_assign_op = 311,
+    T_pow = 312,
+    PLUS_UNOP = 313,
+    MINUS_UNOP = 314,
+    PLUS_DOT_UNOP = 315,
+    MINUS_DOT_UNOP = 316,
+    FUNC_CALL = 317,
+    ARRAY_ELEM = 318,
+    LET_IN = 319,
+    IF_THEN_ELSE = 320
   };
 #endif
 
