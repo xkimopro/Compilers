@@ -3,6 +3,13 @@ Terminals unused in grammar
     T_pow
 
 
+Rules useless in parser due to conflicts
+
+   74 comma_expr_list: %empty
+   75                | comma_expr_list ',' expr
+
+
+State 66 conflicts: 2 reduce/reduce
 State 88 conflicts: 1 shift/reduce
 State 89 conflicts: 24 shift/reduce
 State 91 conflicts: 16 shift/reduce
@@ -10,11 +17,13 @@ State 119 conflicts: 22 shift/reduce
 State 125 conflicts: 2 shift/reduce
 State 128 conflicts: 2 shift/reduce
 State 135 conflicts: 22 shift/reduce
-State 138 conflicts: 22 shift/reduce
+State 136 conflicts: 2 reduce/reduce
+State 138 conflicts: 1 shift/reduce
 State 141 conflicts: 22 shift/reduce
-State 163 conflicts: 23 shift/reduce
+State 163 conflicts: 2 shift/reduce
+State 166 conflicts: 2 reduce/reduce
 State 170 conflicts: 12 shift/reduce
-State 193 conflicts: 22 shift/reduce
+State 193 conflicts: 1 shift/reduce
 State 194 conflicts: 2 shift/reduce
 
 
@@ -115,78 +124,81 @@ Grammar
    72 expr_list: %empty
    73          | expr_list expr
 
-   74 unop: '+'
-   75     | '-'
-   76     | T_plus_op
-   77     | T_minus_op
-   78     | '!'
-   79     | T_not
+   74 comma_expr_list: %empty
+   75                | comma_expr_list ',' expr
 
-   80 binop: '+'
-   81      | '-'
-   82      | '*'
-   83      | '/'
-   84      | T_plus_op
-   85      | T_minus_op
-   86      | T_mult_op
-   87      | T_div_op
-   88      | T_mod
-   89      | T_pow_op
-   90      | '='
-   91      | T_struct_diff_op
-   92      | '<'
-   93      | '>'
-   94      | T_leq_op
-   95      | T_geq_op
-   96      | T_eq_op
-   97      | T_diff_op
-   98      | T_and_op
-   99      | T_or_op
-  100      | ';'
-  101      | T_assign_op
+   76 unop: '+'
+   77     | '-'
+   78     | T_plus_op
+   79     | T_minus_op
+   80     | '!'
+   81     | T_not
 
-  102 clause: pattern T_arrow_op expr
+   82 binop: '+'
+   83      | '-'
+   84      | '*'
+   85      | '/'
+   86      | T_plus_op
+   87      | T_minus_op
+   88      | T_mult_op
+   89      | T_div_op
+   90      | T_mod
+   91      | T_pow_op
+   92      | '='
+   93      | T_struct_diff_op
+   94      | '<'
+   95      | '>'
+   96      | T_leq_op
+   97      | T_geq_op
+   98      | T_eq_op
+   99      | T_diff_op
+  100      | T_and_op
+  101      | T_or_op
+  102      | ';'
+  103      | T_assign_op
 
-  103 pattern: T_int_expr
-  104        | '+' T_int_expr
-  105        | '-' T_int_expr
-  106        | T_float_expr
-  107        | T_plus_op T_float_expr
-  108        | T_minus_op T_float_expr
-  109        | T_char_expr
-  110        | T_true
-  111        | T_false
-  112        | T_id
-  113        | '(' pattern ')'
-  114        | T_Id pattern_list
+  104 clause: pattern T_arrow_op expr
 
-  115 pattern_list: %empty
-  116             | pattern_list pattern
+  105 pattern: T_int_expr
+  106        | '+' T_int_expr
+  107        | '-' T_int_expr
+  108        | T_float_expr
+  109        | T_plus_op T_float_expr
+  110        | T_minus_op T_float_expr
+  111        | T_char_expr
+  112        | T_true
+  113        | T_false
+  114        | T_id
+  115        | '(' pattern ')'
+  116        | T_Id pattern_list
+
+  117 pattern_list: %empty
+  118             | pattern_list pattern
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '!' (33) 78
-    '(' (40) 29 37 51 52 113
-    ')' (41) 29 37 51 52 113
-    '*' (42) 41 44 82
-    '+' (43) 74 80 104
-    ',' (44) 17 44
-    '-' (45) 75 81 105
-    '/' (47) 83
+    '!' (33) 80
+    '(' (40) 29 37 51 52 115
+    ')' (41) 29 37 51 52 115
+    '*' (42) 41 44 84
+    '+' (43) 76 82 106
+    ',' (44) 17 44 75
+    '-' (45) 77 83 107
+    '/' (47) 85
     ':' (58) 11 14 15 29
-    ';' (59) 100
-    '<' (60) 92
-    '=' (61) 10 11 21 67 68 90
-    '>' (62) 93
+    ';' (59) 102
+    '<' (60) 94
+    '=' (61) 10 11 21 67 68 92
+    '>' (62) 95
     '[' (91) 13 15 41 57
     ']' (93) 13 15 41 57
     '|' (124) 23 71
     error (256)
     T_and (258) 9 20
     T_dim (259) 58 59
-    T_false (260) 50 111
+    T_false (260) 50 113
     T_let (261) 6 7
     T_of (262) 25 40 41
     T_type (263) 18
@@ -199,7 +211,7 @@ Terminals, with rules where they appear
     T_begin (270) 63
     T_done (271) 66 67 68
     T_for (272) 67 68
-    T_mod (273) 88
+    T_mod (273) 90
     T_ref (274) 39
     T_while (275) 66
     T_bool (276) 35
@@ -216,37 +228,37 @@ Terminals, with rules where they appear
     T_delete (287) 61
     T_end (288) 63 69
     T_int (289) 33
-    T_not (290) 79
-    T_true (291) 49 110
-    T_Id (292) 24 25 56 114
-    T_id (293) 10 11 12 13 14 15 21 28 29 42 55 57 58 59 67 68 112
-    T_int_expr (294) 45 59 103 104 105
-    T_float_expr (295) 46 106 107 108
-    T_char_expr (296) 47 109
+    T_not (290) 81
+    T_true (291) 49 112
+    T_Id (292) 24 25 56 116
+    T_id (293) 10 11 12 13 14 15 21 28 29 42 55 57 58 59 67 68 114
+    T_int_expr (294) 45 59 105 106 107
+    T_float_expr (295) 46 108 109 110
+    T_char_expr (296) 47 111
     T_str_expr (297) 48
-    T_arrow_op (298) 38 102
-    T_plus_op (299) 76 84 107
-    T_minus_op (300) 77 85 108
-    T_mult_op (301) 86
-    T_div_op (302) 87
-    T_pow_op (303) 89
-    T_and_op (304) 98
-    T_or_op (305) 99
-    T_struct_diff_op (306) 91
-    T_leq_op (307) 94
-    T_geq_op (308) 95
-    T_eq_op (309) 96
-    T_diff_op (310) 97
-    T_assign_op (311) 101
-    T_pow (312)
-    PLUS_UNOP (313)
-    MINUS_UNOP (314)
-    PLUS_DOT_UNOP (315)
-    MINUS_DOT_UNOP (316)
-    FUNC_CALL (317)
-    ARRAY_ELEM (318)
-    LET_IN (319)
-    IF_THEN_ELSE (320)
+    T_arrow_op (298) 38 104
+    T_plus_op (299) 78 86 109
+    T_minus_op (300) 79 87 110
+    T_mult_op (301) 88
+    T_div_op (302) 89
+    T_pow_op (303) 91
+    T_and_op (304) 100
+    T_or_op (305) 101
+    T_struct_diff_op (306) 93
+    T_leq_op (307) 96
+    T_geq_op (308) 97
+    T_eq_op (309) 98
+    T_diff_op (310) 99
+    T_assign_op (311) 103
+    LET_IN (312)
+    IF_THEN_ELSE (313)
+    T_pow (314)
+    PLUS_UNOP (315)
+    MINUS_UNOP (316)
+    PLUS_DOT_UNOP (317)
+    MINUS_DOT_UNOP (318)
+    FUN_CALL (319)
+    ARRAY_ELEM (320)
 
 
 Nonterminals, with rules where they appear
@@ -272,8 +284,8 @@ Nonterminals, with rules where they appear
         on left: 10 11 12 13 14 15
         on right: 6 7 9
     comma_expr_list (89)
-        on left: 16 17
-        on right: 13 15 17 57
+        on left: 16 17 74 75
+        on right: 13 15 17 57 75
     typedef (90)
         on left: 18
         on right: 5
@@ -306,7 +318,7 @@ Nonterminals, with rules where they appear
         on right: 41 44
     expr (100)
         on left: 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69
-        on right: 10 11 13 15 17 52 53 54 57 61 62 63 64 65 66 67 68 69 73 102
+        on right: 10 11 13 15 17 52 53 54 57 61 62 63 64 65 66 67 68 69 73 75 104
     or_clause_list (101)
         on left: 70 71
         on right: 69 71
@@ -314,20 +326,20 @@ Nonterminals, with rules where they appear
         on left: 72 73
         on right: 55 56 73
     unop (103)
-        on left: 74 75 76 77 78 79
+        on left: 76 77 78 79 80 81
         on right: 53
     binop (104)
-        on left: 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101
+        on left: 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103
         on right: 54
     clause (105)
-        on left: 102
+        on left: 104
         on right: 69 71
     pattern (106)
-        on left: 103 104 105 106 107 108 109 110 111 112 113 114
-        on right: 102 113 116
+        on left: 105 106 107 108 109 110 111 112 113 114 115 116
+        on right: 104 115 118
     pattern_list (107)
-        on left: 115 116
-        on right: 114 116
+        on left: 117 118
+        on right: 116 118
 
 
 State 0
@@ -993,9 +1005,9 @@ State 50
 
 State 51
 
-   79 unop: T_not .
+   81 unop: T_not .
 
-    $default  reduce using rule 79 (unop)
+    $default  reduce using rule 81 (unop)
 
 
 State 52
@@ -1056,37 +1068,37 @@ State 58
 
 State 59
 
-   76 unop: T_plus_op .
+   78 unop: T_plus_op .
 
-    $default  reduce using rule 76 (unop)
+    $default  reduce using rule 78 (unop)
 
 
 State 60
 
-   77 unop: T_minus_op .
+   79 unop: T_minus_op .
 
-    $default  reduce using rule 77 (unop)
+    $default  reduce using rule 79 (unop)
 
 
 State 61
 
-   74 unop: '+' .
+   76 unop: '+' .
 
-    $default  reduce using rule 74 (unop)
+    $default  reduce using rule 76 (unop)
 
 
 State 62
 
-   75 unop: '-' .
+   77 unop: '-' .
 
-    $default  reduce using rule 75 (unop)
+    $default  reduce using rule 77 (unop)
 
 
 State 63
 
-   78 unop: '!' .
+   80 unop: '!' .
 
-    $default  reduce using rule 78 (unop)
+    $default  reduce using rule 80 (unop)
 
 
 State 64
@@ -1161,6 +1173,10 @@ State 66
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
+    ']'       reduce using rule 16 (comma_expr_list)
+    ']'       [reduce using rule 74 (comma_expr_list)]
+    ','       reduce using rule 16 (comma_expr_list)
+    ','       [reduce using rule 74 (comma_expr_list)]
     $default  reduce using rule 16 (comma_expr_list)
 
     comma_expr_list  go to state 117
@@ -1743,156 +1759,156 @@ State 94
 
 State 95
 
-   88 binop: T_mod .
-
-    $default  reduce using rule 88 (binop)
-
-
-State 96
-
-   84 binop: T_plus_op .
-
-    $default  reduce using rule 84 (binop)
-
-
-State 97
-
-   85 binop: T_minus_op .
-
-    $default  reduce using rule 85 (binop)
-
-
-State 98
-
-   86 binop: T_mult_op .
-
-    $default  reduce using rule 86 (binop)
-
-
-State 99
-
-   87 binop: T_div_op .
-
-    $default  reduce using rule 87 (binop)
-
-
-State 100
-
-   89 binop: T_pow_op .
-
-    $default  reduce using rule 89 (binop)
-
-
-State 101
-
-   98 binop: T_and_op .
-
-    $default  reduce using rule 98 (binop)
-
-
-State 102
-
-   99 binop: T_or_op .
-
-    $default  reduce using rule 99 (binop)
-
-
-State 103
-
-   91 binop: T_struct_diff_op .
-
-    $default  reduce using rule 91 (binop)
-
-
-State 104
-
-   94 binop: T_leq_op .
-
-    $default  reduce using rule 94 (binop)
-
-
-State 105
-
-   95 binop: T_geq_op .
-
-    $default  reduce using rule 95 (binop)
-
-
-State 106
-
-   96 binop: T_eq_op .
-
-    $default  reduce using rule 96 (binop)
-
-
-State 107
-
-   97 binop: T_diff_op .
-
-    $default  reduce using rule 97 (binop)
-
-
-State 108
-
-  101 binop: T_assign_op .
-
-    $default  reduce using rule 101 (binop)
-
-
-State 109
-
-  100 binop: ';' .
-
-    $default  reduce using rule 100 (binop)
-
-
-State 110
-
-   90 binop: '=' .
+   90 binop: T_mod .
 
     $default  reduce using rule 90 (binop)
 
 
-State 111
+State 96
 
-   93 binop: '>' .
+   86 binop: T_plus_op .
+
+    $default  reduce using rule 86 (binop)
+
+
+State 97
+
+   87 binop: T_minus_op .
+
+    $default  reduce using rule 87 (binop)
+
+
+State 98
+
+   88 binop: T_mult_op .
+
+    $default  reduce using rule 88 (binop)
+
+
+State 99
+
+   89 binop: T_div_op .
+
+    $default  reduce using rule 89 (binop)
+
+
+State 100
+
+   91 binop: T_pow_op .
+
+    $default  reduce using rule 91 (binop)
+
+
+State 101
+
+  100 binop: T_and_op .
+
+    $default  reduce using rule 100 (binop)
+
+
+State 102
+
+  101 binop: T_or_op .
+
+    $default  reduce using rule 101 (binop)
+
+
+State 103
+
+   93 binop: T_struct_diff_op .
 
     $default  reduce using rule 93 (binop)
 
 
-State 112
+State 104
 
-   92 binop: '<' .
+   96 binop: T_leq_op .
+
+    $default  reduce using rule 96 (binop)
+
+
+State 105
+
+   97 binop: T_geq_op .
+
+    $default  reduce using rule 97 (binop)
+
+
+State 106
+
+   98 binop: T_eq_op .
+
+    $default  reduce using rule 98 (binop)
+
+
+State 107
+
+   99 binop: T_diff_op .
+
+    $default  reduce using rule 99 (binop)
+
+
+State 108
+
+  103 binop: T_assign_op .
+
+    $default  reduce using rule 103 (binop)
+
+
+State 109
+
+  102 binop: ';' .
+
+    $default  reduce using rule 102 (binop)
+
+
+State 110
+
+   92 binop: '=' .
 
     $default  reduce using rule 92 (binop)
 
 
+State 111
+
+   95 binop: '>' .
+
+    $default  reduce using rule 95 (binop)
+
+
+State 112
+
+   94 binop: '<' .
+
+    $default  reduce using rule 94 (binop)
+
+
 State 113
 
-   80 binop: '+' .
-
-    $default  reduce using rule 80 (binop)
-
-
-State 114
-
-   81 binop: '-' .
-
-    $default  reduce using rule 81 (binop)
-
-
-State 115
-
-   82 binop: '*' .
+   82 binop: '+' .
 
     $default  reduce using rule 82 (binop)
 
 
-State 116
+State 114
 
-   83 binop: '/' .
+   83 binop: '-' .
 
     $default  reduce using rule 83 (binop)
+
+
+State 115
+
+   84 binop: '*' .
+
+    $default  reduce using rule 84 (binop)
+
+
+State 116
+
+   85 binop: '/' .
+
+    $default  reduce using rule 85 (binop)
 
 
 State 117
@@ -1900,6 +1916,7 @@ State 117
    13 def: T_mutable T_id '[' expr comma_expr_list . ']'
    15    | T_mutable T_id '[' expr comma_expr_list . ']' ':' type
    17 comma_expr_list: comma_expr_list . ',' expr
+   75                | comma_expr_list . ',' expr
 
     ']'  shift, and go to state 139
     ','  shift, and go to state 140
@@ -2350,6 +2367,10 @@ State 136
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
+    ']'       reduce using rule 16 (comma_expr_list)
+    ']'       [reduce using rule 74 (comma_expr_list)]
+    ','       reduce using rule 16 (comma_expr_list)
+    ','       [reduce using rule 74 (comma_expr_list)]
     $default  reduce using rule 16 (comma_expr_list)
 
     comma_expr_list  go to state 164
@@ -2391,29 +2412,8 @@ State 138
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
-    T_mod             [reduce using rule 62 (expr)]
-    T_plus_op         [reduce using rule 62 (expr)]
-    T_minus_op        [reduce using rule 62 (expr)]
-    T_mult_op         [reduce using rule 62 (expr)]
-    T_div_op          [reduce using rule 62 (expr)]
-    T_pow_op          [reduce using rule 62 (expr)]
-    T_and_op          [reduce using rule 62 (expr)]
-    T_or_op           [reduce using rule 62 (expr)]
-    T_struct_diff_op  [reduce using rule 62 (expr)]
-    T_leq_op          [reduce using rule 62 (expr)]
-    T_geq_op          [reduce using rule 62 (expr)]
-    T_eq_op           [reduce using rule 62 (expr)]
-    T_diff_op         [reduce using rule 62 (expr)]
-    T_assign_op       [reduce using rule 62 (expr)]
-    ';'               [reduce using rule 62 (expr)]
-    '='               [reduce using rule 62 (expr)]
-    '>'               [reduce using rule 62 (expr)]
-    '<'               [reduce using rule 62 (expr)]
-    '+'               [reduce using rule 62 (expr)]
-    '-'               [reduce using rule 62 (expr)]
-    '*'               [reduce using rule 62 (expr)]
-    '/'               [reduce using rule 62 (expr)]
-    $default          reduce using rule 62 (expr)
+    T_pow_op  [reduce using rule 62 (expr)]
+    $default  reduce using rule 62 (expr)
 
     binop  go to state 118
 
@@ -2431,6 +2431,7 @@ State 139
 State 140
 
    17 comma_expr_list: comma_expr_list ',' . expr
+   75                | comma_expr_list ',' . expr
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -2591,86 +2592,86 @@ State 146
 
 State 147
 
-  111 pattern: T_false .
+  113 pattern: T_false .
 
-    $default  reduce using rule 111 (pattern)
+    $default  reduce using rule 113 (pattern)
 
 
 State 148
 
-  110 pattern: T_true .
+  112 pattern: T_true .
 
-    $default  reduce using rule 110 (pattern)
+    $default  reduce using rule 112 (pattern)
 
 
 State 149
 
-  114 pattern: T_Id . pattern_list
+  116 pattern: T_Id . pattern_list
 
-    $default  reduce using rule 115 (pattern_list)
+    $default  reduce using rule 117 (pattern_list)
 
     pattern_list  go to state 170
 
 
 State 150
 
-  112 pattern: T_id .
+  114 pattern: T_id .
 
-    $default  reduce using rule 112 (pattern)
+    $default  reduce using rule 114 (pattern)
 
 
 State 151
 
-  103 pattern: T_int_expr .
+  105 pattern: T_int_expr .
 
-    $default  reduce using rule 103 (pattern)
+    $default  reduce using rule 105 (pattern)
 
 
 State 152
 
-  106 pattern: T_float_expr .
+  108 pattern: T_float_expr .
 
-    $default  reduce using rule 106 (pattern)
+    $default  reduce using rule 108 (pattern)
 
 
 State 153
 
-  109 pattern: T_char_expr .
+  111 pattern: T_char_expr .
 
-    $default  reduce using rule 109 (pattern)
+    $default  reduce using rule 111 (pattern)
 
 
 State 154
 
-  107 pattern: T_plus_op . T_float_expr
+  109 pattern: T_plus_op . T_float_expr
 
     T_float_expr  shift, and go to state 171
 
 
 State 155
 
-  108 pattern: T_minus_op . T_float_expr
+  110 pattern: T_minus_op . T_float_expr
 
     T_float_expr  shift, and go to state 172
 
 
 State 156
 
-  104 pattern: '+' . T_int_expr
+  106 pattern: '+' . T_int_expr
 
     T_int_expr  shift, and go to state 173
 
 
 State 157
 
-  105 pattern: '-' . T_int_expr
+  107 pattern: '-' . T_int_expr
 
     T_int_expr  shift, and go to state 174
 
 
 State 158
 
-  113 pattern: '(' . pattern ')'
+  115 pattern: '(' . pattern ')'
 
     T_false       shift, and go to state 147
     T_true        shift, and go to state 148
@@ -2699,7 +2700,7 @@ State 159
 
 State 160
 
-  102 clause: pattern . T_arrow_op expr
+  104 clause: pattern . T_arrow_op expr
 
     T_arrow_op  shift, and go to state 177
 
@@ -2791,7 +2792,6 @@ State 163
     T_eq_op           shift, and go to state 106
     T_diff_op         shift, and go to state 107
     T_assign_op       shift, and go to state 108
-    ';'               shift, and go to state 109
     '='               shift, and go to state 110
     '>'               shift, and go to state 111
     '<'               shift, and go to state 112
@@ -2800,30 +2800,9 @@ State 163
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
-    T_mod             [reduce using rule 64 (expr)]
-    T_else            [reduce using rule 64 (expr)]
-    T_plus_op         [reduce using rule 64 (expr)]
-    T_minus_op        [reduce using rule 64 (expr)]
-    T_mult_op         [reduce using rule 64 (expr)]
-    T_div_op          [reduce using rule 64 (expr)]
-    T_pow_op          [reduce using rule 64 (expr)]
-    T_and_op          [reduce using rule 64 (expr)]
-    T_or_op           [reduce using rule 64 (expr)]
-    T_struct_diff_op  [reduce using rule 64 (expr)]
-    T_leq_op          [reduce using rule 64 (expr)]
-    T_geq_op          [reduce using rule 64 (expr)]
-    T_eq_op           [reduce using rule 64 (expr)]
-    T_diff_op         [reduce using rule 64 (expr)]
-    T_assign_op       [reduce using rule 64 (expr)]
-    ';'               [reduce using rule 64 (expr)]
-    '='               [reduce using rule 64 (expr)]
-    '>'               [reduce using rule 64 (expr)]
-    '<'               [reduce using rule 64 (expr)]
-    '+'               [reduce using rule 64 (expr)]
-    '-'               [reduce using rule 64 (expr)]
-    '*'               [reduce using rule 64 (expr)]
-    '/'               [reduce using rule 64 (expr)]
-    $default          reduce using rule 64 (expr)
+    T_else    [reduce using rule 64 (expr)]
+    T_pow_op  [reduce using rule 64 (expr)]
+    $default  reduce using rule 64 (expr)
 
     binop  go to state 118
 
@@ -2832,6 +2811,7 @@ State 164
 
    17 comma_expr_list: comma_expr_list . ',' expr
    57 expr: T_id '[' expr comma_expr_list . ']'
+   75 comma_expr_list: comma_expr_list . ',' expr
 
     ']'  shift, and go to state 182
     ','  shift, and go to state 140
@@ -2857,6 +2837,7 @@ State 166
 
    17 comma_expr_list: comma_expr_list ',' expr .
    54 expr: expr . binop expr
+   75 comma_expr_list: comma_expr_list ',' expr .
 
     T_mod             shift, and go to state 95
     T_plus_op         shift, and go to state 96
@@ -2881,6 +2862,10 @@ State 166
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
+    ']'       reduce using rule 17 (comma_expr_list)
+    ']'       [reduce using rule 75 (comma_expr_list)]
+    ','       reduce using rule 17 (comma_expr_list)
+    ','       [reduce using rule 75 (comma_expr_list)]
     $default  reduce using rule 17 (comma_expr_list)
 
     binop  go to state 118
@@ -2909,8 +2894,8 @@ State 169
 
 State 170
 
-  114 pattern: T_Id pattern_list .
-  116 pattern_list: pattern_list . pattern
+  116 pattern: T_Id pattern_list .
+  118 pattern_list: pattern_list . pattern
 
     T_false       shift, and go to state 147
     T_true        shift, and go to state 148
@@ -2925,54 +2910,54 @@ State 170
     '-'           shift, and go to state 157
     '('           shift, and go to state 158
 
-    T_false       [reduce using rule 114 (pattern)]
-    T_true        [reduce using rule 114 (pattern)]
-    T_Id          [reduce using rule 114 (pattern)]
-    T_id          [reduce using rule 114 (pattern)]
-    T_int_expr    [reduce using rule 114 (pattern)]
-    T_float_expr  [reduce using rule 114 (pattern)]
-    T_char_expr   [reduce using rule 114 (pattern)]
-    T_plus_op     [reduce using rule 114 (pattern)]
-    T_minus_op    [reduce using rule 114 (pattern)]
-    '+'           [reduce using rule 114 (pattern)]
-    '-'           [reduce using rule 114 (pattern)]
-    '('           [reduce using rule 114 (pattern)]
-    $default      reduce using rule 114 (pattern)
+    T_false       [reduce using rule 116 (pattern)]
+    T_true        [reduce using rule 116 (pattern)]
+    T_Id          [reduce using rule 116 (pattern)]
+    T_id          [reduce using rule 116 (pattern)]
+    T_int_expr    [reduce using rule 116 (pattern)]
+    T_float_expr  [reduce using rule 116 (pattern)]
+    T_char_expr   [reduce using rule 116 (pattern)]
+    T_plus_op     [reduce using rule 116 (pattern)]
+    T_minus_op    [reduce using rule 116 (pattern)]
+    '+'           [reduce using rule 116 (pattern)]
+    '-'           [reduce using rule 116 (pattern)]
+    '('           [reduce using rule 116 (pattern)]
+    $default      reduce using rule 116 (pattern)
 
     pattern  go to state 186
 
 
 State 171
 
-  107 pattern: T_plus_op T_float_expr .
+  109 pattern: T_plus_op T_float_expr .
 
-    $default  reduce using rule 107 (pattern)
+    $default  reduce using rule 109 (pattern)
 
 
 State 172
 
-  108 pattern: T_minus_op T_float_expr .
+  110 pattern: T_minus_op T_float_expr .
 
-    $default  reduce using rule 108 (pattern)
+    $default  reduce using rule 110 (pattern)
 
 
 State 173
 
-  104 pattern: '+' T_int_expr .
+  106 pattern: '+' T_int_expr .
 
-    $default  reduce using rule 104 (pattern)
+    $default  reduce using rule 106 (pattern)
 
 
 State 174
 
-  105 pattern: '-' T_int_expr .
+  107 pattern: '-' T_int_expr .
 
-    $default  reduce using rule 105 (pattern)
+    $default  reduce using rule 107 (pattern)
 
 
 State 175
 
-  113 pattern: '(' pattern . ')'
+  115 pattern: '(' pattern . ')'
 
     ')'  shift, and go to state 187
 
@@ -2988,7 +2973,7 @@ State 176
 
 State 177
 
-  102 clause: pattern T_arrow_op . expr
+  104 clause: pattern T_arrow_op . expr
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -3173,16 +3158,16 @@ State 185
 
 State 186
 
-  116 pattern_list: pattern_list pattern .
+  118 pattern_list: pattern_list pattern .
 
-    $default  reduce using rule 116 (pattern_list)
+    $default  reduce using rule 118 (pattern_list)
 
 
 State 187
 
-  113 pattern: '(' pattern ')' .
+  115 pattern: '(' pattern ')' .
 
-    $default  reduce using rule 113 (pattern)
+    $default  reduce using rule 115 (pattern)
 
 
 State 188
@@ -3216,7 +3201,7 @@ State 189
 State 190
 
    54 expr: expr . binop expr
-  102 clause: pattern T_arrow_op expr .
+  104 clause: pattern T_arrow_op expr .
 
     T_mod             shift, and go to state 95
     T_plus_op         shift, and go to state 96
@@ -3241,7 +3226,7 @@ State 190
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
-    $default  reduce using rule 102 (clause)
+    $default  reduce using rule 104 (clause)
 
     binop  go to state 118
 
@@ -3329,7 +3314,6 @@ State 193
     T_eq_op           shift, and go to state 106
     T_diff_op         shift, and go to state 107
     T_assign_op       shift, and go to state 108
-    ';'               shift, and go to state 109
     '='               shift, and go to state 110
     '>'               shift, and go to state 111
     '<'               shift, and go to state 112
@@ -3338,29 +3322,8 @@ State 193
     '*'               shift, and go to state 115
     '/'               shift, and go to state 116
 
-    T_mod             [reduce using rule 65 (expr)]
-    T_plus_op         [reduce using rule 65 (expr)]
-    T_minus_op        [reduce using rule 65 (expr)]
-    T_mult_op         [reduce using rule 65 (expr)]
-    T_div_op          [reduce using rule 65 (expr)]
-    T_pow_op          [reduce using rule 65 (expr)]
-    T_and_op          [reduce using rule 65 (expr)]
-    T_or_op           [reduce using rule 65 (expr)]
-    T_struct_diff_op  [reduce using rule 65 (expr)]
-    T_leq_op          [reduce using rule 65 (expr)]
-    T_geq_op          [reduce using rule 65 (expr)]
-    T_eq_op           [reduce using rule 65 (expr)]
-    T_diff_op         [reduce using rule 65 (expr)]
-    T_assign_op       [reduce using rule 65 (expr)]
-    ';'               [reduce using rule 65 (expr)]
-    '='               [reduce using rule 65 (expr)]
-    '>'               [reduce using rule 65 (expr)]
-    '<'               [reduce using rule 65 (expr)]
-    '+'               [reduce using rule 65 (expr)]
-    '-'               [reduce using rule 65 (expr)]
-    '*'               [reduce using rule 65 (expr)]
-    '/'               [reduce using rule 65 (expr)]
-    $default          reduce using rule 65 (expr)
+    T_pow_op  [reduce using rule 65 (expr)]
+    $default  reduce using rule 65 (expr)
 
     binop  go to state 118
 

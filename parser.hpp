@@ -103,15 +103,15 @@ extern int yydebug;
     T_eq_op = 309,
     T_diff_op = 310,
     T_assign_op = 311,
-    T_pow = 312,
-    PLUS_UNOP = 313,
-    MINUS_UNOP = 314,
-    PLUS_DOT_UNOP = 315,
-    MINUS_DOT_UNOP = 316,
-    FUNC_CALL = 317,
-    ARRAY_ELEM = 318,
-    LET_IN = 319,
-    IF_THEN_ELSE = 320
+    LET_IN = 312,
+    IF_THEN_ELSE = 313,
+    T_pow = 314,
+    PLUS_UNOP = 315,
+    MINUS_UNOP = 316,
+    PLUS_DOT_UNOP = 317,
+    MINUS_DOT_UNOP = 318,
+    FUN_CALL = 319,
+    ARRAY_ELEM = 320
   };
 #endif
 

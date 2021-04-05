@@ -10,7 +10,7 @@ else loop (i+2)
 else
 true in
 loop 3
-
+--pairnei to let san parametro
 let main =
 print_string "Please, give the upper limit: ";
 let limit = read_int () in

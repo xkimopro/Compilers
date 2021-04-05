@@ -69,11 +69,10 @@
 %left '*' '/' T_mult_op T_div_op T_mod
 %right T_pow
 %nonassoc PLUS_UNOP MINUS_UNOP PLUS_DOT_UNOP MINUS_DOT_UNOP T_not T_delete
-%nonassoc FUNC_CALL
+%nonassoc FUN_CALL
 %nonassoc '!'
 %nonassoc ARRAY_ELEM
 %nonassoc T_new
-
 
 %%
 
@@ -87,7 +86,7 @@ stmt_list:
 ;
 
 stmt:
-  letdef
+  letdef {printf("letdef");}
 | typedef
 ;
 
@@ -180,7 +179,7 @@ expr:
 | '(' expr ')'
 | unop expr
 | expr binop expr
-| T_id expr_list %prec FUNC_CALL
+| T_id expr_list %prec FUN_CALL {printf("func");}
 | T_Id expr_list
 | T_id '[' expr comma_expr_list ']' %prec ARRAY_ELEM
 | T_dim T_id
@@ -197,15 +196,19 @@ expr:
 | T_match expr T_with clause or_clause_list T_end
 ;
 
-
 or_clause_list:
  %empty
 | or_clause_list '|' clause
 ;
 
 expr_list:
-  %empty
-| expr_list expr
+  %empty {printf("expr");}
+| expr_list expr {printf("expr");}
+;
+
+comma_expr_list:
+%empty
+| comma_expr_list ',' expr
 ;
 
 unop:
