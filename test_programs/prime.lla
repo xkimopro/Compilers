@@ -1,4 +1,4 @@
-let rec prime n =
+let rec prime n = 
 if n < 0 then prime (-n)
 else if n < 2 then false
 else if n = 2 then true
@@ -9,8 +9,8 @@ if n mod i = 0 then false
 else loop (i+2)
 else
 true in
-loop 3
---pairnei to let san parametro
+loop 3 
+
 let main =
 print_string "Please, give the upper limit: ";
 let limit = read_int () in

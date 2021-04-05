@@ -58,7 +58,11 @@
 %token T_diff_op
 %token T_assign_op
 
+
+
+
 %nonassoc LET_IN
+%nonassoc LET_DEF
 %left ';'
 %nonassoc IF_THEN_ELSE
 %nonassoc T_assign_op
@@ -67,7 +71,7 @@
 %nonassoc '=' T_struct_diff_op '>' '<' T_leq_op T_geq_op T_eq_op T_diff_op
 %left '+' '-' T_plus_op T_minus_op
 %left '*' '/' T_mult_op T_div_op T_mod
-%right T_pow
+%right T_pow // To be fixed
 %nonassoc PLUS_UNOP MINUS_UNOP PLUS_DOT_UNOP MINUS_DOT_UNOP T_not T_delete
 %nonassoc FUN_CALL
 %nonassoc '!'
@@ -91,8 +95,8 @@ stmt:
 ;
 
 letdef:
- T_let def and_def_list
-| T_let T_rec def and_def_list
+ T_let def and_def_list %prec LET_DEF
+| T_let T_rec def and_def_list %prec LET_DEF
 ;
 
 and_def_list:
@@ -173,14 +177,14 @@ expr:
 | T_float_expr
 | T_char_expr
 | T_str_expr
-| T_true
+| T_true      
 | T_false
 | '(' ')'
 | '(' expr ')'
 | unop expr
 | expr binop expr
 | T_id expr_list %prec FUN_CALL {printf("func");}
-| T_Id expr_list
+| T_Id expr_list 
 | T_id '[' expr comma_expr_list ']' %prec ARRAY_ELEM
 | T_dim T_id
 | T_dim T_int_expr T_id
@@ -206,10 +210,6 @@ expr_list:
 | expr_list expr {printf("expr");}
 ;
 
-comma_expr_list:
-%empty
-| comma_expr_list ',' expr
-;
 
 unop:
  '+' %prec PLUS_UNOP
