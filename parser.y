@@ -61,8 +61,9 @@
 
 
 
+%right T_arrow_op
+
 %nonassoc LET_IN
-%nonassoc LET_DEF
 %left ';'
 %nonassoc IF_THEN_ELSE
 %nonassoc T_assign_op
@@ -71,6 +72,7 @@
 %nonassoc '=' T_struct_diff_op '>' '<' T_leq_op T_geq_op T_eq_op T_diff_op
 %left '+' '-' T_plus_op T_minus_op
 %left '*' '/' T_mult_op T_div_op T_mod
+%left BINOP
 %right T_pow // To be fixed
 %nonassoc PLUS_UNOP MINUS_UNOP PLUS_DOT_UNOP MINUS_DOT_UNOP T_not T_delete
 %nonassoc FUN_CALL
@@ -95,8 +97,8 @@ stmt:
 ;
 
 letdef:
- T_let def and_def_list %prec LET_DEF
-| T_let T_rec def and_def_list %prec LET_DEF
+ T_let def and_def_list
+| T_let T_rec def and_def_list
 ;
 
 and_def_list:
@@ -173,20 +175,59 @@ comma_star_list:
 ;
 
 expr:
-  _expr
-| unop expr
-| expr binop expr
-| T_id expr_list %prec FUN_CALL {printf("func");}
-| T_Id expr_list
-| T_delete expr
-| letdef T_in expr %prec LET_IN
-| T_begin expr T_end
-| T_if expr T_then expr %prec IF_THEN_ELSE
-| T_if expr T_then expr T_else expr %prec IF_THEN_ELSE
+  expr6
+| letdef T_in expr                            %prec LET_IN
 | T_while expr T_do expr T_done
 | T_for T_id '=' expr T_to expr T_do expr T_done
 | T_for T_id '=' expr T_downto expr T_do expr T_done
 | T_match expr T_with clause or_clause_list T_end
+;
+
+expr1:
+  T_int_expr
+| T_float_expr
+| T_char_expr
+| T_str_expr
+| T_true
+| T_false
+| '(' ')'
+| '(' expr ')'
+| T_begin expr T_end
+| T_id '[' expr comma_expr_list ']' %prec ARRAY_ELEM
+| T_dim T_id
+| T_dim T_int_expr T_id
+| T_new type
+| T_id
+| T_Id
+| '!' expr1
+;
+
+expr2:
+  expr1
+| T_id expr1 expr_list %prec FUN_CALL {printf("func");}
+| T_Id expr1 expr_list
+;
+
+expr3:
+  expr2
+| unop expr2
+| T_delete expr2
+;
+
+expr4:
+  expr3
+| expr4 binop expr4 %prec BINOP
+;
+
+expr5:
+  expr4
+| T_if expr5 T_then expr                       %prec IF_THEN_ELSE
+| T_if expr5 T_then expr T_else expr         %prec IF_THEN_ELSE
+;
+
+expr6:
+  expr5
+| expr ';' expr
 ;
 
 or_clause_list:
@@ -196,25 +237,7 @@ or_clause_list:
 
 expr_list:
   %empty {printf("expr");}
-| expr_list _expr {printf("expr");}
-;
-
-_expr:
-  T_int_expr
-| T_float_expr
-| T_char_expr
-| T_str_expr
-| T_true
-| T_false
-| '(' ')'
-| '(' expr ')'
-| T_id '[' expr comma_expr_list ']' %prec ARRAY_ELEM
-| T_dim T_id
-| T_dim T_int_expr T_id
-| T_new type
-| T_id
-| T_Id
-| '!' _expr
+| expr_list expr1 {printf("expr");}
 ;
 
 unop:
@@ -246,7 +269,6 @@ binop:
 | T_diff_op
 | T_and_op
 | T_or_op
-| ';'
 | T_assign_op
 ;
 

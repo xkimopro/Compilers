@@ -109,8 +109,8 @@ extern int yydebug;
     T_diff_op = 310,               /* T_diff_op  */
     T_assign_op = 311,             /* T_assign_op  */
     LET_IN = 312,                  /* LET_IN  */
-    LET_DEF = 313,                 /* LET_DEF  */
-    IF_THEN_ELSE = 314,            /* IF_THEN_ELSE  */
+    IF_THEN_ELSE = 313,            /* IF_THEN_ELSE  */
+    BINOP = 314,                   /* BINOP  */
     T_pow = 315,                   /* T_pow  */
     PLUS_UNOP = 316,               /* PLUS_UNOP  */
     MINUS_UNOP = 317,              /* MINUS_UNOP  */
