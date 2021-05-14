@@ -63,21 +63,20 @@
 
 %right T_arrow_op
 
-%nonassoc LET_IN
+//%nonassoc LET_IN
 %left ';'
-%nonassoc IF_THEN_ELSE
+//%nonassoc IF_THEN_ELSE
 %nonassoc T_assign_op
 %left T_or_op
 %left T_and_op
 %nonassoc '=' T_struct_diff_op '>' '<' T_leq_op T_geq_op T_eq_op T_diff_op
 %left '+' '-' T_plus_op T_minus_op
 %left '*' '/' T_mult_op T_div_op T_mod
-%left BINOP
-%right T_pow // To be fixed
+%right T_pow_op
 %nonassoc PLUS_UNOP MINUS_UNOP PLUS_DOT_UNOP MINUS_DOT_UNOP T_not T_delete
-%nonassoc FUN_CALL
+%left T_of T_array T_Id T_ref
 %nonassoc '!'
-%nonassoc ARRAY_ELEM
+//%nonassoc ARRAY_ELEM
 %nonassoc T_new
 
 %%
@@ -216,12 +215,32 @@ expr3:
 
 expr4:
   expr3
-| expr4 binop expr4 %prec BINOP
+| expr4 '+' expr4
+| expr4 '-' expr4
+| expr4 '*' expr4
+| expr4 '/' expr4
+| expr4 T_plus_op expr4
+| expr4 T_minus_op expr4
+| expr4 T_mult_op expr4
+| expr4 T_div_op expr4
+| expr4 T_mod expr4
+| expr4 T_pow_op expr4
+| expr4 '=' expr4
+| expr4 T_struct_diff_op expr4
+| expr4 '<' expr4
+| expr4 '>' expr4
+| expr4 T_leq_op expr4
+| expr4 T_geq_op expr4
+| expr4 T_eq_op expr4
+| expr4 T_diff_op expr4
+| expr4 T_and_op expr4
+| expr4 T_or_op expr4
+| expr4 T_assign_op expr4
 ;
 
 expr5:
   expr4
-| T_if expr5 T_then expr                       %prec IF_THEN_ELSE
+| T_if expr5 T_then expr                     %prec IF_THEN_ELSE
 | T_if expr5 T_then expr T_else expr         %prec IF_THEN_ELSE
 ;
 
@@ -246,30 +265,6 @@ unop:
 | T_plus_op %prec PLUS_DOT_UNOP
 | T_minus_op %prec MINUS_DOT_UNOP
 | T_not
-;
-
-binop:
- '+'
-| '-'
-| '*'
-| '/'
-| T_plus_op
-| T_minus_op
-| T_mult_op
-| T_div_op
-| T_mod
-| T_pow_op
-| '='
-| T_struct_diff_op
-| '<'
-| '>'
-| T_leq_op
-| T_geq_op
-| T_eq_op
-| T_diff_op
-| T_and_op
-| T_or_op
-| T_assign_op
 ;
 
 clause:
