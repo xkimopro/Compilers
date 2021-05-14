@@ -61,11 +61,9 @@
 
 
 
-%right T_arrow_op
-
-//%nonassoc LET_IN
+%nonassoc LET_IN
 %left ';'
-//%nonassoc IF_THEN_ELSE
+%nonassoc IF_THEN_ELSE
 %nonassoc T_assign_op
 %left T_or_op
 %left T_and_op
@@ -74,9 +72,9 @@
 %left '*' '/' T_mult_op T_div_op T_mod
 %right T_pow_op
 %nonassoc PLUS_UNOP MINUS_UNOP PLUS_DOT_UNOP MINUS_DOT_UNOP T_not T_delete
-%left T_of T_array T_Id T_ref
+%right T_arrow_op
+//%left T_of T_array T_Id T_ref
 %nonassoc '!'
-//%nonassoc ARRAY_ELEM
 %nonassoc T_new
 
 %%
@@ -96,7 +94,7 @@ stmt:
 ;
 
 letdef:
- T_let def and_def_list
+  T_let def and_def_list
 | T_let T_rec def and_def_list
 ;
 
@@ -106,7 +104,7 @@ and_def_list:
 ;
 
 def:
- T_id par_list '=' expr
+  T_id par_list '=' expr
 | T_id par_list ':' type '=' expr
 | T_mutable T_id
 | T_mutable T_id '[' expr comma_expr_list ']'
@@ -120,7 +118,7 @@ comma_expr_list:
 ;
 
 typedef:
- T_type tdef and_tdef_list
+  T_type tdef and_tdef_list
 ;
 
 and_tdef_list:
@@ -128,14 +126,16 @@ and_tdef_list:
 | and_tdef_list T_and tdef
 ;
 
-tdef: T_id '=' constr constr_list;
+tdef:
+  T_id '=' constr constr_list;
 
 constr_list:
   %empty
-| constr_list '|' constr 
+| constr_list '|' constr
 ;
 
-constr: T_Id 
+constr:
+  T_Id 
 | T_Id T_of constr_type_list
 ;
 
@@ -155,7 +155,7 @@ par_list:
 ;
 
 type:
- T_unit
+  T_unit
 | T_int
 | T_char
 | T_bool
@@ -192,7 +192,7 @@ expr1:
 | '(' ')'
 | '(' expr ')'
 | T_begin expr T_end
-| T_id '[' expr comma_expr_list ']' %prec ARRAY_ELEM
+| T_id '[' expr comma_expr_list ']'
 | T_dim T_id
 | T_dim T_int_expr T_id
 | T_new type
@@ -203,7 +203,7 @@ expr1:
 
 expr2:
   expr1
-| T_id expr1 expr_list %prec FUN_CALL {printf("func");}
+| T_id expr1 expr_list {printf("func");}
 | T_Id expr1 expr_list
 ;
 
@@ -250,7 +250,7 @@ expr6:
 ;
 
 or_clause_list:
- %empty
+  %empty
 | or_clause_list '|' clause
 ;
 
@@ -260,7 +260,7 @@ expr_list:
 ;
 
 unop:
- '+' %prec PLUS_UNOP
+  '+' %prec PLUS_UNOP
 | '-' %prec MINUS_UNOP
 | T_plus_op %prec PLUS_DOT_UNOP
 | T_minus_op %prec MINUS_DOT_UNOP
@@ -268,11 +268,11 @@ unop:
 ;
 
 clause:
- pattern T_arrow_op expr
+  pattern T_arrow_op expr
 ;
 
 pattern:
- T_int_expr
+  T_int_expr
 | '+' T_int_expr
 | '-' T_int_expr
 | T_float_expr
@@ -287,7 +287,7 @@ pattern:
 ;
 
 pattern_list:
- %empty
+  %empty
 | pattern_list pattern
 ;
 
