@@ -109,11 +109,7 @@ extern int yydebug;
     T_diff_op = 310,               /* T_diff_op  */
     T_assign_op = 311,             /* T_assign_op  */
     LET_IN = 312,                  /* LET_IN  */
-    IF_THEN_ELSE = 313,            /* IF_THEN_ELSE  */
-    PLUS_UNOP = 314,               /* PLUS_UNOP  */
-    MINUS_UNOP = 315,              /* MINUS_UNOP  */
-    PLUS_DOT_UNOP = 316,           /* PLUS_DOT_UNOP  */
-    MINUS_DOT_UNOP = 317           /* MINUS_DOT_UNOP  */
+    IF_THEN_ELSE = 313             /* IF_THEN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

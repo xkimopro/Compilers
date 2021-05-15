@@ -58,9 +58,6 @@
 %token T_diff_op
 %token T_assign_op
 
-
-
-
 %nonassoc LET_IN
 %left ';'
 %nonassoc IF_THEN_ELSE
@@ -71,9 +68,8 @@
 %left '+' '-' T_plus_op T_minus_op
 %left '*' '/' T_mult_op T_div_op T_mod
 %right T_pow_op
-%nonassoc PLUS_UNOP MINUS_UNOP PLUS_DOT_UNOP MINUS_DOT_UNOP T_not T_delete
 %right T_arrow_op
-//%left T_of T_array T_Id T_ref
+%nonassoc T_array T_of T_ref
 %nonassoc '!'
 %nonassoc T_new
 
@@ -89,7 +85,7 @@ stmt_list:
 ;
 
 stmt:
-  letdef {printf("letdef");}
+  letdef
 | typedef
 ;
 
@@ -174,12 +170,13 @@ comma_star_list:
 ;
 
 expr:
-  expr6
+  expr5
 | letdef T_in expr                            %prec LET_IN
 | T_while expr T_do expr T_done
 | T_for T_id '=' expr T_to expr T_do expr T_done
 | T_for T_id '=' expr T_downto expr T_do expr T_done
 | T_match expr T_with clause or_clause_list T_end
+| expr ';' expr
 ;
 
 expr1:
@@ -203,13 +200,17 @@ expr1:
 
 expr2:
   expr1
-| T_id expr1 expr_list {printf("func");}
+| T_id expr1 expr_list
 | T_Id expr1 expr_list
 ;
 
 expr3:
   expr2
-| unop expr2
+| '+' expr2
+| '-' expr2
+| T_plus_op expr2
+| T_minus_op expr2
+| T_not expr2
 | T_delete expr2
 ;
 
@@ -244,27 +245,14 @@ expr5:
 | T_if expr5 T_then expr T_else expr         %prec IF_THEN_ELSE
 ;
 
-expr6:
-  expr5
-| expr ';' expr
-;
-
 or_clause_list:
   %empty
 | or_clause_list '|' clause
 ;
 
 expr_list:
-  %empty {printf("expr");}
-| expr_list expr1 {printf("expr");}
-;
-
-unop:
-  '+' %prec PLUS_UNOP
-| '-' %prec MINUS_UNOP
-| T_plus_op %prec PLUS_DOT_UNOP
-| T_minus_op %prec MINUS_DOT_UNOP
-| T_not
+  %empty
+| expr_list expr1
 ;
 
 clause:
