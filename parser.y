@@ -61,6 +61,7 @@
 %nonassoc LET_IN
 %left ';'
 %nonassoc IF_THEN_ELSE
+%right T_else
 %nonassoc T_assign_op
 %left T_or_op
 %left T_and_op
@@ -131,17 +132,17 @@ constr_list:
 ;
 
 constr:
-  T_Id 
+  T_Id
 | T_Id T_of constr_type_list
 ;
 
 constr_type_list:
-  type 
+  type
 | constr_type_list type
 ;
 
 par:
-  T_id 
+  T_id
 | '(' T_id ':' type ')'
 ;
 
@@ -260,6 +261,11 @@ clause:
 ;
 
 pattern:
+  pattern1
+| T_Id pattern1 pattern_list
+;
+
+pattern1:
   T_int_expr
 | '+' T_int_expr
 | '-' T_int_expr
@@ -271,12 +277,12 @@ pattern:
 | T_false
 | T_id
 | '(' pattern ')'
-| T_Id pattern_list
+| T_Id
 ;
 
 pattern_list:
   %empty
-| pattern_list pattern
+| pattern_list pattern1
 ;
 
 %%
