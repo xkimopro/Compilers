@@ -1,5 +1,6 @@
 %{
 #include <cstdio>
+#include "ast.hpp"
 #include "lexer.hpp"
 %}
 
@@ -74,39 +75,63 @@
 %nonassoc '!'
 %nonassoc T_new
 
+%union {
+  Stmt_list *stmt_list;
+  LetDef *letdef;
+  TypeDef *typdef;
+  Stmt *stmt;
+  Def *def;
+  TDef *tdef;
+  // Expr *expr;
+  // Decl *decl;
+  // Type type;
+  // char var;
+  // int num;
+  // char op;
+}
+
+%type<stmt_list> program stmt_list
+%type<stmt> stmt
+%type<letdef> letdef and_def_list
+%type<typdef> typedef and_tdef_list
+%type<def> def
+%type<tdef> tdef
+
 %%
 
 program:
-  stmt_list
+  stmt_list { 
+    std::cout << "AST: " << *$1 << std::endl; 
+  }
 ;
 
 stmt_list:
-  %empty
-| stmt_list stmt
+  %empty  { $$ = new Stmt_list; }
+| stmt_list stmt  { $1->append_stmt($2); $$ = $1; }
 ;
 
 stmt:
-  letdef
-| typedef
+  letdef { $$ = $1; }
+| typedef { $$ = $1; }
 ;
 
 letdef:
-  T_let def and_def_list
-| T_let T_rec def and_def_list
+  T_let def and_def_list  { $3->append_front_def($2); $$ = $3; }
+| T_let T_rec def and_def_list  { $4->append_front_def($3); $$ = $4; }
 ;
 
 and_def_list:
-  %empty
-| and_def_list T_and def
+  %empty { $$ = new LetDef(); }
+| and_def_list T_and def { $1->append_def($3); $$ = $1; }
 ;
 
 def:
-  T_id par_list '=' expr
-| T_id par_list ':' type '=' expr
-| T_mutable T_id
-| T_mutable T_id '[' expr comma_expr_list ']'
-| T_mutable T_id ':' type
-| T_mutable T_id '[' expr comma_expr_list ']' ':' type
+  T_id par_list '=' expr  { $$ = new Def(); }
+| T_id par_list ':' type '=' expr  { $$ = new Def(); }
+| T_mutable T_id  { $$ = new Def(); }
+| T_mutable T_id '[' expr comma_expr_list ']'  { $$ = new Def(); }
+| T_mutable T_id ':' type  { $$ = new Def(); }
+| T_mutable T_id '[' expr comma_expr_list ']' ':' type  { $$ = new Def(); }
 ;
 
 comma_expr_list:
@@ -115,16 +140,17 @@ comma_expr_list:
 ;
 
 typedef:
-  T_type tdef and_tdef_list
+  T_type tdef and_tdef_list { $3->append_front_tdef($2); $$ = $3; }
 ;
 
 and_tdef_list:
-  %empty
-| and_tdef_list T_and tdef
+  %empty  { $$ = new TypeDef(); }
+| and_tdef_list T_and tdef { $1->append_tdef($3); $$ = $1; }
 ;
 
 tdef:
-  T_id '=' constr constr_list;
+  T_id '=' constr constr_list  { $$ = new TDef(); }
+  ;
 
 constr_list:
   %empty

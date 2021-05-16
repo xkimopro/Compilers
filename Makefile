@@ -8,12 +8,12 @@ default: parser
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
 
-lexer.o: lexer.cpp lexer.hpp parser.hpp
+lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp symbol.hpp
 
 parser.hpp parser.cpp: parser.y
 	bison  -dv $(F) -o parser.cpp parser.y
 
-parser.o: parser.cpp lexer.hpp
+parser.o: parser.cpp lexer.hpp ast.hpp symbol.hpp
 
 parser: lexer.o parser.o
 	$(CXX) $(CXXFLAGS) -o parser lexer.o parser.o

@@ -237,34 +237,34 @@ Nonterminals, with rules where they appear
 
     $accept (75)
         on left: 0
-    program (76)
+    program <stmt_list> (76)
         on left: 1
         on right: 0
-    stmt_list (77)
+    stmt_list <stmt_list> (77)
         on left: 2 3
         on right: 1 3
-    stmt (78)
+    stmt <stmt> (78)
         on left: 4 5
         on right: 3
-    letdef (79)
+    letdef <letdef> (79)
         on left: 6 7
         on right: 4 46
-    and_def_list (80)
+    and_def_list <letdef> (80)
         on left: 8 9
         on right: 6 7 9
-    def (81)
+    def <def> (81)
         on left: 10 11 12 13 14 15
         on right: 6 7 9
     comma_expr_list (82)
         on left: 16 17
         on right: 13 15 17 61
-    typedef (83)
+    typedef <typdef> (83)
         on left: 18
         on right: 5
-    and_tdef_list (84)
+    and_tdef_list <typdef> (84)
         on left: 19 20
         on right: 18 20
-    tdef (85)
+    tdef <tdef> (85)
         on left: 21
         on right: 18 20
     constr_list (86)

@@ -116,7 +116,27 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 78 "parser.y"
+
+  Stmt_list *stmt_list;
+  LetDef *letdef;
+  TypeDef *typdef;
+  Stmt *stmt;
+  Def *def;
+  TDef *tdef;
+  // Expr *expr;
+  // Decl *decl;
+  // Type type;
+  // char var;
+  // int num;
+  // char op;
+
+#line 137 "parser.hpp"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

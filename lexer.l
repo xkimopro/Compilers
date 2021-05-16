@@ -4,6 +4,7 @@
 %{
 #include <cstdio>
 #include <cstdlib>
+#include "ast.hpp"
 #include "parser.hpp"
 #include "lexer.hpp"
 %}

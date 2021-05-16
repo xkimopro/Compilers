@@ -70,9 +70,10 @@
 #line 1 "parser.y"
 
 #include <cstdio>
+#include "ast.hpp"
 #include "lexer.hpp"
 
-#line 76 "parser.cpp"
+#line 77 "parser.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -578,19 +579,19 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    80,    80,    84,    85,    89,    90,    94,    95,    99,
-     100,   104,   105,   106,   107,   108,   109,   113,   114,   118,
-     122,   123,   127,   130,   131,   135,   136,   140,   141,   145,
-     146,   150,   151,   155,   156,   157,   158,   159,   160,   161,
-     162,   163,   164,   165,   169,   170,   174,   175,   176,   177,
-     178,   179,   180,   184,   185,   186,   187,   188,   189,   190,
-     191,   192,   193,   194,   195,   196,   197,   198,   199,   203,
-     204,   205,   209,   210,   211,   212,   213,   214,   215,   219,
-     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   238,   239,
-     240,   244,   245,   246,   250,   251,   255,   256,   260,   264,
-     265,   269,   270,   271,   272,   273,   274,   275,   276,   277,
-     278,   279,   280,   284,   285
+       0,   103,   103,   109,   110,   114,   115,   119,   120,   124,
+     125,   129,   130,   131,   132,   133,   134,   138,   139,   143,
+     147,   148,   152,   156,   157,   161,   162,   166,   167,   171,
+     172,   176,   177,   181,   182,   183,   184,   185,   186,   187,
+     188,   189,   190,   191,   195,   196,   200,   201,   202,   203,
+     204,   205,   206,   210,   211,   212,   213,   214,   215,   216,
+     217,   218,   219,   220,   221,   222,   223,   224,   225,   229,
+     230,   231,   235,   236,   237,   238,   239,   240,   241,   245,
+     246,   247,   248,   249,   250,   251,   252,   253,   254,   255,
+     256,   257,   258,   259,   260,   261,   262,   263,   264,   265,
+     266,   270,   271,   272,   276,   277,   281,   282,   286,   290,
+     291,   295,   296,   297,   298,   299,   300,   301,   302,   303,
+     304,   305,   306,   310,   311
 };
 #endif
 
@@ -1386,8 +1387,124 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 2: /* program: stmt_list  */
+#line 103 "parser.y"
+            { 
+    std::cout << "AST: " << *(yyvsp[0].stmt_list) << std::endl; 
+  }
+#line 1396 "parser.cpp"
+    break;
 
-#line 1391 "parser.cpp"
+  case 3: /* stmt_list: %empty  */
+#line 109 "parser.y"
+          { (yyval.stmt_list) = new Stmt_list; }
+#line 1402 "parser.cpp"
+    break;
+
+  case 4: /* stmt_list: stmt_list stmt  */
+#line 110 "parser.y"
+                  { (yyvsp[-1].stmt_list)->append_stmt((yyvsp[0].stmt)); (yyval.stmt_list) = (yyvsp[-1].stmt_list); }
+#line 1408 "parser.cpp"
+    break;
+
+  case 5: /* stmt: letdef  */
+#line 114 "parser.y"
+         { (yyval.stmt) = (yyvsp[0].letdef); }
+#line 1414 "parser.cpp"
+    break;
+
+  case 6: /* stmt: typedef  */
+#line 115 "parser.y"
+          { (yyval.stmt) = (yyvsp[0].typdef); }
+#line 1420 "parser.cpp"
+    break;
+
+  case 7: /* letdef: T_let def and_def_list  */
+#line 119 "parser.y"
+                          { (yyvsp[0].letdef)->append_front_def((yyvsp[-1].def)); (yyval.letdef) = (yyvsp[0].letdef); }
+#line 1426 "parser.cpp"
+    break;
+
+  case 8: /* letdef: T_let T_rec def and_def_list  */
+#line 120 "parser.y"
+                                { (yyvsp[0].letdef)->append_front_def((yyvsp[-1].def)); (yyval.letdef) = (yyvsp[0].letdef); }
+#line 1432 "parser.cpp"
+    break;
+
+  case 9: /* and_def_list: %empty  */
+#line 124 "parser.y"
+         { (yyval.letdef) = new LetDef(); }
+#line 1438 "parser.cpp"
+    break;
+
+  case 10: /* and_def_list: and_def_list T_and def  */
+#line 125 "parser.y"
+                         { (yyvsp[-2].letdef)->append_def((yyvsp[0].def)); (yyval.letdef) = (yyvsp[-2].letdef); }
+#line 1444 "parser.cpp"
+    break;
+
+  case 11: /* def: T_id par_list '=' expr  */
+#line 129 "parser.y"
+                          { (yyval.def) = new Def(); }
+#line 1450 "parser.cpp"
+    break;
+
+  case 12: /* def: T_id par_list ':' type '=' expr  */
+#line 130 "parser.y"
+                                   { (yyval.def) = new Def(); }
+#line 1456 "parser.cpp"
+    break;
+
+  case 13: /* def: T_mutable T_id  */
+#line 131 "parser.y"
+                  { (yyval.def) = new Def(); }
+#line 1462 "parser.cpp"
+    break;
+
+  case 14: /* def: T_mutable T_id '[' expr comma_expr_list ']'  */
+#line 132 "parser.y"
+                                               { (yyval.def) = new Def(); }
+#line 1468 "parser.cpp"
+    break;
+
+  case 15: /* def: T_mutable T_id ':' type  */
+#line 133 "parser.y"
+                           { (yyval.def) = new Def(); }
+#line 1474 "parser.cpp"
+    break;
+
+  case 16: /* def: T_mutable T_id '[' expr comma_expr_list ']' ':' type  */
+#line 134 "parser.y"
+                                                        { (yyval.def) = new Def(); }
+#line 1480 "parser.cpp"
+    break;
+
+  case 19: /* typedef: T_type tdef and_tdef_list  */
+#line 143 "parser.y"
+                            { (yyvsp[0].typdef)->append_front_tdef((yyvsp[-1].tdef)); (yyval.typdef) = (yyvsp[0].typdef); }
+#line 1486 "parser.cpp"
+    break;
+
+  case 20: /* and_tdef_list: %empty  */
+#line 147 "parser.y"
+          { (yyval.typdef) = new TypeDef(); }
+#line 1492 "parser.cpp"
+    break;
+
+  case 21: /* and_tdef_list: and_tdef_list T_and tdef  */
+#line 148 "parser.y"
+                           { (yyvsp[-2].typdef)->append_tdef((yyvsp[0].tdef)); (yyval.typdef) = (yyvsp[-2].typdef); }
+#line 1498 "parser.cpp"
+    break;
+
+  case 22: /* tdef: T_id '=' constr constr_list  */
+#line 152 "parser.y"
+                               { (yyval.tdef) = new TDef(); }
+#line 1504 "parser.cpp"
+    break;
+
+
+#line 1508 "parser.cpp"
 
       default: break;
     }
@@ -1581,7 +1698,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 288 "parser.y"
+#line 314 "parser.y"
 
 
 void yyerror(const char *msg) {
