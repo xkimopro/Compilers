@@ -262,15 +262,11 @@ class Stmt: public AST {
 //   int size;
 // };
 
-
-
-
-class TDef: public AST {
-    public:
-        TDef() {}
-
+class Constr: public AST {
+  public:
+        Constr() {}
     virtual void printOn(std::ostream &out) const override {
-            out << "TDef(";
+            out << "Constr(";
             // bool first = true;
             // for (Stmt *s : stmt_vec) {
             // if (!first) out << ", ";
@@ -278,7 +274,71 @@ class TDef: public AST {
             // out << *s;
             // }
             out << ")";
-    }  
+    }
+};
+
+class Par: public AST {
+    public:
+        Par() {}
+
+    virtual void printOn(std::ostream &out) const override {
+            out << "Par(";
+            // bool first = true;
+            // for (Stmt *s : stmt_vec) {
+            // if (!first) out << ", ";
+            // first = false;
+            // out << *s;
+            // }
+            out << ")";
+    }
+};
+
+
+class ParList: public AST {
+public:
+  
+  ParList(): par_vec() {}
+  
+  ~ParList() {
+    for (Par *p : par_vec) delete p;
+  }
+  
+  void append_par(Par *p) { par_vec.push_back(p); }
+
+  virtual void printOn(std::ostream &out) const override {
+    bool first = true;
+    for (Par *p : par_vec) {
+      if (!first) out << ", ";
+      first = false;
+      out << *p;
+    }
+  }
+
+  virtual void sem() override {
+    
+  }
+  
+  std::vector<Par *> par_vec;
+};
+
+class TDef: public AST {
+    public:
+        TDef() {}
+
+        void append_constr(Constr* c) { constr_vec.push_back(c); }
+        void append_front_constr(Constr* c) { constr_vec.insert(constr_vec.begin(),c); }
+        virtual void printOn(std::ostream &out) const override {
+            out << "TDef(";
+            bool first = true;
+            for (Constr *c : constr_vec) {
+              if (!first) out << ", ";
+              first = false;
+              out << *c;
+            }
+            out << ")";
+        }
+    private:
+      std::vector<Constr *> constr_vec;  
 };
 
 class Def: public AST {
@@ -294,7 +354,42 @@ class Def: public AST {
             // out << *s;
             // }
             out << ")";
+    }      
+};
+
+class MutableDef: public Def {
+    public:
+        MutableDef() {}
+
+    virtual void printOn(std::ostream &out) const override {
+            out << "MutableDef(";
+            // bool first = true;
+            // for (Stmt *s : stmt_vec) {
+            // if (!first) out << ", ";
+            // first = false;
+            // out << *s;
+            // }
+            out << ")";
     }
+};
+
+class NormalDef: public Def {
+    public:
+        NormalDef() {}
+
+        void set_my_params(ParList *p){
+          my_params = p;
+        }
+
+    virtual void printOn(std::ostream &out) const override {
+            out << "NormalDef(";
+            out << *my_params;
+            out << ")";
+    }
+
+
+    private:
+        ParList* my_params;
 };
 
 class TypeDef: public Stmt {
@@ -307,7 +402,6 @@ class TypeDef: public Stmt {
         void append_front_tdef(TDef *td){
             typedef_vec.insert(typedef_vec.begin(), td);
         }
-
 
         virtual void printOn(std::ostream &out) const override {
             out << "Typedef(";
@@ -335,7 +429,6 @@ class LetDef: public Stmt {
             if (!first) out << ", ";
             first = false;
             out << *d;
-
             }
             out << ")";
         }

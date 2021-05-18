@@ -65,28 +65,28 @@ Grammar
 
    45 expr: expr5
    46     | letdef T_in expr
-   47     | T_while expr T_do expr T_done
-   48     | T_for T_id '=' expr T_to expr T_do expr T_done
-   49     | T_for T_id '=' expr T_downto expr T_do expr T_done
-   50     | T_match expr T_with clause or_clause_list T_end
-   51     | expr ';' expr
+   47     | expr ';' expr
 
-   52 expr1: T_int_expr
-   53      | T_float_expr
-   54      | T_char_expr
-   55      | T_str_expr
-   56      | T_true
-   57      | T_false
-   58      | '(' ')'
-   59      | '(' expr ')'
-   60      | T_begin expr T_end
-   61      | T_id '[' expr comma_expr_list ']'
-   62      | T_dim T_id
-   63      | T_dim T_int_expr T_id
-   64      | T_new type
-   65      | T_id
-   66      | T_Id
-   67      | '!' expr1
+   48 expr1: T_int_expr
+   49      | T_float_expr
+   50      | T_char_expr
+   51      | T_str_expr
+   52      | T_true
+   53      | T_false
+   54      | '(' ')'
+   55      | '(' expr ')'
+   56      | T_begin expr T_end
+   57      | T_id '[' expr comma_expr_list ']'
+   58      | T_dim T_id
+   59      | T_dim T_int_expr T_id
+   60      | T_new type
+   61      | T_id
+   62      | T_Id
+   63      | '!' expr1
+   64      | T_while expr T_do expr T_done
+   65      | T_for T_id '=' expr T_to expr T_do expr T_done
+   66      | T_for T_id '=' expr T_downto expr T_do expr T_done
+   67      | T_match expr T_with clause or_clause_list T_end
 
    68 expr2: expr1
    69      | T_id expr1 expr_list
@@ -158,63 +158,63 @@ Grammar
 Terminals, with rules where they appear
 
     $end (0) 0
-    '!' (33) 67
-    '(' (40) 29 37 58 59 120
-    ')' (41) 29 37 58 59 120
+    '!' (33) 63
+    '(' (40) 29 37 54 55 120
+    ')' (41) 29 37 54 55 120
     '*' (42) 41 44 81
     '+' (43) 72 79 111
     ',' (44) 17 44
     '-' (45) 73 80 112
     '/' (47) 82
     ':' (58) 11 14 15 29
-    ';' (59) 51
+    ';' (59) 47
     '<' (60) 91
-    '=' (61) 10 11 21 48 49 89
+    '=' (61) 10 11 21 65 66 89
     '>' (62) 92
-    '[' (91) 13 15 41 61
-    ']' (93) 13 15 41 61
+    '[' (91) 13 15 41 57
+    ']' (93) 13 15 41 57
     '|' (124) 23 104
     error (256)
     T_and (258) 9 20
-    T_dim (259) 62 63
-    T_false (260) 57 118
+    T_dim (259) 58 59
+    T_false (260) 53 118
     T_let (261) 6 7
     T_of (262) 25 40 41
     T_type (263) 18
     T_array (264) 40 41
-    T_do (265) 47 48 49
+    T_do (265) 64 65 66
     T_float (266) 36
-    T_match (267) 50
+    T_match (267) 67
     T_rec (268) 7
     T_unit (269) 32
-    T_begin (270) 60
-    T_done (271) 47 48 49
-    T_for (272) 48 49
+    T_begin (270) 56
+    T_done (271) 64 65 66
+    T_for (272) 65 66
     T_mod (273) 87
     T_ref (274) 39
-    T_while (275) 47
+    T_while (275) 64
     T_bool (276) 35
-    T_downto (277) 49
+    T_downto (277) 66
     T_if (278) 101 102
     T_mutable (279) 12 13 14 15
     T_then (280) 101 102
-    T_with (281) 50
+    T_with (281) 67
     T_char (282) 34
     T_else (283) 102
     T_in (284) 46
-    T_new (285) 64
-    T_to (286) 48
+    T_new (285) 60
+    T_to (286) 65
     T_delete (287) 77
-    T_end (288) 50 60
+    T_end (288) 56 67
     T_int (289) 33
     T_not (290) 76
-    T_true (291) 56 117
-    T_Id (292) 24 25 66 70 109 121
-    T_id (293) 10 11 12 13 14 15 21 28 29 42 48 49 61 62 63 65 69 119
-    T_int_expr (294) 52 63 110 111 112
-    T_float_expr (295) 53 113 114 115
-    T_char_expr (296) 54 116
-    T_str_expr (297) 55
+    T_true (291) 52 117
+    T_Id (292) 24 25 62 70 109 121
+    T_id (293) 10 11 12 13 14 15 21 28 29 42 57 58 59 61 65 66 69 119
+    T_int_expr (294) 48 59 110 111 112
+    T_float_expr (295) 49 113 114 115
+    T_char_expr (296) 50 116
+    T_str_expr (297) 51
     T_arrow_op (298) 38 107
     T_plus_op (299) 74 83 114
     T_minus_op (300) 75 84 115
@@ -257,43 +257,43 @@ Nonterminals, with rules where they appear
         on right: 6 7 9
     comma_expr_list (82)
         on left: 16 17
-        on right: 13 15 17 61
-    typedef <typdef> (83)
+        on right: 13 15 17 57
+    typedef <type_def> (83)
         on left: 18
         on right: 5
-    and_tdef_list <typdef> (84)
+    and_tdef_list <type_def> (84)
         on left: 19 20
         on right: 18 20
     tdef <tdef> (85)
         on left: 21
         on right: 18 20
-    constr_list (86)
+    constr_list <tdef> (86)
         on left: 22 23
         on right: 21 23
-    constr (87)
+    constr <constr> (87)
         on left: 24 25
         on right: 21 23
     constr_type_list (88)
         on left: 26 27
         on right: 25 27
-    par (89)
+    par <par> (89)
         on left: 28 29
         on right: 31
-    par_list (90)
+    par_list <par_list> (90)
         on left: 30 31
         on right: 10 11 31
     type (91)
         on left: 32 33 34 35 36 37 38 39 40 41 42
-        on right: 11 14 15 26 27 29 37 38 39 40 41 64
+        on right: 11 14 15 26 27 29 37 38 39 40 41 60
     comma_star_list (92)
         on left: 43 44
         on right: 41 44
     expr (93)
-        on left: 45 46 47 48 49 50 51
-        on right: 10 11 13 15 17 46 47 48 49 50 51 59 60 61 101 102 107
+        on left: 45 46 47
+        on right: 10 11 13 15 17 46 47 55 56 57 64 65 66 67 101 102 107
     expr1 (94)
-        on left: 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
-        on right: 67 68 69 70 106
+        on left: 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
+        on right: 63 68 69 70 106
     expr2 (95)
         on left: 68 69 70
         on right: 71 72 73 74 75 76 77
@@ -308,13 +308,13 @@ Nonterminals, with rules where they appear
         on right: 45 101 102
     or_clause_list (99)
         on left: 103 104
-        on right: 50 104
+        on right: 67 104
     expr_list (100)
         on left: 105 106
         on right: 69 70 106
     clause (101)
         on left: 107
-        on right: 50 104
+        on right: 67 104
     pattern (102)
         on left: 108 109
         on right: 107 120
@@ -786,8 +786,8 @@ State 41
 
 State 42
 
-   62 expr1: T_dim • T_id
-   63      | T_dim • T_int_expr T_id
+   58 expr1: T_dim • T_id
+   59      | T_dim • T_int_expr T_id
 
     T_id        shift, and go to state 84
     T_int_expr  shift, and go to state 85
@@ -795,14 +795,14 @@ State 42
 
 State 43
 
-   57 expr1: T_false •
+   53 expr1: T_false •
 
-    $default  reduce using rule 57 (expr1)
+    $default  reduce using rule 53 (expr1)
 
 
 State 44
 
-   50 expr: T_match • expr T_with clause or_clause_list T_end
+   67 expr1: T_match • expr T_with clause or_clause_list T_end
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -840,7 +840,7 @@ State 44
 
 State 45
 
-   60 expr1: T_begin • expr T_end
+   56 expr1: T_begin • expr T_end
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -878,15 +878,15 @@ State 45
 
 State 46
 
-   48 expr: T_for • T_id '=' expr T_to expr T_do expr T_done
-   49     | T_for • T_id '=' expr T_downto expr T_do expr T_done
+   65 expr1: T_for • T_id '=' expr T_to expr T_do expr T_done
+   66      | T_for • T_id '=' expr T_downto expr T_do expr T_done
 
     T_id  shift, and go to state 88
 
 
 State 47
 
-   47 expr: T_while • expr T_do expr T_done
+   64 expr1: T_while • expr T_do expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -929,7 +929,10 @@ State 48
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_if          shift, and go to state 48
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
@@ -957,7 +960,7 @@ State 48
 
 State 49
 
-   64 expr1: T_new • type
+   60 expr1: T_new • type
 
     T_array  shift, and go to state 33
     T_float  shift, and go to state 34
@@ -977,7 +980,10 @@ State 50
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 53
@@ -999,7 +1005,10 @@ State 51
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 53
@@ -1017,19 +1026,22 @@ State 51
 
 State 52
 
-   56 expr1: T_true •
+   52 expr1: T_true •
 
-    $default  reduce using rule 56 (expr1)
+    $default  reduce using rule 52 (expr1)
 
 
 State 53
 
-   66 expr1: T_Id •
+   62 expr1: T_Id •
    70 expr2: T_Id • expr1 expr_list
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 94
@@ -1041,20 +1053,23 @@ State 53
     '!'           shift, and go to state 63
     '('           shift, and go to state 64
 
-    $default  reduce using rule 66 (expr1)
+    $default  reduce using rule 62 (expr1)
 
     expr1  go to state 96
 
 
 State 54
 
-   61 expr1: T_id • '[' expr comma_expr_list ']'
-   65      | T_id •
+   57 expr1: T_id • '[' expr comma_expr_list ']'
+   61      | T_id •
    69 expr2: T_id • expr1 expr_list
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 94
@@ -1067,37 +1082,37 @@ State 54
     '['           shift, and go to state 97
     '('           shift, and go to state 64
 
-    $default  reduce using rule 65 (expr1)
+    $default  reduce using rule 61 (expr1)
 
     expr1  go to state 98
 
 
 State 55
 
-   52 expr1: T_int_expr •
+   48 expr1: T_int_expr •
 
-    $default  reduce using rule 52 (expr1)
+    $default  reduce using rule 48 (expr1)
 
 
 State 56
 
-   53 expr1: T_float_expr •
+   49 expr1: T_float_expr •
 
-    $default  reduce using rule 53 (expr1)
+    $default  reduce using rule 49 (expr1)
 
 
 State 57
 
-   54 expr1: T_char_expr •
+   50 expr1: T_char_expr •
 
-    $default  reduce using rule 54 (expr1)
+    $default  reduce using rule 50 (expr1)
 
 
 State 58
 
-   55 expr1: T_str_expr •
+   51 expr1: T_str_expr •
 
-    $default  reduce using rule 55 (expr1)
+    $default  reduce using rule 51 (expr1)
 
 
 State 59
@@ -1106,7 +1121,10 @@ State 59
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 53
@@ -1128,7 +1146,10 @@ State 60
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 53
@@ -1150,7 +1171,10 @@ State 61
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 53
@@ -1172,7 +1196,10 @@ State 62
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 53
@@ -1190,11 +1217,14 @@ State 62
 
 State 63
 
-   67 expr1: '!' • expr1
+   63 expr1: '!' • expr1
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 94
@@ -1211,8 +1241,8 @@ State 63
 
 State 64
 
-   58 expr1: '(' • ')'
-   59      | '(' • expr ')'
+   54 expr1: '(' • ')'
+   55      | '(' • expr ')'
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -1260,7 +1290,7 @@ State 66
 
    13 def: T_mutable T_id '[' expr • comma_expr_list ']'
    15    | T_mutable T_id '[' expr • comma_expr_list ']' ':' type
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
 
     ';'  shift, and go to state 107
 
@@ -1350,7 +1380,7 @@ State 71
 State 72
 
    10 def: T_id par_list '=' expr •
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
 
     ';'  shift, and go to state 107
 
@@ -1475,22 +1505,22 @@ State 83
 
 State 84
 
-   62 expr1: T_dim T_id •
+   58 expr1: T_dim T_id •
 
-    $default  reduce using rule 62 (expr1)
+    $default  reduce using rule 58 (expr1)
 
 
 State 85
 
-   63 expr1: T_dim T_int_expr • T_id
+   59 expr1: T_dim T_int_expr • T_id
 
     T_id  shift, and go to state 139
 
 
 State 86
 
-   50 expr: T_match expr • T_with clause or_clause_list T_end
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   67 expr1: T_match expr • T_with clause or_clause_list T_end
 
     T_with  shift, and go to state 140
     ';'     shift, and go to state 107
@@ -1498,8 +1528,8 @@ State 86
 
 State 87
 
-   51 expr: expr • ';' expr
-   60 expr1: T_begin expr • T_end
+   47 expr: expr • ';' expr
+   56 expr1: T_begin expr • T_end
 
     T_end  shift, and go to state 141
     ';'    shift, and go to state 107
@@ -1507,16 +1537,16 @@ State 87
 
 State 88
 
-   48 expr: T_for T_id • '=' expr T_to expr T_do expr T_done
-   49     | T_for T_id • '=' expr T_downto expr T_do expr T_done
+   65 expr1: T_for T_id • '=' expr T_to expr T_do expr T_done
+   66      | T_for T_id • '=' expr T_downto expr T_do expr T_done
 
     '='  shift, and go to state 142
 
 
 State 89
 
-   47 expr: T_while expr • T_do expr T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   64 expr1: T_while expr • T_do expr T_done
 
     T_do  shift, and go to state 143
     ';'   shift, and go to state 107
@@ -1534,12 +1564,12 @@ State 91
 
    38 type: type • T_arrow_op type
    39     | type • T_ref
-   64 expr1: T_new type •
+   60 expr1: T_new type •
 
     T_ref       shift, and go to state 82
     T_arrow_op  shift, and go to state 83
 
-    $default  reduce using rule 64 (expr1)
+    $default  reduce using rule 60 (expr1)
 
 
 State 92
@@ -1558,19 +1588,19 @@ State 93
 
 State 94
 
-   66 expr1: T_Id •
+   62 expr1: T_Id •
 
-    $default  reduce using rule 66 (expr1)
+    $default  reduce using rule 62 (expr1)
 
 
 State 95
 
-   61 expr1: T_id • '[' expr comma_expr_list ']'
-   65      | T_id •
+   57 expr1: T_id • '[' expr comma_expr_list ']'
+   61      | T_id •
 
     '['  shift, and go to state 97
 
-    $default  reduce using rule 65 (expr1)
+    $default  reduce using rule 61 (expr1)
 
 
 State 96
@@ -1584,7 +1614,7 @@ State 96
 
 State 97
 
-   61 expr1: T_id '[' • expr comma_expr_list ']'
+   57 expr1: T_id '[' • expr comma_expr_list ']'
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -1659,22 +1689,22 @@ State 102
 
 State 103
 
-   67 expr1: '!' expr1 •
+   63 expr1: '!' expr1 •
 
-    $default  reduce using rule 67 (expr1)
+    $default  reduce using rule 63 (expr1)
 
 
 State 104
 
-   58 expr1: '(' ')' •
+   54 expr1: '(' ')' •
 
-    $default  reduce using rule 58 (expr1)
+    $default  reduce using rule 54 (expr1)
 
 
 State 105
 
-   51 expr: expr • ';' expr
-   59 expr1: '(' expr • ')'
+   47 expr: expr • ';' expr
+   55 expr1: '(' expr • ')'
 
     ';'  shift, and go to state 107
     ')'  shift, and go to state 148
@@ -1720,7 +1750,7 @@ State 106
 
 State 107
 
-   51 expr: expr ';' • expr
+   47 expr: expr ';' • expr
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -1772,7 +1802,10 @@ State 109
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1802,7 +1835,10 @@ State 110
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1832,7 +1868,10 @@ State 111
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1862,7 +1901,10 @@ State 112
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1892,7 +1934,10 @@ State 113
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1922,7 +1967,10 @@ State 114
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1952,7 +2000,10 @@ State 115
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -1982,7 +2033,10 @@ State 116
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2012,7 +2066,10 @@ State 117
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2042,7 +2099,10 @@ State 118
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2072,7 +2132,10 @@ State 119
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2102,7 +2165,10 @@ State 120
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2132,7 +2198,10 @@ State 121
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2162,7 +2231,10 @@ State 122
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2192,7 +2264,10 @@ State 123
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2222,7 +2297,10 @@ State 124
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2252,7 +2330,10 @@ State 125
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2282,7 +2363,10 @@ State 126
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2312,7 +2396,10 @@ State 127
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2342,7 +2429,10 @@ State 128
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2372,7 +2462,10 @@ State 129
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_delete      shift, and go to state 50
     T_not         shift, and go to state 51
@@ -2496,7 +2589,7 @@ State 135
    39     | type • T_ref
    40     | T_array T_of type •
 
-    T_ref  error (nonassociative)
+    T_ref  shift, and go to state 82
 
     $default  reduce using rule 40 (type)
 
@@ -2531,14 +2624,14 @@ State 138
 
 State 139
 
-   63 expr1: T_dim T_int_expr T_id •
+   59 expr1: T_dim T_int_expr T_id •
 
-    $default  reduce using rule 63 (expr1)
+    $default  reduce using rule 59 (expr1)
 
 
 State 140
 
-   50 expr: T_match expr T_with • clause or_clause_list T_end
+   67 expr1: T_match expr T_with • clause or_clause_list T_end
 
     T_false       shift, and go to state 179
     T_true        shift, and go to state 180
@@ -2560,15 +2653,15 @@ State 140
 
 State 141
 
-   60 expr1: T_begin expr T_end •
+   56 expr1: T_begin expr T_end •
 
-    $default  reduce using rule 60 (expr1)
+    $default  reduce using rule 56 (expr1)
 
 
 State 142
 
-   48 expr: T_for T_id '=' • expr T_to expr T_do expr T_done
-   49     | T_for T_id '=' • expr T_downto expr T_do expr T_done
+   65 expr1: T_for T_id '=' • expr T_to expr T_do expr T_done
+   66      | T_for T_id '=' • expr T_downto expr T_do expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -2606,7 +2699,7 @@ State 142
 
 State 143
 
-   47 expr: T_while expr T_do • expr T_done
+   64 expr1: T_while expr T_do • expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -2688,7 +2781,10 @@ State 145
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 94
@@ -2707,8 +2803,8 @@ State 145
 
 State 146
 
-   51 expr: expr • ';' expr
-   61 expr1: T_id '[' expr • comma_expr_list ']'
+   47 expr: expr • ';' expr
+   57 expr1: T_id '[' expr • comma_expr_list ']'
 
     ';'  shift, and go to state 107
 
@@ -2724,7 +2820,10 @@ State 147
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
+    T_match       shift, and go to state 44
     T_begin       shift, and go to state 45
+    T_for         shift, and go to state 46
+    T_while       shift, and go to state 47
     T_new         shift, and go to state 49
     T_true        shift, and go to state 52
     T_Id          shift, and go to state 94
@@ -2743,15 +2842,15 @@ State 147
 
 State 148
 
-   59 expr1: '(' expr ')' •
+   55 expr1: '(' expr ')' •
 
-    $default  reduce using rule 59 (expr1)
+    $default  reduce using rule 55 (expr1)
 
 
 State 149
 
    46 expr: letdef T_in expr •
-   51     | expr • ';' expr
+   47     | expr • ';' expr
 
     ';'  shift, and go to state 107
 
@@ -2760,10 +2859,10 @@ State 149
 
 State 150
 
-   51 expr: expr • ';' expr
-   51     | expr ';' expr •
+   47 expr: expr • ';' expr
+   47     | expr ';' expr •
 
-    $default  reduce using rule 51 (expr)
+    $default  reduce using rule 47 (expr)
 
 
 State 151
@@ -3667,7 +3766,7 @@ State 173
 State 174
 
    11 def: T_id par_list ':' type '=' expr •
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
 
     ';'  shift, and go to state 107
 
@@ -3829,7 +3928,7 @@ State 190
 
 State 191
 
-   50 expr: T_match expr T_with clause • or_clause_list T_end
+   67 expr1: T_match expr T_with clause • or_clause_list T_end
 
     $default  reduce using rule 103 (or_clause_list)
 
@@ -3852,9 +3951,9 @@ State 193
 
 State 194
 
-   48 expr: T_for T_id '=' expr • T_to expr T_do expr T_done
-   49     | T_for T_id '=' expr • T_downto expr T_do expr T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   65 expr1: T_for T_id '=' expr • T_to expr T_do expr T_done
+   66      | T_for T_id '=' expr • T_downto expr T_do expr T_done
 
     T_downto  shift, and go to state 213
     T_to      shift, and go to state 214
@@ -3863,8 +3962,8 @@ State 194
 
 State 195
 
-   47 expr: T_while expr T_do expr • T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   64 expr1: T_while expr T_do expr • T_done
 
     T_done  shift, and go to state 215
     ';'     shift, and go to state 107
@@ -3872,7 +3971,7 @@ State 195
 
 State 196
 
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
   101 expr5: T_if expr5 T_then expr •
   102      | T_if expr5 T_then expr • T_else expr
 
@@ -3891,7 +3990,7 @@ State 197
 State 198
 
    17 comma_expr_list: comma_expr_list • ',' expr
-   61 expr1: T_id '[' expr comma_expr_list • ']'
+   57 expr1: T_id '[' expr comma_expr_list • ']'
 
     ']'  shift, and go to state 217
     ','  shift, and go to state 152
@@ -3916,7 +4015,7 @@ State 199
 State 200
 
    17 comma_expr_list: comma_expr_list ',' expr •
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
 
     ';'  shift, and go to state 107
 
@@ -3997,7 +4096,7 @@ State 210
 
 State 211
 
-   50 expr: T_match expr T_with clause or_clause_list • T_end
+   67 expr1: T_match expr T_with clause or_clause_list • T_end
   104 or_clause_list: or_clause_list • '|' clause
 
     T_end  shift, and go to state 223
@@ -4044,7 +4143,7 @@ State 212
 
 State 213
 
-   49 expr: T_for T_id '=' expr T_downto • expr T_do expr T_done
+   66 expr1: T_for T_id '=' expr T_downto • expr T_do expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -4082,7 +4181,7 @@ State 213
 
 State 214
 
-   48 expr: T_for T_id '=' expr T_to • expr T_do expr T_done
+   65 expr1: T_for T_id '=' expr T_to • expr T_do expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -4120,9 +4219,9 @@ State 214
 
 State 215
 
-   47 expr: T_while expr T_do expr T_done •
+   64 expr1: T_while expr T_do expr T_done •
 
-    $default  reduce using rule 47 (expr)
+    $default  reduce using rule 64 (expr1)
 
 
 State 216
@@ -4165,9 +4264,9 @@ State 216
 
 State 217
 
-   61 expr1: T_id '[' expr comma_expr_list ']' •
+   57 expr1: T_id '[' expr comma_expr_list ']' •
 
-    $default  reduce using rule 61 (expr1)
+    $default  reduce using rule 57 (expr1)
 
 
 State 218
@@ -4237,9 +4336,9 @@ State 222
 
 State 223
 
-   50 expr: T_match expr T_with clause or_clause_list T_end •
+   67 expr1: T_match expr T_with clause or_clause_list T_end •
 
-    $default  reduce using rule 50 (expr)
+    $default  reduce using rule 67 (expr1)
 
 
 State 224
@@ -4266,7 +4365,7 @@ State 224
 
 State 225
 
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
   107 clause: pattern T_arrow_op expr •
 
     ';'  shift, and go to state 107
@@ -4276,8 +4375,8 @@ State 225
 
 State 226
 
-   49 expr: T_for T_id '=' expr T_downto expr • T_do expr T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   66 expr1: T_for T_id '=' expr T_downto expr • T_do expr T_done
 
     T_do  shift, and go to state 232
     ';'   shift, and go to state 107
@@ -4285,8 +4384,8 @@ State 226
 
 State 227
 
-   48 expr: T_for T_id '=' expr T_to expr • T_do expr T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   65 expr1: T_for T_id '=' expr T_to expr • T_do expr T_done
 
     T_do  shift, and go to state 233
     ';'   shift, and go to state 107
@@ -4294,7 +4393,7 @@ State 227
 
 State 228
 
-   51 expr: expr • ';' expr
+   47 expr: expr • ';' expr
   102 expr5: T_if expr5 T_then expr T_else expr •
 
     $default  reduce using rule 102 (expr5)
@@ -4306,7 +4405,7 @@ State 229
    39     | type • T_ref
    41     | T_array '[' '*' comma_star_list ']' T_of type •
 
-    T_ref  error (nonassociative)
+    T_ref  shift, and go to state 82
 
     $default  reduce using rule 41 (type)
 
@@ -4327,7 +4426,7 @@ State 231
 
 State 232
 
-   49 expr: T_for T_id '=' expr T_downto expr T_do • expr T_done
+   66 expr1: T_for T_id '=' expr T_downto expr T_do • expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -4365,7 +4464,7 @@ State 232
 
 State 233
 
-   48 expr: T_for T_id '=' expr T_to expr T_do • expr T_done
+   65 expr1: T_for T_id '=' expr T_to expr T_do • expr T_done
 
     T_dim         shift, and go to state 42
     T_false       shift, and go to state 43
@@ -4403,8 +4502,8 @@ State 233
 
 State 234
 
-   49 expr: T_for T_id '=' expr T_downto expr T_do expr • T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   66 expr1: T_for T_id '=' expr T_downto expr T_do expr • T_done
 
     T_done  shift, and go to state 236
     ';'     shift, and go to state 107
@@ -4412,8 +4511,8 @@ State 234
 
 State 235
 
-   48 expr: T_for T_id '=' expr T_to expr T_do expr • T_done
-   51     | expr • ';' expr
+   47 expr: expr • ';' expr
+   65 expr1: T_for T_id '=' expr T_to expr T_do expr • T_done
 
     T_done  shift, and go to state 237
     ';'     shift, and go to state 107
@@ -4421,13 +4520,13 @@ State 235
 
 State 236
 
-   49 expr: T_for T_id '=' expr T_downto expr T_do expr T_done •
+   66 expr1: T_for T_id '=' expr T_downto expr T_do expr T_done •
 
-    $default  reduce using rule 49 (expr)
+    $default  reduce using rule 66 (expr1)
 
 
 State 237
 
-   48 expr: T_for T_id '=' expr T_to expr T_do expr T_done •
+   65 expr1: T_for T_id '=' expr T_to expr T_do expr T_done •
 
-    $default  reduce using rule 48 (expr)
+    $default  reduce using rule 65 (expr1)

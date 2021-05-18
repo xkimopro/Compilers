@@ -122,10 +122,13 @@ union YYSTYPE
 
   Stmt_list *stmt_list;
   LetDef *letdef;
-  TypeDef *typdef;
+  TypeDef *type_def;
   Stmt *stmt;
   Def *def;
   TDef *tdef;
+  ParList *par_list;
+  Par *par;
+  Constr *constr;
   // Expr *expr;
   // Decl *decl;
   // Type type;
@@ -133,7 +136,7 @@ union YYSTYPE
   // int num;
   // char op;
 
-#line 137 "parser.hpp"
+#line 140 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

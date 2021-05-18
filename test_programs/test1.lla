@@ -1,7 +1,10 @@
 let a = 2 and c =4 and d = 5
 
-let main = print_string "asdasd"
+let main x y z = print_string "asdasd"
 
 type pile = Left | Middle | Right
  and node = Leaf | Nil
+
+let mutable a : int 
+and a = 'c'
 

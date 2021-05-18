@@ -71,17 +71,20 @@
 %left '*' '/' T_mult_op T_div_op T_mod
 %right T_pow_op
 %right T_arrow_op
-%nonassoc T_array T_of T_ref
+%right T_array T_of T_ref
 %nonassoc '!'
 %nonassoc T_new
 
 %union {
   Stmt_list *stmt_list;
   LetDef *letdef;
-  TypeDef *typdef;
+  TypeDef *type_def;
   Stmt *stmt;
   Def *def;
   TDef *tdef;
+  ParList *par_list;
+  Par *par;
+  Constr *constr;
   // Expr *expr;
   // Decl *decl;
   // Type type;
@@ -93,9 +96,12 @@
 %type<stmt_list> program stmt_list
 %type<stmt> stmt
 %type<letdef> letdef and_def_list
-%type<typdef> typedef and_tdef_list
+%type<type_def> typedef and_tdef_list
 %type<def> def
-%type<tdef> tdef
+%type<tdef> tdef constr_list
+%type<par_list> par_list
+%type<par> par
+%type<constr> constr
 
 %%
 
@@ -126,17 +132,17 @@ and_def_list:
 ;
 
 def:
-  T_id par_list '=' expr  { $$ = new Def(); }
-| T_id par_list ':' type '=' expr  { $$ = new Def(); }
-| T_mutable T_id  { $$ = new Def(); }
-| T_mutable T_id '[' expr comma_expr_list ']'  { $$ = new Def(); }
-| T_mutable T_id ':' type  { $$ = new Def(); }
-| T_mutable T_id '[' expr comma_expr_list ']' ':' type  { $$ = new Def(); }
+  T_id par_list '=' expr  { NormalDef *ndef = new NormalDef(); ndef->set_my_params($2); $$ = ndef; }
+| T_id par_list ':' type '=' expr  { NormalDef *ndef = new NormalDef(); ndef->set_my_params($2); $$ = ndef; }
+| T_mutable T_id  { $$ = new MutableDef(); }
+| T_mutable T_id '[' expr comma_expr_list ']'  { $$ = new MutableDef(); }
+| T_mutable T_id ':' type  { $$ = new MutableDef(); }
+| T_mutable T_id '[' expr comma_expr_list ']' ':' type  { $$ = new MutableDef(); }
 ;
 
 comma_expr_list:
   %empty
-| comma_expr_list ',' expr 
+| comma_expr_list ',' expr
 ;
 
 typedef:
@@ -149,17 +155,17 @@ and_tdef_list:
 ;
 
 tdef:
-  T_id '=' constr constr_list  { $$ = new TDef(); }
-  ;
+  T_id '=' constr constr_list { $4->append_front_constr($3); $$ = $4; }
+;
 
 constr_list:
-  %empty
-| constr_list '|' constr
+  %empty  { $$ = new  TDef(); }
+| constr_list '|' constr { $1->append_constr($3); $$ = $1; }
 ;
 
 constr:
-  T_Id
-| T_Id T_of constr_type_list
+  T_Id { $$ = new Constr(); }
+| T_Id T_of constr_type_list { $$ = new Constr(); }
 ;
 
 constr_type_list:
@@ -168,13 +174,13 @@ constr_type_list:
 ;
 
 par:
-  T_id
-| '(' T_id ':' type ')'
+  T_id { $$ = new Par(); }
+| '(' T_id ':' type ')' {  $$ = new Par();  }
 ;
 
 par_list:
-  %empty
-| par_list par
+  %empty  { $$ = new ParList(); }
+| par_list par { $1->append_par($2); $$ = $1; }
 ;
 
 type:
@@ -199,10 +205,6 @@ comma_star_list:
 expr:
   expr5
 | letdef T_in expr                            %prec LET_IN
-| T_while expr T_do expr T_done
-| T_for T_id '=' expr T_to expr T_do expr T_done
-| T_for T_id '=' expr T_downto expr T_do expr T_done
-| T_match expr T_with clause or_clause_list T_end
 | expr ';' expr
 ;
 
@@ -223,6 +225,10 @@ expr1:
 | T_id
 | T_Id
 | '!' expr1
+| T_while expr T_do expr T_done
+| T_for T_id '=' expr T_to expr T_do expr T_done
+| T_for T_id '=' expr T_downto expr T_do expr T_done
+| T_match expr T_with clause or_clause_list T_end
 ;
 
 expr2:
