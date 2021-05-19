@@ -120,23 +120,27 @@ union YYSTYPE
 {
 #line 78 "parser.y"
 
-  Stmt_list *stmt_list;
-  LetDef *letdef;
-  TypeDef *type_def;
+  std::vector<Stmt *> *stmt_vec;
   Stmt *stmt;
+  std::vector<Def *> *def_vec;
+  LetDef *letdef;
   Def *def;
+  std::vector<Par *> *par_vec;
+
+  TypeDef *type_def;
+  std::vector<TDef *> *tdef_vec;
   TDef *tdef;
-  ParList *par_list;
-  Par *par;
+  std::vector<Constr *> *constr_vec;
   Constr *constr;
+  Par *par;
+
   // Expr *expr;
-  // Decl *decl;
   // Type type;
   // char var;
   // int num;
   // char op;
 
-#line 140 "parser.hpp"
+#line 144 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

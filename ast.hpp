@@ -7,6 +7,20 @@
 
 #include "symbol.hpp"
 
+template <typename T>
+inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v)
+{
+  bool first = true;
+  for (T t : v)
+  {
+    if (!first)
+      out << ", ";
+    first = false;
+    out << *t;
+  }
+  return out;
+}
+
 // inline std::ostream& operator<<(std::ostream &out, Type t) {
 //   switch (t) {
 //   case TYPE_int: out << "int"; break;
@@ -15,22 +29,22 @@
 //   return out;
 // }
 
-class AST {
+class AST
+{
 public:
   virtual ~AST() {}
   virtual void printOn(std::ostream &out) const = 0;
   virtual void sem() {}
 };
 
-inline std::ostream& operator<<(std::ostream &out, const AST &t) {
+inline std::ostream &operator<<(std::ostream &out, const AST &t)
+{
   t.printOn(out);
   return out;
 }
 
-
-class Stmt: public AST {
-    
-
+class Stmt : public AST
+{
 };
 
 // class Expr: public AST {
@@ -46,8 +60,6 @@ class Stmt: public AST {
 // protected:
 //   Type type;
 // };
-
-
 
 // extern std::vector<int> rt_stack;
 
@@ -262,214 +274,97 @@ class Stmt: public AST {
 //   int size;
 // };
 
-class Constr: public AST {
-  public:
-        Constr() {}
-    virtual void printOn(std::ostream &out) const override {
-            out << "Constr(";
-            // bool first = true;
-            // for (Stmt *s : stmt_vec) {
-            // if (!first) out << ", ";
-            // first = false;
-            // out << *s;
-            // }
-            out << ")";
-    }
-};
-
-class Par: public AST {
-    public:
-        Par() {}
-
-    virtual void printOn(std::ostream &out) const override {
-            out << "Par(";
-            // bool first = true;
-            // for (Stmt *s : stmt_vec) {
-            // if (!first) out << ", ";
-            // first = false;
-            // out << *s;
-            // }
-            out << ")";
-    }
-};
-
-
-class ParList: public AST {
+class Constr : public AST
+{
 public:
-  
-  ParList(): par_vec() {}
-  
-  ~ParList() {
-    for (Par *p : par_vec) delete p;
+  Constr() {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Constr("
+        << ")";
   }
-  
-  void append_par(Par *p) { par_vec.push_back(p); }
-
-  virtual void printOn(std::ostream &out) const override {
-    bool first = true;
-    for (Par *p : par_vec) {
-      if (!first) out << ", ";
-      first = false;
-      out << *p;
-    }
-  }
-
-  virtual void sem() override {
-    
-  }
-  
-  std::vector<Par *> par_vec;
 };
 
-class TDef: public AST {
-    public:
-        TDef() {}
-
-        void append_constr(Constr* c) { constr_vec.push_back(c); }
-        void append_front_constr(Constr* c) { constr_vec.insert(constr_vec.begin(),c); }
-        virtual void printOn(std::ostream &out) const override {
-            out << "TDef(";
-            bool first = true;
-            for (Constr *c : constr_vec) {
-              if (!first) out << ", ";
-              first = false;
-              out << *c;
-            }
-            out << ")";
-        }
-    private:
-      std::vector<Constr *> constr_vec;  
-};
-
-class Def: public AST {
-    public:
-        Def() {}
-
-    virtual void printOn(std::ostream &out) const override {
-            out << "Def(";
-            // bool first = true;
-            // for (Stmt *s : stmt_vec) {
-            // if (!first) out << ", ";
-            // first = false;
-            // out << *s;
-            // }
-            out << ")";
-    }      
-};
-
-class MutableDef: public Def {
-    public:
-        MutableDef() {}
-
-    virtual void printOn(std::ostream &out) const override {
-            out << "MutableDef(";
-            // bool first = true;
-            // for (Stmt *s : stmt_vec) {
-            // if (!first) out << ", ";
-            // first = false;
-            // out << *s;
-            // }
-            out << ")";
-    }
-};
-
-class NormalDef: public Def {
-    public:
-        NormalDef() {}
-
-        void set_my_params(ParList *p){
-          my_params = p;
-        }
-
-    virtual void printOn(std::ostream &out) const override {
-            out << "NormalDef(";
-            out << *my_params;
-            out << ")";
-    }
-
-
-    private:
-        ParList* my_params;
-};
-
-class TypeDef: public Stmt {
-    public:
-        TypeDef():  typedef_vec() {}
-
-        void append_tdef(TDef *td){
-            typedef_vec.push_back(td);
-        }
-        void append_front_tdef(TDef *td){
-            typedef_vec.insert(typedef_vec.begin(), td);
-        }
-
-        virtual void printOn(std::ostream &out) const override {
-            out << "Typedef(";
-            bool first = true;
-            for (TDef *td : typedef_vec) {
-             if (!first) out << ", ";
-             first = false;
-             out << *td;
-            }
-            out << ")";
-        }
-
-    private:
-        std::vector<TDef *> typedef_vec;
-};
-
-class LetDef: public Stmt {
-    public:
-        LetDef():  letdef_vec() {}
-
-        virtual void printOn(std::ostream &out) const override {
-            out << "Letdef(";
-            bool first = true;
-            for (Def *d : letdef_vec) {
-            if (!first) out << ", ";
-            first = false;
-            out << *d;
-            }
-            out << ")";
-        }
-
-        void append_def(Def *d){
-            letdef_vec.push_back(d);
-        }
-        void append_front_def(Def *d){
-            letdef_vec.insert(letdef_vec.begin(), d);
-        }
-
-    private:
-        std::vector<Def *> letdef_vec;
-
-};
-
-class Stmt_list: public AST {
+class Par : public AST
+{
 public:
-  
-  Stmt_list(): stmt_vec() {}
-  
-  ~Stmt_list() {
-    for (Stmt *s : stmt_vec) delete s;
-  }
-  
-  void append_stmt(Stmt *s) { stmt_vec.push_back(s); }
+  Par() {}
 
-  virtual void printOn(std::ostream &out) const override {
-    out << "Stmt_list(";
-    bool first = true;
-    for (Stmt *s : stmt_vec) {
-      if (!first) out << ", ";
-      first = false;
-      out << *s;
-    }
-    out << ")";
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Par("
+        << ")";
+  }
+};
+
+class TDef : public AST
+{
+public:
+  TDef(std::vector<Constr *> *v) : constr_vec(v) {}
+
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "TDef(" << *constr_vec << ")";
   }
 
-  virtual void sem() override {
-    
-  }
 private:
-  std::vector<Stmt *> stmt_vec;
+  std::vector<Constr *> *constr_vec;
+};
+
+class TypeDef : public Stmt
+{
+public:
+  TypeDef(std::vector<TDef *> *v) : tdef_vec(v) {}
+
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Typedef(" << *tdef_vec << ")";
+  }
+
+private:
+  std::vector<TDef *> *tdef_vec;
+};
+
+class Def : public AST
+{
+};
+
+class MutableDef : public Def
+{
+public:
+  MutableDef() {}
+
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "MutableDef("
+        << ")";
+  }
+};
+
+class NormalDef : public Def
+{
+public:
+  NormalDef(std::vector<Par *> *v) : par_vec(v) {}
+
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Def(" << *par_vec << ")";
+  }
+
+private:
+  std::vector<Par *> *par_vec;
+};
+
+class LetDef : public Stmt
+{
+public:
+  LetDef(std::vector<Def *> *v) : def_vec(v) {}
+
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Letdef(" << *def_vec << ")";
+  }
+
+private:
+  std::vector<Def *> *def_vec;
 };

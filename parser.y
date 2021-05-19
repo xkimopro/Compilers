@@ -76,32 +76,40 @@
 %nonassoc T_new
 
 %union {
-  Stmt_list *stmt_list;
-  LetDef *letdef;
-  TypeDef *type_def;
+  std::vector<Stmt *> *stmt_vec;
   Stmt *stmt;
+  std::vector<Def *> *def_vec;
+  LetDef *letdef;
   Def *def;
+  std::vector<Par *> *par_vec;
+
+  TypeDef *type_def;
+  std::vector<TDef *> *tdef_vec;
   TDef *tdef;
-  ParList *par_list;
-  Par *par;
+  std::vector<Constr *> *constr_vec;
   Constr *constr;
+  Par *par;
+
   // Expr *expr;
-  // Decl *decl;
   // Type type;
   // char var;
   // int num;
   // char op;
 }
 
-%type<stmt_list> program stmt_list
+%type<stmt_vec> program stmt_list
 %type<stmt> stmt
-%type<letdef> letdef and_def_list
-%type<type_def> typedef and_tdef_list
+%type<def_vec> and_def_list
+%type<letdef> letdef
 %type<def> def
-%type<tdef> tdef constr_list
-%type<par_list> par_list
-%type<par> par
+%type<par_vec> par_list
+
+%type<type_def> typedef
+%type<tdef_vec> and_tdef_list
+%type<tdef> tdef 
+%type<constr_vec> constr_list
 %type<constr> constr
+%type<par> par
 
 %%
 
@@ -112,8 +120,8 @@ program:
 ;
 
 stmt_list:
-  %empty  { $$ = new Stmt_list; }
-| stmt_list stmt  { $1->append_stmt($2); $$ = $1; }
+  %empty  { $$ = new std::vector<Stmt *>; }
+| stmt_list stmt  { $1->push_back($2); $$ = $1; }
 ;
 
 stmt:
@@ -122,45 +130,50 @@ stmt:
 ;
 
 letdef:
-  T_let def and_def_list  { $3->append_front_def($2); $$ = $3; }
-| T_let T_rec def and_def_list  { $4->append_front_def($3); $$ = $4; }
+  T_let and_def_list  { $$ = new LetDef($2); }
+| T_let T_rec and_def_list  { $$ = new LetDef($3); }
 ;
 
 and_def_list:
-  %empty { $$ = new LetDef(); }
-| and_def_list T_and def { $1->append_def($3); $$ = $1; }
+  def { $$ = new std::vector<Def *>; $$->push_back($1); }
+| and_def_list T_and def { $1->push_back($3); $$ = $1; }
 ;
 
 def:
-  T_id par_list '=' expr  { NormalDef *ndef = new NormalDef(); ndef->set_my_params($2); $$ = ndef; }
-| T_id par_list ':' type '=' expr  { NormalDef *ndef = new NormalDef(); ndef->set_my_params($2); $$ = ndef; }
+  T_id par_list '=' expr  { $$ = new NormalDef($2); }
+| T_id par_list ':' type '=' expr  { $$ = new NormalDef($2); }
 | T_mutable T_id  { $$ = new MutableDef(); }
-| T_mutable T_id '[' expr comma_expr_list ']'  { $$ = new MutableDef(); }
+| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef(); }
 | T_mutable T_id ':' type  { $$ = new MutableDef(); }
-| T_mutable T_id '[' expr comma_expr_list ']' ':' type  { $$ = new MutableDef(); }
+| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef(); }
+;
+
+par_list:
+  %empty  { $$ = new std::vector<Par *>; }
+| par_list par { $1->push_back($2); $$ = $1; }
 ;
 
 comma_expr_list:
-  %empty
+  expr
 | comma_expr_list ',' expr
 ;
 
 typedef:
-  T_type tdef and_tdef_list { $3->append_front_tdef($2); $$ = $3; }
+  T_type and_tdef_list { $$ = new TypeDef($2); }
 ;
 
 and_tdef_list:
-  %empty  { $$ = new TypeDef(); }
-| and_tdef_list T_and tdef { $1->append_tdef($3); $$ = $1; }
+  tdef  { $$ = new std::vector<TDef *>; $$->push_back($1); }
+| and_tdef_list T_and tdef { $1->push_back($3); $$ = $1; }
 ;
 
 tdef:
-  T_id '=' constr constr_list { $4->append_front_constr($3); $$ = $4; }
+  T_id '=' constr_list { $$ = new TDef($3); }
 ;
 
 constr_list:
-  %empty  { $$ = new  TDef(); }
-| constr_list '|' constr { $1->append_constr($3); $$ = $1; }
+  constr  { $$ = new std::vector<Constr *>; $$->push_back($1); }
+| constr_list '|' constr { $1->push_back($3); $$ = $1; }
 ;
 
 constr:
@@ -178,11 +191,6 @@ par:
 | '(' T_id ':' type ')' {  $$ = new Par();  }
 ;
 
-par_list:
-  %empty  { $$ = new ParList(); }
-| par_list par { $1->append_par($2); $$ = $1; }
-;
-
 type:
   T_unit
 | T_int
@@ -193,12 +201,12 @@ type:
 | type T_arrow_op type
 | type T_ref
 | T_array T_of type
-| T_array '[' '*' comma_star_list ']' T_of type
+| T_array '[' comma_star_list ']' T_of type
 | T_id
 ;
 
 comma_star_list:
-  %empty
+  '*'
 | comma_star_list ',' '*'
 ;
 
@@ -218,7 +226,7 @@ expr1:
 | '(' ')'
 | '(' expr ')'
 | T_begin expr T_end
-| T_id '[' expr comma_expr_list ']'
+| T_id '[' comma_expr_list ']'
 | T_dim T_id
 | T_dim T_int_expr T_id
 | T_new type
@@ -228,13 +236,13 @@ expr1:
 | T_while expr T_do expr T_done
 | T_for T_id '=' expr T_to expr T_do expr T_done
 | T_for T_id '=' expr T_downto expr T_do expr T_done
-| T_match expr T_with clause or_clause_list T_end
+| T_match expr T_with or_clause_list T_end
 ;
 
 expr2:
   expr1
-| T_id expr1 expr_list
-| T_Id expr1 expr_list
+| T_id expr_list
+| T_Id expr_list
 ;
 
 expr3:
@@ -279,12 +287,12 @@ expr5:
 ;
 
 or_clause_list:
-  %empty
+  clause
 | or_clause_list '|' clause
 ;
 
 expr_list:
-  %empty
+  expr1
 | expr_list expr1
 ;
 
@@ -294,7 +302,7 @@ clause:
 
 pattern:
   pattern1
-| T_Id pattern1 pattern_list
+| T_Id pattern_list
 ;
 
 pattern1:
@@ -313,7 +321,7 @@ pattern1:
 ;
 
 pattern_list:
-  %empty
+  pattern1
 | pattern_list pattern1
 ;
 
