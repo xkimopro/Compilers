@@ -73,13 +73,13 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 {D}+                {return T_int_expr; }
 
-"->"  {return T_arrow_op; }
-"+."  {return T_plus_op; }
-"-."  {return T_minus_op; }
-"*."  {return T_mult_op; }
-"/."  {return T_div_op; }
-"**"  {return T_pow_op; }
-"&&"  {return T_and_op; }
+"->"  { return T_arrow_op; }
+"+."  { return T_plus_op; }
+"-."  { return T_minus_op; }
+"*."  { return T_mult_op; }
+"/."  { return T_div_op; }
+"**"  { return T_pow_op; }
+"&&"  { return T_and_op; }
 "||" { return T_or_op; }
 "<>" { return T_struct_diff_op; }
 "<=" { return T_leq_op; }

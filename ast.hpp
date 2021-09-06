@@ -21,14 +21,6 @@ inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v)
   return out;
 }
 
-// inline std::ostream& operator<<(std::ostream &out, Type t) {
-//   switch (t) {
-//   case TYPE_int: out << "int"; break;
-//   case TYPE_bool: out << "bool"; break;
-//   }
-//   return out;
-// }
-
 class AST
 {
 public:
@@ -47,19 +39,75 @@ class Stmt : public AST
 {
 };
 
-// class Expr: public AST {
-// public:
-//   virtual int eval() const = 0;
-//   void type_check(Type t) {
-//     sem();
-//     if (type != t) {
-//       std::cerr << "Type mismatch" << std::endl;
-//       exit(1);
-//     }
-//   }
-// protected:
-//   Type type;
-// };
+class Expr: public AST {
+public:
+  virtual int eval() const = 0;
+  void type_check(Type t) {
+    sem();
+    if (type != t) {
+      std::cerr << "Type mismatch" << std::endl;
+      exit(1);
+    }
+  }
+protected:
+  Type type;
+};
+
+class Int_Expr: public Expr {
+public:
+  Int_Expr(int n): num(n) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Int_Expr(" << num << ")";
+  }
+private:
+  int num;
+};
+
+class Float_Expr: public Expr {
+public:
+  Float_Expr(float n): num(n) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Float_Expr(" << num << ")";
+  }
+private:
+  float num;
+};
+
+class Char_Expr: public Expr {
+public:
+  Char_Expr(char c): chr(c) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Char_Expr(" << chr << ")";
+  }
+private:
+  char chr;
+};
+
+class Str_Expr: public Expr {
+public:
+  Str_Expr(string s): str(s) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Str_Expr(" << str << ")";
+  }
+private:
+  string str;
+};
+
+class True: public Expr {
+public:
+  True() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "true";
+  }
+};
+
+class False: public Expr {
+public:
+  False() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "false";
+  }
+};
 
 // extern std::vector<int> rt_stack;
 
@@ -225,53 +273,6 @@ class Stmt : public AST
 // private:
 //   char var;
 //   Type type;
-// };
-
-// class Block: public Stmt {
-// public:
-//   Block(): decl_list(), stmt_list(), size(0) {}
-//   ~Block() {
-//     for (Decl *d : decl_list) delete d;
-//     for (Stmt *s : stmt_list) delete s;
-//   }
-//   void append_decl(Decl *d) { decl_list.push_back(d); }
-//   void append_stmt(Stmt *s) { stmt_list.push_back(s); }
-//   void merge(Block *b) {
-//     stmt_list = b->stmt_list;
-//     b->stmt_list.clear();
-//     delete b;
-//   }
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "Block(";
-//     bool first = true;
-//     for (Decl *d : decl_list) {
-//       if (!first) out << ", ";
-//       first = false;
-//       out << *d;
-//     }
-//     for (Stmt *s : stmt_list) {
-//       if (!first) out << ", ";
-//       first = false;
-//       out << *s;
-//     }
-//     out << ")";
-//   }
-//   virtual void sem() override {
-//     st.openScope();
-//     for (Decl *d : decl_list) d->sem();
-//     for (Stmt *s : stmt_list) s->sem();
-//     size = st.getSizeOfCurrentScope();
-//     st.closeScope();
-//   }
-//   virtual void run() const override {
-//     for (int i = 0; i < size; ++i) rt_stack.push_back(0);
-//     for (Stmt *s : stmt_list) s->run();
-//     for (int i = 0; i < size; ++i) rt_stack.pop_back();
-//   }
-// private:
-//   std::vector<Decl *> decl_list;
-//   std::vector<Stmt *> stmt_list;
-//   int size;
 // };
 
 class Constr : public AST

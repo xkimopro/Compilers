@@ -212,7 +212,7 @@ comma_star_list:
 
 expr:
   expr5
-| letdef T_in expr                            %prec LET_IN
+| letdef T_in expr %prec LET_IN
 | expr ';' expr
 ;
 
@@ -282,8 +282,8 @@ expr4:
 
 expr5:
   expr4
-| T_if expr5 T_then expr                     %prec IF_THEN_ELSE
-| T_if expr5 T_then expr T_else expr         %prec IF_THEN_ELSE
+| T_if expr5 T_then expr %prec IF_THEN_ELSE
+| T_if expr5 T_then expr T_else expr %prec IF_THEN_ELSE
 ;
 
 or_clause_list:
