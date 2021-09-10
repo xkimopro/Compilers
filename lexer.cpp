@@ -1065,42 +1065,42 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 74 "lexer.l"
-{return T_int_expr; }
+{ yylval.num = atoi(yytext); return T_int_expr; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 76 "lexer.l"
-{return T_arrow_op; }
+{ return T_arrow_op; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 77 "lexer.l"
-{return T_plus_op; }
+{ return T_plus_op; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 78 "lexer.l"
-{return T_minus_op; }
+{ return T_minus_op; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 79 "lexer.l"
-{return T_mult_op; }
+{ return T_mult_op; }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 80 "lexer.l"
-{return T_div_op; }
+{ return T_div_op; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 81 "lexer.l"
-{return T_pow_op; }
+{ return T_pow_op; }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 82 "lexer.l"
-{return T_and_op; }
+{ return T_and_op; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP

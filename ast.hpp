@@ -4,7 +4,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
+#include <string>
 #include "symbol.hpp"
 
 template <typename T>
@@ -40,17 +40,7 @@ class Stmt : public AST
 };
 
 class Expr: public AST {
-public:
-  virtual int eval() const = 0;
-  void type_check(Type t) {
-    sem();
-    if (type != t) {
-      std::cerr << "Type mismatch" << std::endl;
-      exit(1);
-    }
-  }
-protected:
-  Type type;
+
 };
 
 class Int_Expr: public Expr {
@@ -85,12 +75,12 @@ private:
 
 class Str_Expr: public Expr {
 public:
-  Str_Expr(string s): str(s) {}
+  Str_Expr(std::string s): str(s) {}
   virtual void printOn(std::ostream &out) const override {
     out << "Str_Expr(" << str << ")";
   }
 private:
-  string str;
+  std::string str;
 };
 
 class True: public Expr {
@@ -107,6 +97,45 @@ public:
   virtual void printOn(std::ostream &out) const override {
     out << "false";
   }
+};
+
+class Unit: public Expr {
+public:
+  Unit() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "()";
+  }
+};
+
+class Array: public Expr {
+public:
+  Array(std::string s, std::vector<Expr *> *v): var(s), expr_vec(v) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Array(" << var << ", [" << *expr_vec << "])";
+  }
+private:
+  std::string var;
+  std::vector<Expr *> *expr_vec;
+};
+
+class id: public Expr {
+public:
+  id(std::string s): var(s) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "id(" << var << ")";
+  }
+private:
+  std::string var;
+};
+
+class Id: public Expr {
+public:
+  Id(std::string s): var(s) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Id(" << var << ")";
+  }
+private:
+  std::string var;
 };
 
 // extern std::vector<int> rt_stack;
@@ -345,15 +374,16 @@ public:
 class NormalDef : public Def
 {
 public:
-  NormalDef(std::vector<Par *> *v) : par_vec(v) {}
+  NormalDef(std::vector<Par *> *v, Expr *e) : par_vec(v), expr(e) {}
 
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Def(" << *par_vec << ")";
+    out << "Def(" << *par_vec << *expr << ")";
   }
 
 private:
   std::vector<Par *> *par_vec;
+  Expr *expr;
 };
 
 class LetDef : public Stmt

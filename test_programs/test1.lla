@@ -1,9 +1,2 @@
 let a = 2 and c =4 and d = 5
 
-let main x y z = print_string "asdasd"
-
-type pile = Left | Middle | Right
-
-let mutable a : int 
-and a = 'c'
-

@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.7.  */
+/* A Bison parser, made by GNU Bison 3.5.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -31,9 +31,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_YY_PARSER_HPP_INCLUDED
 # define YY_YY_PARSER_HPP_INCLUDED
@@ -45,73 +44,68 @@
 extern int yydebug;
 #endif
 
-/* Token kinds.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    T_and = 258,                   /* T_and  */
-    T_dim = 259,                   /* T_dim  */
-    T_false = 260,                 /* T_false  */
-    T_let = 261,                   /* T_let  */
-    T_of = 262,                    /* T_of  */
-    T_type = 263,                  /* T_type  */
-    T_array = 264,                 /* T_array  */
-    T_do = 265,                    /* T_do  */
-    T_float = 266,                 /* T_float  */
-    T_match = 267,                 /* T_match  */
-    T_rec = 268,                   /* T_rec  */
-    T_unit = 269,                  /* T_unit  */
-    T_begin = 270,                 /* T_begin  */
-    T_done = 271,                  /* T_done  */
-    T_for = 272,                   /* T_for  */
-    T_mod = 273,                   /* T_mod  */
-    T_ref = 274,                   /* T_ref  */
-    T_while = 275,                 /* T_while  */
-    T_bool = 276,                  /* T_bool  */
-    T_downto = 277,                /* T_downto  */
-    T_if = 278,                    /* T_if  */
-    T_mutable = 279,               /* T_mutable  */
-    T_then = 280,                  /* T_then  */
-    T_with = 281,                  /* T_with  */
-    T_char = 282,                  /* T_char  */
-    T_else = 283,                  /* T_else  */
-    T_in = 284,                    /* T_in  */
-    T_new = 285,                   /* T_new  */
-    T_to = 286,                    /* T_to  */
-    T_delete = 287,                /* T_delete  */
-    T_end = 288,                   /* T_end  */
-    T_int = 289,                   /* T_int  */
-    T_not = 290,                   /* T_not  */
-    T_true = 291,                  /* T_true  */
-    T_Id = 292,                    /* T_Id  */
-    T_id = 293,                    /* T_id  */
-    T_int_expr = 294,              /* T_int_expr  */
-    T_float_expr = 295,            /* T_float_expr  */
-    T_char_expr = 296,             /* T_char_expr  */
-    T_str_expr = 297,              /* T_str_expr  */
-    T_arrow_op = 298,              /* T_arrow_op  */
-    T_plus_op = 299,               /* T_plus_op  */
-    T_minus_op = 300,              /* T_minus_op  */
-    T_mult_op = 301,               /* T_mult_op  */
-    T_div_op = 302,                /* T_div_op  */
-    T_pow_op = 303,                /* T_pow_op  */
-    T_and_op = 304,                /* T_and_op  */
-    T_or_op = 305,                 /* T_or_op  */
-    T_struct_diff_op = 306,        /* T_struct_diff_op  */
-    T_leq_op = 307,                /* T_leq_op  */
-    T_geq_op = 308,                /* T_geq_op  */
-    T_eq_op = 309,                 /* T_eq_op  */
-    T_diff_op = 310,               /* T_diff_op  */
-    T_assign_op = 311,             /* T_assign_op  */
-    LET_IN = 312,                  /* LET_IN  */
-    IF_THEN_ELSE = 313             /* IF_THEN_ELSE  */
+    T_and = 258,
+    T_dim = 259,
+    T_false = 260,
+    T_let = 261,
+    T_of = 262,
+    T_type = 263,
+    T_array = 264,
+    T_do = 265,
+    T_float = 266,
+    T_match = 267,
+    T_rec = 268,
+    T_unit = 269,
+    T_begin = 270,
+    T_done = 271,
+    T_for = 272,
+    T_mod = 273,
+    T_ref = 274,
+    T_while = 275,
+    T_bool = 276,
+    T_downto = 277,
+    T_if = 278,
+    T_mutable = 279,
+    T_then = 280,
+    T_with = 281,
+    T_char = 282,
+    T_else = 283,
+    T_in = 284,
+    T_new = 285,
+    T_to = 286,
+    T_delete = 287,
+    T_end = 288,
+    T_int = 289,
+    T_not = 290,
+    T_true = 291,
+    T_Id = 292,
+    T_id = 293,
+    T_int_expr = 294,
+    T_float_expr = 295,
+    T_char_expr = 296,
+    T_str_expr = 297,
+    T_arrow_op = 298,
+    T_plus_op = 299,
+    T_minus_op = 300,
+    T_mult_op = 301,
+    T_div_op = 302,
+    T_pow_op = 303,
+    T_and_op = 304,
+    T_or_op = 305,
+    T_struct_diff_op = 306,
+    T_leq_op = 307,
+    T_geq_op = 308,
+    T_eq_op = 309,
+    T_diff_op = 310,
+    T_assign_op = 311,
+    LET_IN = 312,
+    IF_THEN_ELSE = 313
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
@@ -133,14 +127,13 @@ union YYSTYPE
   std::vector<Constr *> *constr_vec;
   Constr *constr;
   Par *par;
-
-  // Expr *expr;
+  Expr *expr;
   // Type type;
   // char var;
-  // int num;
+  int num;
   // char op;
 
-#line 144 "parser.hpp"
+#line 137 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

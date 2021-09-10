@@ -40,7 +40,7 @@
 %token T_true
 %token T_Id
 %token T_id
-%token T_int_expr
+%token<num> T_int_expr
 %token T_float_expr
 %token T_char_expr
 %token T_str_expr
@@ -89,11 +89,10 @@
   std::vector<Constr *> *constr_vec;
   Constr *constr;
   Par *par;
-
-  // Expr *expr;
+  Expr *expr;
   // Type type;
   // char var;
-  // int num;
+  int num;
   // char op;
 }
 
@@ -110,7 +109,7 @@
 %type<constr_vec> constr_list
 %type<constr> constr
 %type<par> par
-
+%type<expr> expr expr1 expr2 expr3 expr4 expr5
 %%
 
 program:
@@ -140,8 +139,8 @@ and_def_list:
 ;
 
 def:
-  T_id par_list '=' expr  { $$ = new NormalDef($2); }
-| T_id par_list ':' type '=' expr  { $$ = new NormalDef($2); }
+  T_id par_list '=' expr  { $$ = new NormalDef($2, $4); }
+| T_id par_list ':' type '=' expr  { $$ = new NormalDef($2, $6); }
 | T_mutable T_id  { $$ = new MutableDef(); }
 | T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef(); }
 | T_mutable T_id ':' type  { $$ = new MutableDef(); }
@@ -188,7 +187,7 @@ constr_type_list:
 
 par:
   T_id { $$ = new Par(); }
-| '(' T_id ':' type ')' {  $$ = new Par();  }
+| '(' T_id ':' type ')' { $$ = new Par(); }
 ;
 
 type:
@@ -211,13 +210,13 @@ comma_star_list:
 ;
 
 expr:
-  expr5
+  expr5 { $$ = $1; }
 | letdef T_in expr %prec LET_IN
 | expr ';' expr
 ;
 
 expr1:
-  T_int_expr
+  T_int_expr { $$ = new Int_Expr($1); }
 | T_float_expr
 | T_char_expr
 | T_str_expr
@@ -240,13 +239,13 @@ expr1:
 ;
 
 expr2:
-  expr1
+  expr1 { $$ = $1; }
 | T_id expr_list
 | T_Id expr_list
 ;
 
 expr3:
-  expr2
+  expr2 { $$ = $1; }
 | '+' expr2
 | '-' expr2
 | T_plus_op expr2
@@ -256,7 +255,7 @@ expr3:
 ;
 
 expr4:
-  expr3
+  expr3 { $$ = $1; }
 | expr4 '+' expr4
 | expr4 '-' expr4
 | expr4 '*' expr4
@@ -281,7 +280,7 @@ expr4:
 ;
 
 expr5:
-  expr4
+  expr4 { $$ = $1; }
 | T_if expr5 T_then expr %prec IF_THEN_ELSE
 | T_if expr5 T_then expr T_else expr %prec IF_THEN_ELSE
 ;

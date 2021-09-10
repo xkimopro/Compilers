@@ -71,7 +71,7 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 
 \"{CHAR}*\" { return T_str_expr; }
 
-{D}+                {return T_int_expr; }
+{D}+ { yylval.num = atoi(yytext); return T_int_expr; }
 
 "->"  { return T_arrow_op; }
 "+."  { return T_plus_op; }
