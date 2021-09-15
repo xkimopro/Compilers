@@ -63,15 +63,15 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 "not"    { return T_not; }
 "true"  { return T_true; }
 
-[A-Z][A-Za-z_0-9]* { return T_Id; }
-[a-z][A-Za-z_0-9]*   { return T_id; }
-[0-9]+\.[0-9]+([eE][\-+][0-9]+)? { return T_float_expr; }
- 
-\'{CHAR}\' { return T_char_expr; }
+[A-Z][A-Za-z_0-9]* { yylval.var = strdup(yytext); return T_Id; }
+[a-z][A-Za-z_0-9]*   { yylval.var = strdup(yytext); return T_id; }
+[0-9]+\.[0-9]+([eE][\-+][0-9]+)? { yylval.float_expr = atof(yytext); return T_float_expr; }
 
-\"{CHAR}*\" { return T_str_expr; }
+\'{CHAR}\' { yylval.char_expr = yytext[1]; return T_char_expr; }
 
-{D}+ { yylval.num = atoi(yytext); return T_int_expr; }
+\"{CHAR}*\" { yylval.str_expr = strdup(yytext); return T_str_expr; }
+
+{D}+ { yylval.int_expr = atoi(yytext); return T_int_expr; }
 
 "->"  { return T_arrow_op; }
 "+."  { return T_plus_op; }

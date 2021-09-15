@@ -128,12 +128,17 @@ union YYSTYPE
   Constr *constr;
   Par *par;
   Expr *expr;
+  std::vector<Expr *> *expr_vec;
   // Type type;
-  // char var;
-  int num;
+  int int_expr;
+  float float_expr;
+  char char_expr;
+  char* str_expr;
+  bool bool_expr;
+  char* var;
   // char op;
 
-#line 137 "parser.hpp"
+#line 142 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

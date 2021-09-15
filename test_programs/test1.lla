@@ -1,2 +1,2 @@
-let a = 2 and c =4 and d = 5
-
+let a = 223.2 and c = 'c' and d = 5 and e = true and f = false and g = ("asd") and h = ()
+and i = a[v,B] and j = !a and k = dim 2 a and l = while true do 1 done

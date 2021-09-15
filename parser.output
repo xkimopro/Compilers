@@ -177,7 +177,7 @@ Terminals, with rules where they appear
     error (256)
     T_and (258) 9 22
     T_dim (259) 58 59
-    T_false (260) 53 118
+    T_false <bool_expr> (260) 53 118
     T_let (261) 6 7
     T_of (262) 27 40 41
     T_type (263) 20
@@ -208,13 +208,13 @@ Terminals, with rules where they appear
     T_end (288) 56 67
     T_int (289) 33
     T_not (290) 76
-    T_true (291) 52 117
-    T_Id (292) 26 27 62 70 109 121
-    T_id (293) 10 11 12 13 14 15 23 30 31 42 57 58 59 61 65 66 69 119
-    T_int_expr <num> (294) 48 59 110 111 112
-    T_float_expr (295) 49 113 114 115
-    T_char_expr (296) 50 116
-    T_str_expr (297) 51
+    T_true <bool_expr> (291) 52 117
+    T_Id <var> (292) 26 27 62 70 109 121
+    T_id <var> (293) 10 11 12 13 14 15 23 30 31 42 57 58 59 61 65 66 69 119
+    T_int_expr <int_expr> (294) 48 59 110 111 112
+    T_float_expr <float_expr> (295) 49 113 114 115
+    T_char_expr <char_expr> (296) 50 116
+    T_str_expr <str_expr> (297) 51
     T_arrow_op (298) 38 107
     T_plus_op (299) 74 83 114
     T_minus_op (300) 75 84 115
@@ -258,7 +258,7 @@ Nonterminals, with rules where they appear
     par_list <par_vec> (82)
         on left: 16 17
         on right: 10 11 17
-    comma_expr_list (83)
+    comma_expr_list <expr_vec> (83)
         on left: 18 19
         on right: 13 15 19 57
     typedef <type_def> (84)

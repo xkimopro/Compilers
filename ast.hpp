@@ -1,10 +1,8 @@
 #pragma once
 
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
-#include <map>
-#include <vector>
-#include <string>
 #include "symbol.hpp"
 
 template <typename T>
@@ -83,27 +81,21 @@ private:
   std::string str;
 };
 
-class True: public Expr {
+class Bool_Expr: public Expr {
 public:
-  True() {}
+  Bool_Expr(bool b): var(b) {}
   virtual void printOn(std::ostream &out) const override {
-    out << "true";
+    out << "Bool_Expr(" << var << ")";
   }
-};
-
-class False: public Expr {
-public:
-  False() {}
-  virtual void printOn(std::ostream &out) const override {
-    out << "false";
-  }
+private:
+  bool var;
 };
 
 class Unit: public Expr {
 public:
   Unit() {}
   virtual void printOn(std::ostream &out) const override {
-    out << "()";
+    out << "Unit()";
   }
 };
 
@@ -116,6 +108,17 @@ public:
 private:
   std::string var;
   std::vector<Expr *> *expr_vec;
+};
+
+class Dim: public Expr {
+public:
+  Dim(std::string s, int i = 1): var(s), ind(i) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Dim(" << ind << ", "<< var << ")";
+  }
+private:
+  std::string var;
+  int ind;
 };
 
 class id: public Expr {
@@ -137,6 +140,27 @@ public:
 private:
   std::string var;
 };
+
+class Exclamation: public Expr {
+public:
+  Exclamation(Expr *e): expr(e) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "!(" << *expr << ")";
+  }
+private:
+  Expr *expr;
+};
+
+class While: public Expr {
+public:
+  While(Expr *e1, Expr *e2): cond(e1), stmt(e2) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "While(" << *cond << ", " << *stmt << ")";
+  }
+private:
+  Expr *cond, *stmt;
+};
+
 
 // extern std::vector<int> rt_stack;
 

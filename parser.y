@@ -6,7 +6,7 @@
 
 %token T_and
 %token T_dim
-%token T_false
+%token<bool_expr> T_false
 %token T_let
 %token T_of
 %token T_type
@@ -37,13 +37,13 @@
 %token T_end
 %token T_int
 %token T_not
-%token T_true
-%token T_Id
-%token T_id
-%token<num> T_int_expr
-%token T_float_expr
-%token T_char_expr
-%token T_str_expr
+%token<bool_expr> T_true
+%token<var> T_Id
+%token<var> T_id
+%token<int_expr> T_int_expr
+%token<float_expr> T_float_expr
+%token<char_expr> T_char_expr
+%token<str_expr> T_str_expr
 %token T_arrow_op
 %token T_plus_op
 %token T_minus_op
@@ -90,9 +90,14 @@
   Constr *constr;
   Par *par;
   Expr *expr;
+  std::vector<Expr *> *expr_vec;
   // Type type;
-  // char var;
-  int num;
+  int int_expr;
+  float float_expr;
+  char char_expr;
+  char* str_expr;
+  bool bool_expr;
+  char* var;
   // char op;
 }
 
@@ -110,6 +115,7 @@
 %type<constr> constr
 %type<par> par
 %type<expr> expr expr1 expr2 expr3 expr4 expr5
+%type<expr_vec> comma_expr_list
 %%
 
 program:
@@ -153,8 +159,8 @@ par_list:
 ;
 
 comma_expr_list:
-  expr
-| comma_expr_list ',' expr
+  expr { $$ = new std::vector<Expr *>; $$->push_back($1); }
+| comma_expr_list ',' expr { $1->push_back($3); $$ = $1; }
 ;
 
 typedef:
@@ -162,7 +168,7 @@ typedef:
 ;
 
 and_tdef_list:
-  tdef  { $$ = new std::vector<TDef *>; $$->push_back($1); }
+  tdef { $$ = new std::vector<TDef *>; $$->push_back($1); }
 | and_tdef_list T_and tdef { $1->push_back($3); $$ = $1; }
 ;
 
@@ -217,22 +223,22 @@ expr:
 
 expr1:
   T_int_expr { $$ = new Int_Expr($1); }
-| T_float_expr
-| T_char_expr
-| T_str_expr
-| T_true
-| T_false
-| '(' ')'
-| '(' expr ')'
-| T_begin expr T_end
-| T_id '[' comma_expr_list ']'
-| T_dim T_id
-| T_dim T_int_expr T_id
+| T_float_expr { $$ = new Float_Expr($1); }
+| T_char_expr { $$ = new Char_Expr($1); }
+| T_str_expr { $$ = new Str_Expr($1); }
+| T_true { $$ = new Bool_Expr(true); }
+| T_false { $$ = new Bool_Expr(false); }
+| '(' ')' { $$ = new Unit(); }
+| '(' expr ')' { $$ = $2; }
+| T_begin expr T_end { $$ = $2; }
+| T_id '[' comma_expr_list ']' { $$ = new Array($1, $3); }
+| T_dim T_id { $$ = new Dim($2); }
+| T_dim T_int_expr T_id { $$ = new Dim($3, $2); }
 | T_new type
-| T_id
-| T_Id
-| '!' expr1
-| T_while expr T_do expr T_done
+| T_id { $$ = new id($1); }
+| T_Id { $$ = new Id($1); }
+| '!' expr1 { $$ = new Exclamation($2); }
+| T_while expr T_do expr T_done { $$ = new While($2, $4); }
 | T_for T_id '=' expr T_to expr T_do expr T_done
 | T_for T_id '=' expr T_downto expr T_do expr T_done
 | T_match expr T_with or_clause_list T_end

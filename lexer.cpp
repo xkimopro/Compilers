@@ -1040,32 +1040,32 @@ YY_RULE_SETUP
 case 35:
 YY_RULE_SETUP
 #line 66 "lexer.l"
-{ return T_Id; }
+{ yylval.var = strdup(yytext); return T_Id; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 67 "lexer.l"
-{ return T_id; }
+{ yylval.var = strdup(yytext); return T_id; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 68 "lexer.l"
-{ return T_float_expr; }
+{ yylval.float_expr = atof(yytext); return T_float_expr; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 70 "lexer.l"
-{ return T_char_expr; }
+{ yylval.char_expr = yytext[1]; return T_char_expr; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 72 "lexer.l"
-{ return T_str_expr; }
+{ yylval.str_expr = strdup(yytext); return T_str_expr; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 74 "lexer.l"
-{ yylval.num = atoi(yytext); return T_int_expr; }
+{ yylval.int_expr = atoi(yytext); return T_int_expr; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
