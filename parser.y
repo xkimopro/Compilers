@@ -346,7 +346,7 @@ void yyerror(const char *msg) {
    fprintf (stderr, "Error: %s\n", msg);
    exit(1);
 }
-//test
+
 int main() {
   int result = yyparse();
   if (result == 0) printf("Success.\n");
