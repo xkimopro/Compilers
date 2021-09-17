@@ -1,2 +1,14 @@
 let a = 223.2 and c = 'c' and d = 5 and e = true and f = false and g = ("asd") and h = ()
-and i = a[v,B] and j = !a and k = dim 2 a and l = while true do 1 done
+and i = a[v,B] and j = !a and k = dim 2 a and l = while true do 1 done and t =  for i = 1 to k do
+    2
+done
+and m = A 1 2 3
+and n = + 3
+and o = delete 4
+and o = +. 4
+and p = a + 5
+and a = if 1 then 2 
+and a = if 1 then 2 else 3
+and a = !n ; !m
+and a = let x = 5 in x
+and a = match pile with 1 -> 66 end

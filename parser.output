@@ -306,19 +306,19 @@ Nonterminals, with rules where they appear
     expr5 <expr> (98)
         on left: 100 101 102
         on right: 45 101 102
-    or_clause_list (99)
+    or_clause_list <clause_vec> (99)
         on left: 103 104
         on right: 67 104
-    expr_list (100)
+    expr_list <expr_vec> (100)
         on left: 105 106
         on right: 69 70 106
-    clause (101)
+    clause <clause> (101)
         on left: 107
         on right: 103 104
-    pattern (102)
+    pattern <pattern> (102)
         on left: 108 109
         on right: 107 120
-    pattern1 (103)
+    pattern1 <pattern> (103)
         on left: 110 111 112 113 114 115 116 117 118 119 120 121
         on right: 108 122 123
     pattern_list (104)

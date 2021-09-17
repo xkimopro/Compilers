@@ -136,9 +136,11 @@ union YYSTYPE
   char* str_expr;
   bool bool_expr;
   char* var;
-  // char op;
+  Pattern* pattern;
+  Clause* clause;
+  std::vector<Clause *> *clause_vec;
 
-#line 142 "parser.hpp"
+#line 144 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

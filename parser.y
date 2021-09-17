@@ -6,7 +6,7 @@
 
 %token T_and
 %token T_dim
-%token<bool_expr> T_false
+%token T_false
 %token T_let
 %token T_of
 %token T_type
@@ -37,13 +37,13 @@
 %token T_end
 %token T_int
 %token T_not
-%token<bool_expr> T_true
-%token<var> T_Id
-%token<var> T_id
-%token<int_expr> T_int_expr
-%token<float_expr> T_float_expr
-%token<char_expr> T_char_expr
-%token<str_expr> T_str_expr
+%token T_true
+%token T_Id
+%token T_id
+%token T_int_expr
+%token T_float_expr
+%token T_char_expr
+%token T_str_expr
 %token T_arrow_op
 %token T_plus_op
 %token T_minus_op
@@ -98,7 +98,9 @@
   char* str_expr;
   bool bool_expr;
   char* var;
-  // char op;
+  Pattern* pattern;
+  Clause* clause;
+  std::vector<Clause *> *clause_vec;
 }
 
 %type<stmt_vec> program stmt_list
@@ -115,7 +117,16 @@
 %type<constr> constr
 %type<par> par
 %type<expr> expr expr1 expr2 expr3 expr4 expr5
-%type<expr_vec> comma_expr_list
+%type<expr_vec> comma_expr_list expr_list
+%type<bool_expr> T_false T_true
+%type<var> T_id T_Id
+%type<int_expr> T_int_expr
+%type<float_expr> T_float_expr
+%type<char_expr> T_char_expr
+%type<str_expr> T_str_expr
+%type<pattern> pattern pattern1
+%type<clause> clause
+%type<clause_vec> or_clause_list
 %%
 
 program:
@@ -145,12 +156,12 @@ and_def_list:
 ;
 
 def:
-  T_id par_list '=' expr  { $$ = new NormalDef($2, $4); }
-| T_id par_list ':' type '=' expr  { $$ = new NormalDef($2, $6); }
-| T_mutable T_id  { $$ = new MutableDef(); }
-| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef(); }
-| T_mutable T_id ':' type  { $$ = new MutableDef(); }
-| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef(); }
+  T_id par_list '=' expr  { $$ = new NormalDef($1, $2, $4); }
+| T_id par_list ':' type '=' expr  { $$ = new NormalDef($1, $2, $6); }
+| T_mutable T_id  { $$ = new MutableDef($2); }
+| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2); }
+| T_mutable T_id ':' type  { $$ = new MutableDef($2); }
+| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2); }
 ;
 
 par_list:
@@ -168,14 +179,13 @@ typedef:
 ;
 
 and_tdef_list:
-  tdef { $$ = new std::vector<TDef *>; $$->push_back($1); }
+  tdef {   }
 | and_tdef_list T_and tdef { $1->push_back($3); $$ = $1; }
 ;
 
-tdef:
+tdef: 
   T_id '=' constr_list { $$ = new TDef($3); }
 ;
-
 constr_list:
   constr  { $$ = new std::vector<Constr *>; $$->push_back($1); }
 | constr_list '|' constr { $1->push_back($3); $$ = $1; }
@@ -217,8 +227,8 @@ comma_star_list:
 
 expr:
   expr5 { $$ = $1; }
-| letdef T_in expr %prec LET_IN
-| expr ';' expr
+| letdef T_in expr %prec LET_IN { $$ = new LetIn($1, $3); }
+| expr ';' expr { $$ = new BinOp($1, binop_semicolon, $3); }
 ;
 
 expr1:
@@ -226,7 +236,7 @@ expr1:
 | T_float_expr { $$ = new Float_Expr($1); }
 | T_char_expr { $$ = new Char_Expr($1); }
 | T_str_expr { $$ = new Str_Expr($1); }
-| T_true { $$ = new Bool_Expr(true); }
+| T_true { $$ = new Bool_Expr(true); }  
 | T_false { $$ = new Bool_Expr(false); }
 | '(' ')' { $$ = new Unit(); }
 | '(' expr ')' { $$ = $2; }
@@ -237,81 +247,81 @@ expr1:
 | T_new type
 | T_id { $$ = new id($1); }
 | T_Id { $$ = new Id($1); }
-| '!' expr1 { $$ = new Exclamation($2); }
+| '!' expr1 { $$ = new UnOp(unop_exclamation, $2); }
 | T_while expr T_do expr T_done { $$ = new While($2, $4); }
-| T_for T_id '=' expr T_to expr T_do expr T_done
-| T_for T_id '=' expr T_downto expr T_do expr T_done
-| T_match expr T_with or_clause_list T_end
+| T_for T_id '=' expr T_to expr T_do expr T_done { $$ = new For($2, $4, $6, $8, false); }
+| T_for T_id '=' expr T_downto expr T_do expr T_done { $$ = new For($2, $4, $6, $8, true); }
+| T_match expr T_with or_clause_list T_end { $$ = new Match($2,$4); }
 ;
 
 expr2:
   expr1 { $$ = $1; }
-| T_id expr_list
-| T_Id expr_list
+| T_id expr_list { $$ = new call($1, $2); }
+| T_Id expr_list { $$ = new Call($1, $2); }
 ;
 
 expr3:
   expr2 { $$ = $1; }
-| '+' expr2
-| '-' expr2
-| T_plus_op expr2
-| T_minus_op expr2
-| T_not expr2
-| T_delete expr2
+| '+' expr2 { $$ = new UnOp(unop_plus, $2); }
+| '-' expr2  { $$ = new UnOp(unop_minus, $2); }
+| T_plus_op expr2 { $$ = new UnOp(unop_float_plus, $2); }
+| T_minus_op expr2 { $$ = new UnOp(unop_float_minus, $2); }
+| T_not expr2 { $$ = new UnOp(unop_not, $2); }
+| T_delete expr2 { $$ = new UnOp(unop_delete, $2); }
 ;
 
 expr4:
   expr3 { $$ = $1; }
-| expr4 '+' expr4
-| expr4 '-' expr4
-| expr4 '*' expr4
-| expr4 '/' expr4
-| expr4 T_plus_op expr4
-| expr4 T_minus_op expr4
-| expr4 T_mult_op expr4
-| expr4 T_div_op expr4
-| expr4 T_mod expr4
-| expr4 T_pow_op expr4
-| expr4 '=' expr4
-| expr4 T_struct_diff_op expr4
-| expr4 '<' expr4
-| expr4 '>' expr4
-| expr4 T_leq_op expr4
-| expr4 T_geq_op expr4
-| expr4 T_eq_op expr4
-| expr4 T_diff_op expr4
-| expr4 T_and_op expr4
-| expr4 T_or_op expr4
-| expr4 T_assign_op expr4
+| expr4 '+' expr4 { $$ = new BinOp($1, binop_plus , $3); }
+| expr4 '-' expr4 { $$ = new BinOp($1, binop_minus , $3); }
+| expr4 '*' expr4 { $$ = new BinOp($1, binop_mult , $3); }
+| expr4 '/' expr4 { $$ = new BinOp($1, binop_div , $3); }
+| expr4 T_plus_op expr4 { $$ = new BinOp($1, binop_float_plus , $3); }
+| expr4 T_minus_op expr4 { $$ = new BinOp($1, binop_float_minus , $3); }
+| expr4 T_mult_op expr4 { $$ = new BinOp($1, binop_float_mult , $3); }
+| expr4 T_div_op expr4 { $$ = new BinOp($1, binop_float_div , $3); }
+| expr4 T_mod expr4 { $$ = new BinOp($1, binop_mod , $3); }
+| expr4 T_pow_op expr4 { $$ = new BinOp($1, binop_pow , $3); }
+| expr4 '=' expr4 { $$ = new BinOp($1, binop_single_eq , $3); }
+| expr4 T_struct_diff_op expr4 { $$ = new BinOp($1, binop_struct_diff , $3); }
+| expr4 '<' expr4 { $$ = new BinOp($1, binop_l , $3); }
+| expr4 '>' expr4 { $$ = new BinOp($1, binop_g , $3); }
+| expr4 T_leq_op expr4 { $$ = new BinOp($1, binop_leq , $3); }
+| expr4 T_geq_op expr4 { $$ = new BinOp($1, binop_geq , $3); }
+| expr4 T_eq_op expr4 { $$ = new BinOp($1, binop_double_eq , $3); } 
+| expr4 T_diff_op expr4 { $$ = new BinOp($1, binop_diff , $3); }
+| expr4 T_and_op expr4 { $$ = new BinOp($1, binop_and , $3); }
+| expr4 T_or_op expr4 { $$ = new BinOp($1, binop_or , $3); }
+| expr4 T_assign_op expr4 { $$ = new BinOp($1, binop_assign , $3); }
 ;
 
 expr5:
   expr4 { $$ = $1; }
-| T_if expr5 T_then expr %prec IF_THEN_ELSE
-| T_if expr5 T_then expr T_else expr %prec IF_THEN_ELSE
+| T_if expr5 T_then expr %prec IF_THEN_ELSE { $$ = new If($2 ,$4, nullptr ); }
+| T_if expr5 T_then expr T_else expr %prec IF_THEN_ELSE { $$ = new If($2 ,$4, $6 ); }
 ;
 
 or_clause_list:
-  clause
-| or_clause_list '|' clause
+  clause { $$ = new std::vector<Clause *>; $$->push_back($1); }
+| or_clause_list '|' clause { $1->push_back($3); $$ = $1; }
 ;
 
 expr_list:
-  expr1
-| expr_list expr1
+  expr1 { $$ = new std::vector<Expr *>; $$->push_back($1); }
+| expr_list expr1 { $1->push_back($2); $$ = $1; }
 ;
 
 clause:
-  pattern T_arrow_op expr
+  pattern T_arrow_op expr { $$ = new Clause($1, $3); }
 ;
 
 pattern:
-  pattern1
+  pattern1 { $$ = $1; }
 | T_Id pattern_list
 ;
 
 pattern1:
-  T_int_expr
+  T_int_expr { $$ = new Pattern_Int_Expr($1); }
 | '+' T_int_expr
 | '-' T_int_expr
 | T_float_expr
