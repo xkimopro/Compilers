@@ -55,14 +55,6 @@ typedef enum {
     binop_assign
 } binop_enum;
 
-typedef enum {
-    pattern_plus,
-    pattern_minus,
-    pattern_float_plus,
-    pattern_float_minus
-    
-} pattern_enum;
-
 class AST
 {
 public:
@@ -230,17 +222,6 @@ private:
   std::vector<Expr *> *expr_vec;
 };
 
-// class CustomType: public Expr {
-// public:
-//   CustomType(std::string s, std::vector<Expr *> *v): fun_name(s), expr_vec(v) {}
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "FunCall(" << fun_name << ", (" << *expr_vec << "))";
-//   }
-// private:
-//   std::string fun_name;
-//   std::vector<Expr *> *expr_vec;
-// };
-
 class UnOp: public Expr {
 public:
   UnOp(unop_enum op1 , Expr* e1): op(op1), e(e1) {}
@@ -319,6 +300,37 @@ private:
   bool var;
 };
 
+class Pattern_id: public Pattern {
+public:
+  Pattern_id(std::string s): var(s) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Pattern_id(" << var << ")";
+  }
+private:
+  std::string var;
+};
+
+class Pattern_Id: public Pattern {
+public:
+  Pattern_Id(std::string s): var(s) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Pattern_Id(" << var << ")";
+  }
+private:
+  std::string var;
+};
+
+class Pattern_Call: public Pattern {
+public:
+  Pattern_Call(std::string s, std::vector<Pattern *> *v): fun_name(s), pattern_vec(v) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Pattern_Call(" << fun_name << ", (" << *pattern_vec << "))";
+  }
+private:
+  std::string fun_name;
+  std::vector<Pattern *> *pattern_vec;
+};
+
 class Clause: public AST {
 public:
   Clause(Pattern* p1 , Expr* e1): p(p1), e(e1) {}
@@ -340,6 +352,7 @@ private:
   Expr* e;
   std::vector<Clause *> *vec;
 };
+
 // extern std::vector<int> rt_stack;
 
 // class Id: public Expr {
@@ -532,14 +545,15 @@ public:
 class TDef : public AST
 {
 public:
-  TDef(std::vector<Constr *> *v) : constr_vec(v) {}
+  TDef(std::string s, std::vector<Constr *> *v) : id(s), constr_vec(v) {}
 
   virtual void printOn(std::ostream &out) const override
   {
-    out << "TDef(" << *constr_vec << ")";
+    out << "TDef(" << id << ", " << *constr_vec << ")";
   }
 
 private:
+  std::string id;
   std::vector<Constr *> *constr_vec;
 };
 
@@ -564,14 +578,17 @@ class Def : public AST
 class MutableDef : public Def
 {
 public:
-  MutableDef(std::string s): id(s) {}
+  MutableDef(std::string s, std::vector<Expr *> *e): id(s), expr_vec(e) {}
 
   virtual void printOn(std::ostream &out) const override
   {
-    out << "MutableDef(" << id << ")";
+    out << "MutableDef(" << id;
+    if(expr_vec != nullptr) out << ", [" << *expr_vec << "]";
+    out << ")";
   }
 
   std::string id;
+  std::vector<Expr *> *expr_vec;
 };
 
 class NormalDef : public Def
@@ -595,14 +612,15 @@ private:
 class LetDef : public Stmt
 {
 public:
-  LetDef(std::vector<Def *> *v) : def_vec(v) {}
+  LetDef(bool b, std::vector<Def *> *v) : rec(b), def_vec(v) {}
 
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Letdef(" << *def_vec << ")";
+    out << "Letdef(" << rec << ", "  << *def_vec << ")";
   }
 
 private:
+  bool rec;
   std::vector<Def *> *def_vec;
 };
 

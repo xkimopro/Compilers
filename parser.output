@@ -177,7 +177,7 @@ Terminals, with rules where they appear
     error (256)
     T_and (258) 9 22
     T_dim (259) 58 59
-    T_false <bool_expr> (260) 53 118
+    T_false (260) 53 118
     T_let (261) 6 7
     T_of (262) 27 40 41
     T_type (263) 20
@@ -208,7 +208,7 @@ Terminals, with rules where they appear
     T_end (288) 56 67
     T_int (289) 33
     T_not (290) 76
-    T_true <bool_expr> (291) 52 117
+    T_true (291) 52 117
     T_Id <var> (292) 26 27 62 70 109 121
     T_id <var> (293) 10 11 12 13 14 15 23 30 31 42 57 58 59 61 65 66 69 119
     T_int_expr <int_expr> (294) 48 59 110 111 112
@@ -321,7 +321,7 @@ Nonterminals, with rules where they appear
     pattern1 <pattern> (103)
         on left: 110 111 112 113 114 115 116 117 118 119 120 121
         on right: 108 122 123
-    pattern_list (104)
+    pattern_list <pattern_vec> (104)
         on left: 122 123
         on right: 109 123
 

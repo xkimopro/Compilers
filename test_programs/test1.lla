@@ -11,4 +11,4 @@ and a = if 1 then 2
 and a = if 1 then 2 else 3
 and a = !n ; !m
 and a = let x = 5 in x
-and a = match pile with 1 -> 66 end
+and a = match pile with Id -. 0.6 -1 -> 66 end

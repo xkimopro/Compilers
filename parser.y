@@ -82,25 +82,24 @@
   LetDef *letdef;
   Def *def;
   std::vector<Par *> *par_vec;
-
+  std::vector<Expr *> *expr_vec;
   TypeDef *type_def;
   std::vector<TDef *> *tdef_vec;
   TDef *tdef;
   std::vector<Constr *> *constr_vec;
   Constr *constr;
   Par *par;
-  Expr *expr;
-  std::vector<Expr *> *expr_vec;
   // Type type;
+  Expr *expr;
   int int_expr;
   float float_expr;
   char char_expr;
   char* str_expr;
-  bool bool_expr;
   char* var;
   Pattern* pattern;
   Clause* clause;
   std::vector<Clause *> *clause_vec;
+  std::vector<Pattern *> *pattern_vec;
 }
 
 %type<stmt_vec> program stmt_list
@@ -109,24 +108,24 @@
 %type<letdef> letdef
 %type<def> def
 %type<par_vec> par_list
-
+%type<expr_vec> comma_expr_list expr_list
 %type<type_def> typedef
 %type<tdef_vec> and_tdef_list
 %type<tdef> tdef 
 %type<constr_vec> constr_list
 %type<constr> constr
 %type<par> par
+
 %type<expr> expr expr1 expr2 expr3 expr4 expr5
-%type<expr_vec> comma_expr_list expr_list
-%type<bool_expr> T_false T_true
-%type<var> T_id T_Id
 %type<int_expr> T_int_expr
 %type<float_expr> T_float_expr
 %type<char_expr> T_char_expr
 %type<str_expr> T_str_expr
+%type<var> T_id T_Id
 %type<pattern> pattern pattern1
 %type<clause> clause
 %type<clause_vec> or_clause_list
+%type<pattern_vec> pattern_list
 %%
 
 program:
@@ -146,8 +145,8 @@ stmt:
 ;
 
 letdef:
-  T_let and_def_list  { $$ = new LetDef($2); }
-| T_let T_rec and_def_list  { $$ = new LetDef($3); }
+  T_let and_def_list  { $$ = new LetDef(false, $2); }
+| T_let T_rec and_def_list  { $$ = new LetDef(true, $3); }
 ;
 
 and_def_list:
@@ -158,10 +157,10 @@ and_def_list:
 def:
   T_id par_list '=' expr  { $$ = new NormalDef($1, $2, $4); }
 | T_id par_list ':' type '=' expr  { $$ = new NormalDef($1, $2, $6); }
-| T_mutable T_id  { $$ = new MutableDef($2); }
-| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2); }
-| T_mutable T_id ':' type  { $$ = new MutableDef($2); }
-| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2); }
+| T_mutable T_id  { $$ = new MutableDef($2, nullptr); }
+| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2, $4); }
+| T_mutable T_id ':' type  { $$ = new MutableDef($2, nullptr); }
+| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2, $4); }
 ;
 
 par_list:
@@ -179,12 +178,12 @@ typedef:
 ;
 
 and_tdef_list:
-  tdef {   }
+  tdef { $$ = new std::vector<TDef *>; $$->push_back($1); }
 | and_tdef_list T_and tdef { $1->push_back($3); $$ = $1; }
 ;
 
-tdef: 
-  T_id '=' constr_list { $$ = new TDef($3); }
+tdef:
+  T_id '=' constr_list { $$ = new TDef($1, $3); }
 ;
 constr_list:
   constr  { $$ = new std::vector<Constr *>; $$->push_back($1); }
@@ -317,27 +316,27 @@ clause:
 
 pattern:
   pattern1 { $$ = $1; }
-| T_Id pattern_list
+| T_Id pattern_list { $$ = new Pattern_Call($1, $2); }
 ;
 
 pattern1:
   T_int_expr { $$ = new Pattern_Int_Expr($1); }
-| '+' T_int_expr
-| '-' T_int_expr
-| T_float_expr
-| T_plus_op T_float_expr
-| T_minus_op T_float_expr
-| T_char_expr
-| T_true
-| T_false
-| T_id
-| '(' pattern ')'
-| T_Id
+| '+' T_int_expr { $$ = new Pattern_Int_Expr($2); }
+| '-' T_int_expr { $$ = new Pattern_Int_Expr(-$2); }
+| T_float_expr { $$ = new Pattern_Float_Expr($1); }
+| T_plus_op T_float_expr { $$ = new Pattern_Float_Expr($2); }
+| T_minus_op T_float_expr { $$ = new Pattern_Float_Expr(-$2); }
+| T_char_expr { $$ = new Pattern_Char_Expr($1); }
+| T_true { $$ = new Pattern_Bool_Expr(true); }
+| T_false { $$ = new Pattern_Bool_Expr(false); }
+| T_id { $$ = new Pattern_id($1); }
+| '(' pattern ')' { $$ = $2; }
+| T_Id { $$ = new Pattern_Id($1); }
 ;
 
 pattern_list:
-  pattern1
-| pattern_list pattern1
+  pattern1 { $$ = new std::vector<Pattern *>; $$->push_back($1); }
+| pattern_list pattern1 { $1->push_back($2); $$ = $1; }
 ;
 
 %%
