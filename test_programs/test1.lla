@@ -1,4 +1,4 @@
-let a = 223.2 and c = 'c' and d = 5 and e = true and f = false and g = ("asd") and h = ()
+let a (i : int) b = 223.2 and c = 'c' and d = 5 and e = true and f = false and g = ("asd") and h = ()
 and i = a[v,B] and j = !a and k = dim 2 a and l = while true do 1 done and t =  for i = 1 to k do
     2
 done
@@ -12,3 +12,8 @@ and a = if 1 then 2 else 3
 and a = !n ; !m
 and a = let x = 5 in x
 and a = match pile with Id -. 0.6 -1 -> 66 end
+and mutable a
+and mutable a [1, 2]
+and mutable a : int
+and mutable a [1, 2] : int
+and a = new a

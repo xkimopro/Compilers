@@ -1,0 +1,1 @@
+type test = Node of unit int char bool (float) int -> float char ref array [*,*] of int gfhf | Leaf

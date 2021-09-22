@@ -353,6 +353,99 @@ private:
   std::vector<Clause *> *vec;
 };
 
+class Type: public AST {
+};
+
+class Type_Unit: public Type {
+public:
+  Type_Unit() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Unit()";
+  }
+};
+
+class Type_Int: public Type {
+public:
+  Type_Int() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Int()";
+  }
+};
+
+class Type_Char: public Type {
+public:
+  Type_Char() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Char()";
+  }
+};
+
+class Type_Float: public Type {
+public:
+  Type_Float() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Float()";
+  }
+};
+
+class Type_Bool: public Type {
+public:
+  Type_Bool() {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Bool()";
+  }
+};
+
+class Type_Func: public Type {
+public:
+  Type_Func(Type* t1, Type* t2) : from(t1), to(t2) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Func(" << *from << ", " << *to << ")";
+  }
+private:
+  Type *from, *to;
+};
+
+class Type_Ref: public Type {
+public:
+  Type_Ref(Type* t1) : t(t1) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Ref(" << *t << ")";
+  }
+private:
+  Type* t;
+};
+
+class Type_Array: public Type {
+public:
+  Type_Array(int i, Type* t1) : dim(i), t(t1) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_Array(" << dim << ", " << *t << ")";
+  }
+private:
+  int dim;
+  Type* t;
+};
+
+class Type_id: public Type {
+public:
+  Type_id(std::string s): var(s) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "Type_id(" << var << ")";
+  }
+private:
+  std::string var;
+};
+
+class New: public Expr {
+public:
+  New(Type *t): typ(t) {}
+  virtual void printOn(std::ostream &out) const override {
+    out << "New(" << *typ << ")";
+  }
+private:
+  Type *typ;
+};
 // extern std::vector<int> rt_stack;
 
 // class Id: public Expr {
@@ -522,24 +615,32 @@ private:
 class Constr : public AST
 {
 public:
-  Constr() {}
+  Constr(std::string s, std::vector<Type *> *v) : Id(s), type_vec(v) {}
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Constr("
-        << ")";
+    out << "Constr(" << Id;
+    if(type_vec != nullptr) out << ", " << *type_vec;
+    out << ")";
   }
+private:
+  std::string Id;
+  std::vector<Type *> *type_vec;
 };
 
 class Par : public AST
 {
 public:
-  Par() {}
+  Par(std::string s, Type *t) : id(s), typ(t) {}
 
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Par("
-        << ")";
+    out << "Par(" << id;
+    if(typ != nullptr) out << ", " << *typ;
+    out << ")";
   }
+private:
+  std::string id;
+  Type *typ;
 };
 
 class TDef : public AST
@@ -578,34 +679,38 @@ class Def : public AST
 class MutableDef : public Def
 {
 public:
-  MutableDef(std::string s, std::vector<Expr *> *e): id(s), expr_vec(e) {}
+  MutableDef(std::string s, std::vector<Expr *> *e, Type *t): id(s), expr_vec(e), typ(t) {}
 
   virtual void printOn(std::ostream &out) const override
   {
     out << "MutableDef(" << id;
     if(expr_vec != nullptr) out << ", [" << *expr_vec << "]";
+    if(typ != nullptr) out << ", " << *typ ;
     out << ")";
   }
 
+private:
   std::string id;
   std::vector<Expr *> *expr_vec;
+  Type *typ;
 };
 
 class NormalDef : public Def
 {
 public:
-  NormalDef(std::string id1 , std::vector<Par *> *v, Expr *e): id(id1), par_vec(v), expr(e) {}
+  NormalDef(std::string id1 , std::vector<Par *> *v, Type *t, Expr *e): id(id1), par_vec(v), typ(t), expr(e) {}
 
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Def(" << id << ", [" << *par_vec << "], " << *expr << ")";
+    out << "Def(" << id << ", [" << *par_vec << "], ";
+    if(typ != nullptr) out << *typ << ", " ;
+    out << *expr << ")";
   }
 
-
-
 private:
-  std::vector<Par *> *par_vec; 
+  std::vector<Par *> *par_vec;
   std::string id;
+  Type *typ;
   Expr *expr;
 };
 

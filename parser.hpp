@@ -126,8 +126,10 @@ union YYSTYPE
   TDef *tdef;
   std::vector<Constr *> *constr_vec;
   Constr *constr;
+  std::vector<Type *> *type_vec;
   Par *par;
-  // Type type;
+  Type *type;
+  int stars;
   Expr *expr;
   int int_expr;
   float float_expr;
@@ -139,7 +141,7 @@ union YYSTYPE
   std::vector<Clause *> *clause_vec;
   std::vector<Pattern *> *pattern_vec;
 
-#line 143 "parser.hpp"
+#line 145 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

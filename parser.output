@@ -276,16 +276,16 @@ Nonterminals, with rules where they appear
     constr <constr> (88)
         on left: 26 27
         on right: 24 25
-    constr_type_list (89)
+    constr_type_list <type_vec> (89)
         on left: 28 29
         on right: 27 29
     par <par> (90)
         on left: 30 31
         on right: 17
-    type (91)
+    type <type> (91)
         on left: 32 33 34 35 36 37 38 39 40 41 42
         on right: 11 14 15 28 29 31 37 38 39 40 41 60
-    comma_star_list (92)
+    comma_star_list <stars> (92)
         on left: 43 44
         on right: 41 44
     expr <expr> (93)

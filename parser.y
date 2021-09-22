@@ -88,8 +88,10 @@
   TDef *tdef;
   std::vector<Constr *> *constr_vec;
   Constr *constr;
+  std::vector<Type *> *type_vec;
   Par *par;
-  // Type type;
+  Type *type;
+  int stars;
   Expr *expr;
   int int_expr;
   float float_expr;
@@ -114,8 +116,10 @@
 %type<tdef> tdef 
 %type<constr_vec> constr_list
 %type<constr> constr
+%type<type_vec> constr_type_list
 %type<par> par
-
+%type<type> type
+%type<stars> comma_star_list
 %type<expr> expr expr1 expr2 expr3 expr4 expr5
 %type<int_expr> T_int_expr
 %type<float_expr> T_float_expr
@@ -155,12 +159,12 @@ and_def_list:
 ;
 
 def:
-  T_id par_list '=' expr  { $$ = new NormalDef($1, $2, $4); }
-| T_id par_list ':' type '=' expr  { $$ = new NormalDef($1, $2, $6); }
-| T_mutable T_id  { $$ = new MutableDef($2, nullptr); }
-| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2, $4); }
-| T_mutable T_id ':' type  { $$ = new MutableDef($2, nullptr); }
-| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2, $4); }
+  T_id par_list '=' expr  { $$ = new NormalDef($1, $2, nullptr, $4); }
+| T_id par_list ':' type '=' expr  { $$ = new NormalDef($1, $2, $4, $6); }
+| T_mutable T_id  { $$ = new MutableDef($2, nullptr, nullptr); }
+| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2, $4, nullptr); }
+| T_mutable T_id ':' type  { $$ = new MutableDef($2, nullptr, $4); }
+| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2, $4, $7); }
 ;
 
 par_list:
@@ -191,37 +195,37 @@ constr_list:
 ;
 
 constr:
-  T_Id { $$ = new Constr(); }
-| T_Id T_of constr_type_list { $$ = new Constr(); }
+  T_Id { $$ = new Constr($1, nullptr); }
+| T_Id T_of constr_type_list { $$ = new Constr($1, $3); }
 ;
 
 constr_type_list:
-  type
-| constr_type_list type
+  type { $$ = new std::vector<Type *>; $$->push_back($1); }
+| constr_type_list type { $1->push_back($2); $$ = $1; }
 ;
 
 par:
-  T_id { $$ = new Par(); }
-| '(' T_id ':' type ')' { $$ = new Par(); }
+  T_id { $$ = new Par($1, nullptr); }
+| '(' T_id ':' type ')' { $$ = new Par($2, $4); }
 ;
 
 type:
-  T_unit
-| T_int
-| T_char
-| T_bool
-| T_float
-| '(' type ')'
-| type T_arrow_op type
-| type T_ref
-| T_array T_of type
-| T_array '[' comma_star_list ']' T_of type
-| T_id
+  T_unit { $$ = new Type_Unit(); }
+| T_int { $$ = new Type_Int(); }
+| T_char { $$ = new Type_Char(); }
+| T_bool { $$ = new Type_Bool(); }
+| T_float { $$ = new Type_Float(); }
+| '(' type ')' { $$ = $2; }
+| type T_arrow_op type { $$ = new Type_Func($1, $3); }
+| type T_ref  { $$ = new Type_Ref($1); }
+| T_array T_of type  { $$ = new Type_Array(1, $3); }
+| T_array '[' comma_star_list ']' T_of type  { $$ = new Type_Array($3, $6); }
+| T_id { $$ = new Type_id($1); }
 ;
 
 comma_star_list:
-  '*'
-| comma_star_list ',' '*'
+  '*' { $$ = 1; }
+| comma_star_list ',' '*' { $$ = $1 + 1; }
 ;
 
 expr:
@@ -243,7 +247,7 @@ expr1:
 | T_id '[' comma_expr_list ']' { $$ = new Array($1, $3); }
 | T_dim T_id { $$ = new Dim($2); }
 | T_dim T_int_expr T_id { $$ = new Dim($3, $2); }
-| T_new type
+| T_new type{ $$ = new New($2); }
 | T_id { $$ = new id($1); }
 | T_Id { $$ = new Id($1); }
 | '!' expr1 { $$ = new UnOp(unop_exclamation, $2); }
