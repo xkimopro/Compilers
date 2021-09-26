@@ -1,0 +1,5 @@
+let treeMerge (t1:float) (t2:int) : int =
+match t1 with
+Nil -> t2
+| Node n t11 t12 -> Node n 2 4
+end

@@ -134,7 +134,13 @@
 
 program:
   stmt_list { 
-    std::cout << "AST: " << *$1 << std::endl; 
+    // std::cout << "AST: " << *$1 << std::endl; 
+    
+    // Semantic analysis on each stmt
+    for (Stmt *stmt  : *$1){
+      stmt->sem();
+    }
+
   }
 ;
 
