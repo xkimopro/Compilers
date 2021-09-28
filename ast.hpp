@@ -4,6 +4,9 @@
 #include <cstdio>
 #include <iostream>
 #include "symbol.hpp"
+#include <map>
+
+
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v)
@@ -81,6 +84,8 @@ typedef enum  {
   type_undefined
 } main_type;
 
+std::map<std::string, SymbolEntry> globals;
+
 
 class AST
 {
@@ -100,8 +105,19 @@ class Stmt : public AST
 {
 };
 
+
+class Type : public AST
+{ 
+  public:
+    virtual main_type getMyType() {};
+    virtual main_type getDimension() {};
+  
+};
+
 class Expr : public AST
 {
+  virtual void typeCheck(Type* t) {};
+
 };
 
 class Int_Expr : public Expr
@@ -111,6 +127,13 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Int_Expr(" << num << ")";
+  }
+
+  virtual void typeCheck(Type *t) override {
+    main_type mt = t->getMyType(); 
+    if (mt != type_int) {
+      semanticError("Type mismatch. Expected integer");
+    }
   }
 
 private:
@@ -126,6 +149,15 @@ public:
     out << "Float_Expr(" << num << ")";
   }
 
+  virtual void typeCheck(Type *t) override {
+    main_type mt = t->getMyType(); 
+    if (mt != type_float) {
+      semanticError("Type mismatch. Expected Float");
+    }
+  }
+
+ 
+
 private:
   float num;
 };
@@ -137,6 +169,12 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Char_Expr(" << chr << ")";
+  }
+  virtual void typeCheck(Type *t) override {
+    main_type mt = t->getMyType(); 
+    if (mt != type_char) {
+      semanticError("Type mismatch. Expected char");
+    }
   }
 
 private:
@@ -165,6 +203,12 @@ public:
   {
     out << "Bool_Expr(" << var << ")";
   }
+  virtual void typeCheck(Type *t) override {
+    main_type mt = t->getMyType(); 
+    if (mt != type_bool) {
+      semanticError("Type mismatch. Expected Boolean");
+    }
+  }
 
 private:
   bool var;
@@ -178,15 +222,37 @@ public:
   {
     out << "Unit()";
   }
+  virtual void typeCheck(Type *t) override {
+    main_type mt = t->getMyType(); 
+    if (mt != type_unit) {
+      semanticError("Type mismatch. Expected unit");
+    }
+  }
 };
 
 class Array : public Expr
 {
-public:
+public:  
   Array(std::string s, std::vector<Expr *> *v) : var(s), expr_vec(v) {}
   virtual void printOn(std::ostream &out) const override
   {
     out << "Array(" << var << ", [" << *expr_vec << "])";
+  }
+
+  virtual void typeCheck(Type *t) override {
+    main_type mt = t->getMyType(); 
+    if (mt != type_array) {
+      semanticError("Type mismatch. Expected array");
+    }
+    else { 
+
+      int myDim =  ( expr_vec == nullptr ) ?  0 : (*expr_vec).size(); // my dimension
+      int givenDim = t->getDimension();
+      if (myDim != givenDim) semanticError("Type mismatch for array. Dimensions dont match");
+
+      // Also check the array return value through the symbolTable and you re ready
+
+    }
   }
 
 private:
@@ -460,9 +526,7 @@ private:
   std::vector<Clause *> *vec;
 };
 
-class Type : public AST
-{
-};
+
 
 class Type_Unit : public Type
 {
@@ -471,6 +535,10 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Type_Unit()";
+  }
+
+  virtual main_type getMyType() override{
+    return my_type;
   }
 
   private:
@@ -484,6 +552,9 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Type_Int()";
+  }
+  virtual main_type getMyType() override{
+    return my_type;
   }
 
 private:
@@ -499,6 +570,9 @@ public:
   {
     out << "Type_Char()";
   }
+  virtual main_type getMyType() override{
+    return my_type;
+  }
 
   private:
     main_type my_type;
@@ -512,6 +586,10 @@ public:
   {
     out << "Type_Float()";
   }
+  virtual main_type getMyType() override{
+    return my_type;
+  }
+
 
 private:
   main_type my_type;
@@ -524,6 +602,9 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Type_Bool()";
+  }
+  virtual main_type getMyType() override{
+    return my_type;
   }
 
   private:
@@ -543,6 +624,9 @@ public:
   {
     out << "Type_Func(" << *from << ", " << *to << ")";
   }
+  virtual main_type getMyType() override{
+    return my_type;
+  }
 
 private:
   Type *from, *to;
@@ -557,6 +641,9 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Type_Ref(" << *t << ")";
+  }
+  virtual main_type getMyType() override{
+    return my_type;
   }
 
 private:
@@ -573,6 +660,11 @@ public:
   {
     out << "Type_Array(" << dim << ", " << *t << ")";
   }
+  virtual main_type getMyType() override{
+    return my_type;
+  }
+
+  int getDimension() const { return dim; }
 
 private:
   int dim;
@@ -588,6 +680,9 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Type_id(" << var << ")";
+  }
+  virtual main_type getMyType() override{
+    return my_type;
   }
 
 private:

@@ -2,11 +2,12 @@
 
 #include <cstdlib>
 #include <vector>
-
+#include "ast.hpp
 // enum Type { TYPE_int, TYPE_bool };
 
+
 // struct SymbolEntry {
-//   Type type;
+//   Type *type;
 //   int offset;
 //   SymbolEntry() {}
 //   SymbolEntry(Type t, int ofs) : type(t), offset(ofs) {}
