@@ -2,6 +2,8 @@
 #include <cstdio>
 #include "ast.hpp"
 #include "lexer.hpp"
+
+SymbolTable st;
 %}
 
 %token T_and

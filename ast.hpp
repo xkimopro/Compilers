@@ -4,7 +4,9 @@
 #include <cstdio>
 #include <iostream>
 #include "symbol.hpp"
-#include <map>
+
+
+extern SymbolTable st;
 
 
 
@@ -84,9 +86,6 @@ typedef enum  {
   type_undefined
 } main_type;
 
-std::map<std::string, SymbolEntry> globals;
-
-
 class AST
 {
 public:
@@ -107,13 +106,21 @@ class Stmt : public AST
 
 
 class Type : public AST
-{ 
+{
   public:
     virtual main_type getMyType() {};
     virtual main_type getDimension() {};
-  
+ 
 };
 
+//class Type : public AST
+//{
+//public:
+//  std::string type;
+//  Type *type1 = nullptr, *type2 = nullptr;
+//  int dim = 0;
+//};
+//
 class Expr : public AST
 {
   virtual void typeCheck(Type* t) {};
@@ -130,7 +137,7 @@ public:
   }
 
   virtual void typeCheck(Type *t) override {
-    main_type mt = t->getMyType(); 
+      main_type mt = t->getMyType(); 
     if (mt != type_int) {
       semanticError("Type mismatch. Expected integer");
     }
@@ -155,8 +162,6 @@ public:
       semanticError("Type mismatch. Expected Float");
     }
   }
-
- 
 
 private:
   float num;
@@ -980,9 +985,10 @@ public:
 
   virtual void sem() override
   {
-    normal_def_type = par_vec == nullptr ? variable_definition : function_definition;
 
+    normal_def_type = par_vec->empty() ? variable_definition : function_definition;
     if (normal_def_type == function_definition){
+      std::cerr << "Fn" << std::endl;
       if (typ == nullptr) semanticError("No type specified for function " + id);
       for (Par *par : *par_vec){
         par->sem();  
@@ -990,7 +996,23 @@ public:
       // Check that type of result = type of expression
     }
     else{
-        
+
+      // Elekse an yparxei type and den yparxei vara error
+      if (typ == nullptr) semanticError("No type specified for declaration " + id);
+      // Psakse to identifier sto symbol table an yparxei vara error redeclared again an oxi valto sto st
+      SymbolEntry se;
+      
+      
+      if (st.lookup(id) == nullptr){
+        st.insert(id, se);
+      }
+      else {
+        semanticError("Variable redeclared"); 
+      }
+      // Kane Type check to expression me to Type pou vrikes parapanw
+
+
+      
     }
   }
 
