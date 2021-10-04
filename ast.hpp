@@ -5,10 +5,7 @@
 #include <iostream>
 #include "symbol.hpp"
 
-
 extern SymbolTable st;
-
-
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v)
@@ -73,16 +70,17 @@ typedef enum
   function_definition
 } normal_definition;
 
-typedef enum  {
-  type_unit,                         
-  type_int,                          
-  type_char,                         
-  type_bool,                         
-  type_float,                        
-  type_func,                          
-  type_ref,                           
-  type_array,                         
-  type_id,                            
+typedef enum
+{
+  type_unit,
+  type_int,
+  type_char,
+  type_bool,
+  type_float,
+  type_func,
+  type_ref,
+  type_array,
+  type_id,
   type_undefined
 } main_type;
 
@@ -104,27 +102,222 @@ class Stmt : public AST
 {
 };
 
-
 class Type : public AST
 {
-  public:
-    virtual main_type getMyType() {};
-    virtual main_type getDimension() {};
- 
+public:
+  virtual main_type getType(){};
+  virtual Type *getChild1()
+  {
+    return nullptr;
+  }
+  virtual Type *getChild2()
+  {
+    return nullptr;
+  }
+  virtual int getDimension()
+  {
+    return 0;
+  }
+  virtual std::string get_id()
+  {
+    return "";
+  }
+  virtual bool equals(Type *other)
+  {
+    if (other == nullptr)
+      return false;
+    return this->getType() == other->getType();
+  }
 };
 
-//class Type : public AST
-//{
-//public:
-//  std::string type;
-//  Type *type1 = nullptr, *type2 = nullptr;
-//  int dim = 0;
-//};
-//
+class Type_Unit : public Type
+{
+public:
+  Type_Unit() {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Unit()";
+  }
+  virtual main_type getType() override
+  {
+    return type_unit;
+  }
+};
+
+class Type_Int : public Type
+{
+public:
+  Type_Int() {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Int()";
+  }
+  virtual main_type getType() override
+  {
+    return type_int;
+  }
+};
+
+class Type_Float : public Type
+{
+public:
+  Type_Float() {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Float()";
+  }
+  virtual main_type getType() override
+  {
+    return type_float;
+  }
+};
+
+class Type_Char : public Type
+{
+public:
+  Type_Char() {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Char()";
+  }
+  virtual main_type getType() override
+  {
+    return type_char;
+  }
+};
+
+class Type_Bool : public Type
+{
+public:
+  Type_Bool() {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Bool()";
+  }
+  virtual main_type getType() override
+  {
+    return type_bool;
+  }
+};
+
+class Type_Func : public Type
+{
+public:
+  Type_Func(Type *t1, Type *t2) : from(t1), to(t2) {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Func(" << *from << ", " << *to << ")";
+  }
+  virtual main_type getType() override
+  {
+    return type_func;
+  }
+  virtual Type *getChild1() override
+  {
+    return from;
+  }
+  virtual Type *getChild2() override
+  {
+    return to;
+  }
+  virtual bool equals(Type *other) override
+  {
+    if (other == nullptr)
+      return false;
+    if (this->getType() != other->getType())
+      return false;
+    return from->equals(other->getChild1()) && to->equals(other->getChild2());
+  };
+
+private:
+  Type *from, *to;
+};
+
+class Type_Ref : public Type
+{
+public:
+  Type_Ref(Type *t) : t(t) {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Ref(" << *t << ")";
+  }
+  virtual main_type getType() override
+  {
+    return type_ref;
+  }
+  virtual Type *getChild1() override
+  {
+    return t;
+  }
+  virtual bool equals(Type *other) override
+  {
+    if (other == nullptr)
+      return false;
+    if (this->getType() != other->getType())
+      return false;
+    return t->equals(other->getChild1());
+  };
+
+private:
+  Type *t;
+};
+
+class Type_Array : public Type
+{
+public:
+  Type_Array(int i, Type *t1) : dim(i), t(t1) {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_Array(" << dim << ", " << *t << ")";
+  }
+  virtual main_type getType() override
+  {
+    return type_array;
+  }
+  virtual Type *getChild1() override
+  {
+    return t;
+  }
+  virtual int getDimension() override { return dim; }
+  virtual bool equals(Type *other) override
+  {
+    if (other == nullptr)
+      return false;
+    if (this->getType() != other->getType())
+      return false;
+    return t->equals(other->getChild1()) && dim == other->getDimension();
+  };
+private:
+  int dim;
+  Type *t;
+};
+
+class Type_id : public Type
+{
+public:
+  Type_id(std::string s) : var(s) {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Type_id(" << var << ")";
+  }
+  virtual main_type getType() override
+  {
+    return type_id;
+  }
+
+private:
+  std::string var;
+};
+
 class Expr : public AST
 {
-  virtual void typeCheck(Type* t) {};
-
+public:
+  virtual Type *getType(){};
+  virtual void type_check(Type *t)
+  {
+    if (!t->equals(this->getType()))
+      semanticError("Type mismatch");
+  };
 };
 
 class Int_Expr : public Expr
@@ -136,11 +329,9 @@ public:
     out << "Int_Expr(" << num << ")";
   }
 
-  virtual void typeCheck(Type *t) override {
-      main_type mt = t->getMyType(); 
-    if (mt != type_int) {
-      semanticError("Type mismatch. Expected integer");
-    }
+  virtual Type *getType() override
+  {
+    return new Type_Int();
   }
 
 private:
@@ -156,11 +347,9 @@ public:
     out << "Float_Expr(" << num << ")";
   }
 
-  virtual void typeCheck(Type *t) override {
-    main_type mt = t->getMyType(); 
-    if (mt != type_float) {
-      semanticError("Type mismatch. Expected Float");
-    }
+  virtual Type *getType() override
+  {
+    return new Type_Float();
   }
 
 private:
@@ -175,11 +364,10 @@ public:
   {
     out << "Char_Expr(" << chr << ")";
   }
-  virtual void typeCheck(Type *t) override {
-    main_type mt = t->getMyType(); 
-    if (mt != type_char) {
-      semanticError("Type mismatch. Expected char");
-    }
+
+  virtual Type *getType() override
+  {
+    return new Type_Char();
   }
 
 private:
@@ -208,11 +396,9 @@ public:
   {
     out << "Bool_Expr(" << var << ")";
   }
-  virtual void typeCheck(Type *t) override {
-    main_type mt = t->getMyType(); 
-    if (mt != type_bool) {
-      semanticError("Type mismatch. Expected Boolean");
-    }
+  virtual Type *getType() override
+  {
+    return new Type_Bool();
   }
 
 private:
@@ -227,37 +413,19 @@ public:
   {
     out << "Unit()";
   }
-  virtual void typeCheck(Type *t) override {
-    main_type mt = t->getMyType(); 
-    if (mt != type_unit) {
-      semanticError("Type mismatch. Expected unit");
-    }
+  virtual Type *getType() override
+  {
+    return new Type_Unit();
   }
 };
 
 class Array : public Expr
 {
-public:  
+public:
   Array(std::string s, std::vector<Expr *> *v) : var(s), expr_vec(v) {}
   virtual void printOn(std::ostream &out) const override
   {
     out << "Array(" << var << ", [" << *expr_vec << "])";
-  }
-
-  virtual void typeCheck(Type *t) override {
-    main_type mt = t->getMyType(); 
-    if (mt != type_array) {
-      semanticError("Type mismatch. Expected array");
-    }
-    else { 
-
-      int myDim =  ( expr_vec == nullptr ) ?  0 : (*expr_vec).size(); // my dimension
-      int givenDim = t->getDimension();
-      if (myDim != givenDim) semanticError("Type mismatch for array. Dimensions dont match");
-
-      // Also check the array return value through the symbolTable and you re ready
-
-    }
   }
 
 private:
@@ -379,15 +547,39 @@ private:
 class BinOp : public Expr
 {
 public:
-  BinOp(Expr *e1, binop_enum op1, Expr *e2) : expr1(e1), op(op1), expr2(e2) {}
+  BinOp(Expr *e1, binop_enum op1, Expr *e2) : left(e1), op(op1), right(e2) {}
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Binop(" << *expr1 << ", " << op << ", " << *expr2 << ")";
+    out << "Binop(" << *left << ", " << op << ", " << *right << ")";
+  }
+  virtual void sem() override
+  {
+    left->sem();
+    right->sem();
+    switch (op)
+    {
+    case binop_plus:
+    case binop_minus:
+    case binop_mult:
+    case binop_div:
+    case binop_mod:
+    case binop_pow:
+      left->type_check(new Type_Int);
+      right->type_check(new Type_Int);
+      break;
+    case binop_float_plus:
+    case binop_float_minus:
+    case binop_float_mult:
+    case binop_float_div:
+      left->type_check(new Type_Float);
+      right->type_check(new Type_Float);
+      break;
+    }
   }
 
 private:
   binop_enum op;
-  Expr *expr1, *expr2;
+  Expr *left, *right;
 };
 
 class If : public Expr
@@ -405,6 +597,19 @@ public:
 
 private:
   Expr *expr1, *expr2, *expr3;
+};
+
+class New : public Expr
+{
+public:
+  New(Type *t) : typ(t) {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "New(" << *typ << ")";
+  }
+
+private:
+  Type *typ;
 };
 
 class Pattern : public AST
@@ -531,183 +736,6 @@ private:
   std::vector<Clause *> *vec;
 };
 
-
-
-class Type_Unit : public Type
-{
-public:
-  Type_Unit() : my_type(type_unit) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Unit()";
-  }
-
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-  private:
-    main_type my_type;
-};
-
-class Type_Int : public Type
-{
-public:
-  Type_Int() : my_type(type_int) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Int()";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-private:
-    main_type my_type;
-  
-};
-
-class Type_Char : public Type
-{
-public:
-  Type_Char() : my_type(type_char) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Char()";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-  private:
-    main_type my_type;
-};
-
-class Type_Float : public Type
-{
-public:
-  Type_Float() : my_type(type_float) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Float()";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-
-private:
-  main_type my_type;
-};
-
-class Type_Bool : public Type
-{
-public:
-  Type_Bool(): my_type(type_bool) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Bool()";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-  private:
-    main_type my_type;
-};
-
-
-
-
-
-
-class Type_Func : public Type
-{
-public:
-  Type_Func(Type *t1, Type *t2) : my_type(type_func) , from(t1), to(t2) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Func(" << *from << ", " << *to << ")";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-private:
-  Type *from, *to;
-  main_type my_type;
-
-};
-
-class Type_Ref : public Type
-{
-public:
-  Type_Ref(Type *t1) : my_type(type_ref) , t(t1) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Ref(" << *t << ")";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-private:
-  Type *t;
-  main_type my_type;
-  
-};
-
-class Type_Array : public Type
-{
-public:
-  Type_Array(int i, Type *t1) : my_type(my_type), dim(i), t(t1) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_Array(" << dim << ", " << *t << ")";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-  int getDimension() const { return dim; }
-
-private:
-  int dim;
-  Type *t;
-  main_type my_type;
-  
-};
-
-class Type_id : public Type
-{
-public:
-  Type_id(std::string s) : my_type(type_id) , var(s) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Type_id(" << var << ")";
-  }
-  virtual main_type getMyType() override{
-    return my_type;
-  }
-
-private:
-  std::string var;
-  main_type my_type;
-
-};
-
-class New : public Expr
-{
-public:
-  New(Type *t) : typ(t) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "New(" << *typ << ")";
-  }
-
-private:
-  Type *typ;
-};
 // extern std::vector<int> rt_stack;
 
 // class Id: public Expr {
@@ -904,9 +932,10 @@ public:
     out << ")";
   }
 
-  virtual void sem() override {
-    if (typ == nullptr) semanticError("No type specified for parameter " + id);
-    
+  virtual void sem() override
+  {
+    if (typ == nullptr)
+      semanticError("No type specified for parameter " + id);
   }
 
 private:
@@ -985,34 +1014,36 @@ public:
 
   virtual void sem() override
   {
-
-    normal_def_type = par_vec->empty() ? variable_definition : function_definition;
-    if (normal_def_type == function_definition){
-      std::cerr << "Fn" << std::endl;
-      if (typ == nullptr) semanticError("No type specified for function " + id);
-      for (Par *par : *par_vec){
-        par->sem();  
-      }
-      // Check that type of result = type of expression
-    }
-    else{
-
+    if (par_vec->empty()) //variable
+    {
       // Elekse an yparxei type and den yparxei vara error
-      if (typ == nullptr) semanticError("No type specified for declaration " + id);
+      if (typ == nullptr)
+        semanticError("No type specified for declaration " + id);
       // Psakse to identifier sto symbol table an yparxei vara error redeclared again an oxi valto sto st
       SymbolEntry se;
-      
-      
-      if (st.lookup(id) == nullptr){
+
+      if (st.lookup(id) == nullptr)
+      {
         st.insert(id, se);
       }
-      else {
-        semanticError("Variable redeclared"); 
+      else
+      {
+        semanticError("Variable redeclared");
       }
       // Kane Type check to expression me to Type pou vrikes parapanw
-
-
-      
+      expr->sem();
+      expr->type_check(typ);
+    }
+    else
+    {
+      std::cerr << "Fn" << std::endl;
+      if (typ == nullptr)
+        semanticError("No type specified for function " + id);
+      for (Par *par : *par_vec)
+      {
+        par->sem();
+      }
+      // Check that type of result = type of expression
     }
   }
 
