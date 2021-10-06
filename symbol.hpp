@@ -6,39 +6,34 @@
 
 #include "ast.hpp"
 
-// enum Type2 { TYPE_int, TYPE_bool };
-
 class Type;
 
-class SymbolEntry {
-    public:
-        SymbolEntry(Type* t) : type(t) {}
-        SymbolEntry() {}
-    private:
-        Type* type;
+class SymbolEntry
+{
+public:
+    SymbolEntry(Type *t) : type(t) {}
+    SymbolEntry() {}
+    Type *type;
 };
 
+class SymbolTable
+{
+public:
+    SymbolTable() {}
+    SymbolEntry *lookup(std::string id)
+    {
+        if (globals.find(id) != globals.end())
+            return &globals[id];
+        return nullptr;
+    }
+    void insert(std::string id, Type *t)
+    {
+        globals[id] = SymbolEntry(t);
+    }
 
-class SymbolTable {
-    public:
-        SymbolTable() {}
-
-        SymbolEntry* lookup(std::string id){
-            if (globals.find(id) != globals.end()) return &globals[id];
-            return nullptr;
-        }
-
-        SymbolEntry insert(std::string id, SymbolEntry se){
-            globals[id] = se;
-            return globals[id];
-        }
-
-    private:
-        std::map<std::string, SymbolEntry> globals;
-
-
+private:
+    std::map<std::string, SymbolEntry> globals;
 };
-
 
 // struct SymbolEntry {
 //   Type *type;

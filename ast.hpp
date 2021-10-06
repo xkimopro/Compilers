@@ -66,12 +66,6 @@ typedef enum
 
 typedef enum
 {
-  variable_definition,
-  function_definition
-} normal_definition;
-
-typedef enum
-{
   type_unit,
   type_int,
   type_char,
@@ -105,7 +99,7 @@ class Stmt : public AST
 class Type : public AST
 {
 public:
-  virtual main_type getType(){};
+  virtual main_type get_type(){};
   virtual Type *getChild1()
   {
     return nullptr;
@@ -126,7 +120,7 @@ public:
   {
     if (other == nullptr)
       return false;
-    return this->getType() == other->getType();
+    return this->get_type() == other->get_type();
   }
 };
 
@@ -138,7 +132,7 @@ public:
   {
     out << "Type_Unit()";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_unit;
   }
@@ -152,7 +146,7 @@ public:
   {
     out << "Type_Int()";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_int;
   }
@@ -166,7 +160,7 @@ public:
   {
     out << "Type_Float()";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_float;
   }
@@ -180,7 +174,7 @@ public:
   {
     out << "Type_Char()";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_char;
   }
@@ -194,7 +188,7 @@ public:
   {
     out << "Type_Bool()";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_bool;
   }
@@ -208,7 +202,7 @@ public:
   {
     out << "Type_Func(" << *from << ", " << *to << ")";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_func;
   }
@@ -224,7 +218,7 @@ public:
   {
     if (other == nullptr)
       return false;
-    if (this->getType() != other->getType())
+    if (this->get_type() != other->get_type())
       return false;
     return from->equals(other->getChild1()) && to->equals(other->getChild2());
   };
@@ -241,7 +235,7 @@ public:
   {
     out << "Type_Ref(" << *t << ")";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_ref;
   }
@@ -253,7 +247,7 @@ public:
   {
     if (other == nullptr)
       return false;
-    if (this->getType() != other->getType())
+    if (this->get_type() != other->get_type())
       return false;
     return t->equals(other->getChild1());
   };
@@ -270,7 +264,7 @@ public:
   {
     out << "Type_Array(" << dim << ", " << *t << ")";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_array;
   }
@@ -283,10 +277,11 @@ public:
   {
     if (other == nullptr)
       return false;
-    if (this->getType() != other->getType())
+    if (this->get_type() != other->get_type())
       return false;
     return t->equals(other->getChild1()) && dim == other->getDimension();
   };
+
 private:
   int dim;
   Type *t;
@@ -300,7 +295,7 @@ public:
   {
     out << "Type_id(" << var << ")";
   }
-  virtual main_type getType() override
+  virtual main_type get_type() override
   {
     return type_id;
   }
@@ -328,7 +323,6 @@ public:
   {
     out << "Int_Expr(" << num << ")";
   }
-
   virtual Type *getType() override
   {
     return new Type_Int();
@@ -346,7 +340,6 @@ public:
   {
     out << "Float_Expr(" << num << ")";
   }
-
   virtual Type *getType() override
   {
     return new Type_Float();
@@ -364,7 +357,6 @@ public:
   {
     out << "Char_Expr(" << chr << ")";
   }
-
   virtual Type *getType() override
   {
     return new Type_Char();
@@ -405,13 +397,13 @@ private:
   bool var;
 };
 
-class Unit : public Expr
+class Unit_Expr : public Expr
 {
 public:
-  Unit() {}
+  Unit_Expr() {}
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Unit()";
+    out << "Unit_Expr()";
   }
   virtual Type *getType() override
   {
@@ -454,6 +446,23 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "id(" << var << ")";
+  }
+  virtual void sem() override
+  {
+    if (st.lookup(var) == nullptr)
+      semanticError("Unknown variable");
+    switch(st.lookup(var)->type->get_type())
+    {
+      case type_func:
+        semanticError("Function called with no arguments");
+        break;
+      default:
+        break;
+    }
+  }
+  virtual Type *getType() override
+  {
+    return st.lookup(var)->type;
   }
 
 private:
@@ -510,6 +519,30 @@ public:
   {
     out << "call(" << fun_name << ", (" << *expr_vec << "))";
   }
+  virtual void sem() override
+  {
+    if (st.lookup(fun_name) == nullptr)
+      semanticError("Call to Undefined function");
+    Type *tmp = st.lookup(fun_name)->type;
+    if (tmp == nullptr)
+      semanticError("Unknown variable");
+    for (Expr *e : *expr_vec)
+    {
+      if (tmp->get_type() != type_func)
+      {
+        semanticError("Parameter number mismatch");
+      }
+      else
+      {
+        e->type_check(tmp->getChild1());
+        tmp = tmp->getChild2();
+      }
+    }
+    if (tmp->get_type() == type_func)
+    {
+      semanticError("Parameter number mismatch");
+    }
+  }
 
 private:
   std::string fun_name;
@@ -563,7 +596,6 @@ public:
     case binop_mult:
     case binop_div:
     case binop_mod:
-    case binop_pow:
       left->type_check(new Type_Int);
       right->type_check(new Type_Int);
       break;
@@ -571,11 +603,80 @@ public:
     case binop_float_minus:
     case binop_float_mult:
     case binop_float_div:
+    case binop_pow:
       left->type_check(new Type_Float);
       right->type_check(new Type_Float);
       break;
+    case binop_single_eq:
+    case binop_struct_diff:
+    case binop_double_eq:
+    case binop_diff:
+      left->type_check(right->getType());
+      switch (left->getType()->get_type())
+      {
+      case type_array:
+      case type_func:
+        semanticError("Type not allowed");
+        break;
+      }
+    case binop_l:
+    case binop_g:
+    case binop_leq:
+    case binop_geq:
+      left->type_check(right->getType());
+      switch (left->getType()->get_type())
+      {
+      case type_int:
+      case type_float:
+      case type_char:
+        break;
+      default:
+        semanticError("Type not allowed");
+        break;
+      }
+    case binop_and:
+    case binop_or:
+      left->type_check(new Type_Bool);
+      right->type_check(new Type_Bool);
+      break;
+    case binop_assign:
+      left->type_check(new Type_Ref(right->getType()));
+      break;
     }
   }
+  virtual Type *getType() override
+  {
+    switch (op)
+    {
+    case binop_plus:
+    case binop_minus:
+    case binop_mult:
+    case binop_div:
+    case binop_mod:
+      return new Type_Int();
+    case binop_float_plus:
+    case binop_float_minus:
+    case binop_float_mult:
+    case binop_float_div:
+    case binop_pow:
+      return new Type_Float();
+    case binop_single_eq:
+    case binop_struct_diff:
+    case binop_l:
+    case binop_g:
+    case binop_leq:
+    case binop_geq:
+    case binop_double_eq:
+    case binop_diff:
+    case binop_and:
+    case binop_or:
+      return new Type_Bool();
+    case binop_assign:
+      return new Type_Unit();
+    case binop_semicolon:
+      return right->getType();
+    }
+  };
 
 private:
   binop_enum op;
@@ -736,172 +837,6 @@ private:
   std::vector<Clause *> *vec;
 };
 
-// extern std::vector<int> rt_stack;
-
-// class Id: public Expr {
-// public:
-//   Id(char v): var(v), offset(-1) {}
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "Id(" << var << "@" << offset << ")";
-//   }
-//   virtual int eval() const override {
-//     return rt_stack[offset];
-//   }
-//   virtual void sem() override {
-//     SymbolEntry *e = st.lookup(var);
-//     type = e->type;
-//     offset = e->offset;
-//   }
-// private:
-//   char var;
-//   int offset;
-// };
-
-// class Const: public Expr {
-// public:
-//   Const(int n): num(n) {}
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "Const(" << num << ")";
-//   }
-//   virtual int eval() const override { return num; }
-//   virtual void sem() override { type = TYPE_int; }
-// private:
-//   int num;
-// };
-
-// class BinOp: public Expr {
-// public:
-//   BinOp(Expr *l, char o, Expr *r): left(l), op(o), right(r) {}
-//   ~BinOp() { delete left; delete right; }
-//   virtual void printOn(std::ostream &out) const override {
-//     out << op << "(" << *left << ", " << *right << ")";
-//   }
-//   virtual void sem() override {
-//     left->type_check(TYPE_int);
-//     right->type_check(TYPE_int);
-//     switch (op) {
-//     case '+': case '-': case '*': case '/': case '%':
-//       type = TYPE_int; break;
-//     case '=': case '<': case '>':
-//       type = TYPE_bool; break;
-//     }
-//   }
-//   virtual int eval() const override {
-//     switch (op) {
-//     case '+': return left->eval() + right->eval();
-//     case '-': return left->eval() - right->eval();
-//     case '*': return left->eval() * right->eval();
-//     case '/': return left->eval() / right->eval();
-//     case '%': return left->eval() % right->eval();
-//     case '=': return left->eval() == right->eval();
-//     case '<': return left->eval() < right->eval();
-//     case '>': return left->eval() > right->eval();
-//     }
-//     return 0;  // this will never be reached.
-//   }
-// private:
-//   Expr *left;
-//   char op;
-//   Expr *right;
-// };
-
-// class Let: public Stmt {
-// public:
-//   Let(char v, Expr *e): var(v), offset(-1), expr(e) {}
-//   ~Let() { delete expr; }
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "Let(" << var << "@" << offset << " = " << *expr << ")";
-//   }
-//   virtual void sem() override {
-//     SymbolEntry *lhs = st.lookup(var);
-//     expr->type_check(lhs->type);
-//     offset = lhs->offset;
-//   }
-//   virtual void run() const override {
-//     rt_stack[offset] = expr->eval();
-//   }
-// private:
-//   char var;
-//   int offset;
-//   Expr *expr;
-// };
-
-// class Print: public Stmt {
-// public:
-//   Print(Expr *e): expr(e) {}
-//   ~Print() { delete expr; }
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "Print(" << *expr << ")";
-//   }
-//   virtual void sem() override {
-//     expr->type_check(TYPE_int);
-//   }
-//   virtual void run() const override {
-//     std::cout << expr->eval() << std::endl;
-//   }
-// private:
-//   Expr *expr;
-// };
-
-// class If: public Stmt {
-// public:
-//   If(Expr *c, Stmt *s1, Stmt *s2 = nullptr):
-//     cond(c), stmt1(s1), stmt2(s2) {}
-//   ~If() { delete cond; delete stmt1; delete stmt2; }
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "If(" << *cond << ", " << *stmt1;
-//     if (stmt2 != nullptr) out << ", " << *stmt2;
-//     out << ")";
-//   }
-//   virtual void sem() override {
-//     cond->type_check(TYPE_bool);
-//     stmt1->sem();
-//     if (stmt2 != nullptr) stmt2->sem();
-//   }
-//   virtual void run() const override {
-//     if (cond->eval())
-//       stmt1->run();
-//     else if (stmt2 != nullptr)
-//       stmt2->run();
-//   }
-// private:
-//   Expr *cond;
-//   Stmt *stmt1;
-//   Stmt *stmt2;
-// };
-
-// class For: public Stmt {
-// public:
-//   For(Expr *e, Stmt *s): expr(e), stmt(s) {}
-//   ~For() { delete expr; delete stmt; }
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "For(" << *expr << ", " << *stmt << ")";
-//   }
-//   virtual void sem() override {
-//     expr->type_check(TYPE_int);
-//     stmt->sem();
-//   }
-//   virtual void run() const override {
-//     for (int times = expr->eval(), i = 0; i < times; ++i)
-//       stmt->run();
-//   }
-// private:
-//   Expr *expr;
-//   Stmt *stmt;
-// };
-
-// class Decl: public AST {
-// public:
-//   Decl(char c, Type t): var(c), type(t) {}
-//   virtual void printOn(std::ostream &out) const override {
-//     out << "Decl(" << var << " : " << type << ")";
-//   }
-//   virtual void sem() override { st.insert(var, type); }
-// private:
-//   char var;
-//   Type type;
-// };
-
 class Constr : public AST
 {
 public:
@@ -936,6 +871,13 @@ public:
   {
     if (typ == nullptr)
       semanticError("No type specified for parameter " + id);
+    if (st.lookup(id) != nullptr)
+      semanticError("Function parameter redeclared");
+    st.insert(id, typ);
+  }
+  virtual Type *getType()
+  {
+    return typ;
   }
 
 private:
@@ -1016,34 +958,34 @@ public:
   {
     if (par_vec->empty()) //variable
     {
-      // Elekse an yparxei type and den yparxei vara error
-      if (typ == nullptr)
-        semanticError("No type specified for declaration " + id);
-      // Psakse to identifier sto symbol table an yparxei vara error redeclared again an oxi valto sto st
-      SymbolEntry se;
-
-      if (st.lookup(id) == nullptr)
-      {
-        st.insert(id, se);
-      }
-      else
-      {
-        semanticError("Variable redeclared");
-      }
-      // Kane Type check to expression me to Type pou vrikes parapanw
       expr->sem();
-      expr->type_check(typ);
+      if (typ != nullptr)
+        expr->type_check(typ);
+      if (st.lookup(id) == nullptr)
+        st.insert(id, expr->getType());
+      else
+        semanticError("Variable redeclared");
     }
     else
     {
-      std::cerr << "Fn" << std::endl;
-      if (typ == nullptr)
-        semanticError("No type specified for function " + id);
       for (Par *par : *par_vec)
       {
         par->sem();
       }
-      // Check that type of result = type of expression
+      Type *tmp = typ;
+
+      for (auto i = par_vec->rbegin();
+           i != par_vec->rend(); ++i)
+      {
+        tmp = new Type_Func((*i)->getType(), tmp);
+      }
+      if (st.lookup(id) == nullptr)
+        st.insert(id, tmp);
+      else
+        semanticError("Variable redeclared");
+      expr->sem();
+      if (typ != nullptr)
+        expr->type_check(typ);
     }
   }
 
@@ -1056,7 +998,6 @@ public:
   }
 
 private:
-  normal_definition normal_def_type;
   std::vector<Par *> *par_vec;
   std::string id;
   Type *typ;

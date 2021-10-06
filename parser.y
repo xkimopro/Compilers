@@ -249,7 +249,7 @@ expr1:
 | T_str_expr { $$ = new Str_Expr($1); }
 | T_true { $$ = new Bool_Expr(true); }  
 | T_false { $$ = new Bool_Expr(false); }
-| '(' ')' { $$ = new Unit(); }
+| '(' ')' { $$ = new Unit_Expr(); }
 | '(' expr ')' { $$ = $2; }
 | T_begin expr T_end { $$ = $2; }
 | T_id '[' comma_expr_list ']' { $$ = new Array($1, $3); }

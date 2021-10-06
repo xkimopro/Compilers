@@ -1,1 +1,4 @@
-let a : float = 1.1 *. 1.1
+let a : float = 1.2 *. 1.1 and
+b : float = a *. 1.1
+and f (d:int) (c:int) :int = d + c
+and l = m 45 45
