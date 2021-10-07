@@ -6,6 +6,9 @@
 
 #include "ast.hpp"
 
+void semanticError(std::string msg);
+
+
 class Type;
 
 class SymbolEntry
@@ -16,29 +19,68 @@ public:
     Type *type;
 };
 
-class SymbolTable
-{
+class Scope {
 public:
-    SymbolTable() {}
-    SymbolEntry *lookup(std::string id)
-    {
-        if (globals.find(id) != globals.end())
-            return &globals[id];
-        return nullptr;
-    }
-    void insert(std::string id, Type *t)
-    {
-        if (globals.find(id) != globals.end())
-        {
-            std::cerr << "Duplicate variable " << id << std::endl;
-            exit(1);
-        }
-        globals[id] = SymbolEntry(t);
-    }
-
+  Scope() : locals() {}
+  SymbolEntry * lookup(std::string id) {
+    if (locals.find(id) == locals.end()) return nullptr;
+    return &locals[id];
+  }
+  void insert(std::string id, Type *t) {
+    if (locals.find(id) != locals.end()) semanticError("Identifier " + id + " redeclared");
+    locals[id] = SymbolEntry(t);
+  }
 private:
-    std::map<std::string, SymbolEntry> globals;
+  std::map<std::string, SymbolEntry> locals;
 };
+
+class SymbolTable {
+public:
+  void openScope() {
+    scopes.push_back(Scope());
+  }
+  void closeScope() {
+    scopes.pop_back();
+  }
+  SymbolEntry * lookup(std::string id) {
+    for (auto i = scopes.rbegin(); i != scopes.rend(); ++i) {
+      SymbolEntry *e = i->lookup(id);
+      if (e != nullptr) return e;
+    }
+    semanticError("Variable " + id + "  not found");
+    return nullptr;
+  }
+  void insert(std::string id, Type *t) {
+    scopes.back().insert(id, t);
+  }
+  
+private:
+  std::vector<Scope> scopes;
+};
+
+//class SymbolTable
+//{
+//public:
+//    SymbolTable() {}
+//    SymbolEntry *lookup(std::string id)
+//    {
+//        if (globals.find(id) != globals.end())
+//            return &globals[id];
+//        return nullptr;
+//    }
+//    void insert(std::string id, Type *t)
+//    {
+//        if (globals.find(id) != globals.end())
+//        {
+//            std::cerr << "Duplicate variable " << id << std::endl;
+//            exit(1);
+//        }
+//        globals[id] = SymbolEntry(t);
+//    }
+//
+//private:
+//    std::map<std::string, SymbolEntry> globals;
+//};
 
 // struct SymbolEntry {
 //   Type *type;

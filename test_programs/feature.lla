@@ -1,2 +1,4 @@
-let x : int = 5
-and x : int = 5
+let x:t0  = 5
+let b:t1 = x
+t0:new int
+t1:new int

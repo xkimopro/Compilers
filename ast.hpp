@@ -221,7 +221,7 @@ public:
     if (this->get_type() != other->get_type())
       return false;
     return from->equals(other->getChild1()) && to->equals(other->getChild2());
-  };
+  }
 
 private:
   Type *from, *to;
@@ -250,7 +250,7 @@ public:
     if (this->get_type() != other->get_type())
       return false;
     return t->equals(other->getChild1());
-  };
+  }
 
 private:
   Type *t;
@@ -280,7 +280,7 @@ public:
     if (this->get_type() != other->get_type())
       return false;
     return t->equals(other->getChild1()) && dim == other->getDimension();
-  };
+  }
 
 private:
   int dim;
@@ -311,7 +311,10 @@ public:
   virtual void type_check(Type *t)
   {
     if (!t->equals(this->getType()))
+    {
+      std::cout << *this;
       semanticError("Type mismatch");
+    }
   };
 };
 
@@ -372,7 +375,6 @@ public:
   Str_Expr(std::string s) : str(s.substr(1, s.size() - 2)) {}
   virtual void printOn(std::ostream &out) const override
   {
-
     out << "Str_Expr(" << str << ")";
   }
 
@@ -450,15 +452,7 @@ public:
   virtual void sem() override
   {
     if (st.lookup(var) == nullptr)
-      semanticError("Unknown variable");
-    switch (st.lookup(var)->type->get_type())
-    {
-    case type_func:
-      semanticError("Function called with no arguments");
-      break;
-    default:
-      break;
-    }
+      semanticError("Unknown variable " + var);
   }
   virtual Type *getType() override
   {
@@ -522,10 +516,11 @@ public:
   virtual void sem() override
   {
     if (st.lookup(fun_name) == nullptr)
-      semanticError("Call to Undefined function");
+      semanticError("Call to Undefined function " + fun_name);
     Type *tmp = st.lookup(fun_name)->type;
     for (Expr *e : *expr_vec)
     {
+      e->sem();
       if (tmp->get_type() != type_func)
       {
         semanticError("Parameter number mismatch");
@@ -544,7 +539,7 @@ public:
   virtual Type *getType() override
   {
     if (st.lookup(fun_name) == nullptr)
-      semanticError("Call to Undefined function");
+      semanticError("Call to Undefined function " + fun_name);
     Type *tmp = st.lookup(fun_name)->type;
     while (tmp->get_type() == type_func)
     {
@@ -628,6 +623,7 @@ public:
         semanticError("Type not allowed");
         break;
       }
+      break;
     case binop_l:
     case binop_g:
     case binop_leq:
@@ -643,6 +639,7 @@ public:
         semanticError("Type not allowed");
         break;
       }
+      break;
     case binop_and:
     case binop_or:
       left->type_check(new Type_Bool);
@@ -703,6 +700,21 @@ public:
     if (expr3 != nullptr)
       out << ", " << *expr3;
     out << ")";
+  }
+  virtual void sem() override
+  {
+    expr1->sem();
+    expr1->type_check(new Type_Bool());
+    expr2->sem();
+    if (expr3 != nullptr)
+    {
+      expr3->sem();
+      expr2->type_check(expr3->getType());
+    }
+  }
+  virtual Type *getType() override
+  {
+    return expr2->getType();
   }
 
 private:
@@ -880,8 +892,6 @@ public:
   {
     if (typ == nullptr)
       semanticError("No type specified for parameter " + id);
-    if (st.lookup(id) != nullptr)
-      semanticError("Function parameter redeclared");
     st.insert(id, typ);
   }
   virtual Type *getType()
@@ -935,6 +945,9 @@ private:
 
 class Def : public AST
 {
+public:
+  virtual void sem1(){};
+  virtual void sem2(){};
 };
 
 class MutableDef : public Def
@@ -974,6 +987,7 @@ public:
     }
     else
     {
+      st.openScope();
       for (Par *par : *par_vec)
       {
         par->sem();
@@ -983,13 +997,36 @@ public:
       {
         tmp = new Type_Func((*i)->getType(), tmp);
       }
-      st.insert(id, tmp);
       expr->sem();
       if (typ != nullptr)
         expr->type_check(typ);
+      st.closeScope();
+      st.insert(id, tmp);
     }
   }
-
+  virtual void sem1() override
+  {
+    if (typ == nullptr)
+      semanticError("Missing function type");
+    Type *tmp = typ;
+    for (auto i = par_vec->rbegin(); i != par_vec->rend(); i++)
+    {
+      tmp = new Type_Func((*i)->getType(), tmp);
+    }
+    st.insert(id, tmp);
+  }
+  virtual void sem2() override
+  {
+    st.openScope();
+    for (Par *par : *par_vec)
+    {
+      par->sem();
+    }
+    expr->sem();
+    if (typ != nullptr)
+      expr->type_check(typ);
+    st.closeScope();
+  }
   virtual void printOn(std::ostream &out) const override
   {
     out << "Def(" << id << ", [" << *par_vec << "], ";
@@ -1009,17 +1046,25 @@ class LetDef : public Stmt
 {
 public:
   LetDef(bool b, std::vector<Def *> *v) : rec(b), def_vec(v) {}
-
   virtual void sem() override
   {
-
-    if (def_vec == nullptr)
-      return;
-
-    for (Def *def : *def_vec)
+    st.openScope();
+    if (rec)
     {
-      def->sem();
+      for (Def *def : *def_vec)
+      {
+        def->sem1();
+      }
+      for (Def *def : *def_vec)
+      {
+        def->sem2();
+      }
     }
+    else
+      for (Def *def : *def_vec)
+      {
+        def->sem();
+      }
 
     // std::cout << "Letdef" << std::endl;
   }
@@ -1042,8 +1087,20 @@ public:
   {
     out << "LetIn(" << *def << ", " << *expr << ")";
   }
+  virtual void sem() override
+  {
+    def->sem();
+    expr->sem();
+    t = expr->getType();
+    st.closeScope();
+  }
+  virtual Type *getType() override
+  {
+    return t;
+  }
 
 private:
   LetDef *def;
   Expr *expr;
+  Type *t;
 };

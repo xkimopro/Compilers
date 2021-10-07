@@ -1,4 +1,10 @@
-let a : float = 1.2 *. 1.1 and
-b : float = a *. 1.1
-and f (d:int) (c:int) = d + c
-and l = f 1 2
+ let a : float = 1.2 *. 1.1 and
+ b : float = a *. 1.1 
+let rec even (n:int) : bool = if n = 0 then true else odd (n-1)
+and odd (n:int) : bool = if n = 0 then false else even (n-1)
+let f (inc:int->int) (x:int) :int = inc x
+and incr (y:int) :int = y + 1
+let f1 (x:int) = x + 1 and x = 3 and f2 (x:int) = x + 2
+let a = let f3 (x:int) :int = x + 2 in  f3 5
+       --letdef in  expr
+
