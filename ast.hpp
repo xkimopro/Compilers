@@ -451,13 +451,13 @@ public:
   {
     if (st.lookup(var) == nullptr)
       semanticError("Unknown variable");
-    switch(st.lookup(var)->type->get_type())
+    switch (st.lookup(var)->type->get_type())
     {
-      case type_func:
-        semanticError("Function called with no arguments");
-        break;
-      default:
-        break;
+    case type_func:
+      semanticError("Function called with no arguments");
+      break;
+    default:
+      break;
     }
   }
   virtual Type *getType() override
@@ -524,8 +524,6 @@ public:
     if (st.lookup(fun_name) == nullptr)
       semanticError("Call to Undefined function");
     Type *tmp = st.lookup(fun_name)->type;
-    if (tmp == nullptr)
-      semanticError("Unknown variable");
     for (Expr *e : *expr_vec)
     {
       if (tmp->get_type() != type_func)
@@ -542,6 +540,17 @@ public:
     {
       semanticError("Parameter number mismatch");
     }
+  }
+  virtual Type *getType() override
+  {
+    if (st.lookup(fun_name) == nullptr)
+      semanticError("Call to Undefined function");
+    Type *tmp = st.lookup(fun_name)->type;
+    while (tmp->get_type() == type_func)
+    {
+      tmp = tmp->getChild2();
+    }
+    return tmp;
   }
 
 private:
@@ -961,10 +970,7 @@ public:
       expr->sem();
       if (typ != nullptr)
         expr->type_check(typ);
-      if (st.lookup(id) == nullptr)
-        st.insert(id, expr->getType());
-      else
-        semanticError("Variable redeclared");
+      st.insert(id, expr->getType());
     }
     else
     {
@@ -972,17 +978,12 @@ public:
       {
         par->sem();
       }
-      Type *tmp = typ;
-
-      for (auto i = par_vec->rbegin();
-           i != par_vec->rend(); ++i)
+      Type *tmp = expr->getType();
+      for (auto i = par_vec->rbegin(); i != par_vec->rend(); i++)
       {
         tmp = new Type_Func((*i)->getType(), tmp);
       }
-      if (st.lookup(id) == nullptr)
-        st.insert(id, tmp);
-      else
-        semanticError("Variable redeclared");
+      st.insert(id, tmp);
       expr->sem();
       if (typ != nullptr)
         expr->type_check(typ);

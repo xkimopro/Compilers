@@ -28,6 +28,11 @@ public:
     }
     void insert(std::string id, Type *t)
     {
+        if (globals.find(id) != globals.end())
+        {
+            std::cerr << "Duplicate variable " << id << std::endl;
+            exit(1);
+        }
         globals[id] = SymbolEntry(t);
     }
 
