@@ -492,6 +492,16 @@ public:
   {
     out << "While(" << *cond << ", " << *stmt << ")";
   }
+  virtual void sem() override { 
+    cond->sem();
+    cond->type_check(new Type_Bool()); 
+    stmt->sem();
+  }
+
+  virtual Type* getType() override { 
+    return new Type_Unit();
+  }
+
 
 private:
   Expr *cond, *stmt;
@@ -505,6 +515,19 @@ public:
   {
     std::string for_str = down ? " down to " : " to ";
     out << "For(" << id << " from " << *start << for_str << *end << ") do (" << *do_stmt << ")";
+  }
+
+  virtual void sem() override { 
+    if (st.lookup(id) != nullptr) semanticError("Loop variable " + id + " redeclared in the same scope");
+    start->sem();
+    start->type_check(new Type_Int());
+    end->sem();
+    end->type_check(new Type_Int());
+    do_stmt->sem();
+  }
+
+  virtual Type* getType() override { 
+    return new Type_Unit();
   }
 
 private:
@@ -583,6 +606,64 @@ public:
   {
     out << "Unop(" << op << ", " << *e << ")";
   }
+
+  virtual void sem() override
+  {
+    e->sem();
+    switch (op)
+    {
+    case unop_plus:
+    case unop_minus:
+      e->type_check(new Type_Int());
+      break;
+    case unop_float_plus:
+    case unop_float_minus:
+      e->type_check(new Type_Float());
+      break;
+
+    case unop_exclamation:
+      e->type_check(new Type_Ref(e->getType()));
+      break;
+    case unop_not:
+      e->type_check(new Type_Bool());
+      break;
+    case unop_delete:
+      e->type_check(new Type_Ref(e->getType()));
+      break;
+
+    default: 
+      semanticError("Unary operator not allowed for expression");
+      break;
+    }
+  }
+
+  virtual Type *getType() override { 
+    switch (op)
+    {
+    case unop_plus:
+    case unop_minus:
+      return new Type_Int();
+      break;
+    case unop_float_plus:
+    case unop_float_minus:
+      return new Type_Float();
+      break;
+    case unop_exclamation:
+      return e->getType();
+      break;
+    case unop_not:
+      return new Type_Bool();
+      break;
+    case unop_delete:
+      return new Type_Unit();
+      break;
+    default: 
+      semanticError("Unary operator not allowed. Cant read type.");
+      break;
+    }
+  }
+
+
 
 private:
   unop_enum op;
@@ -737,6 +818,14 @@ public:
   {
     out << "New(" << *typ << ")";
   }
+
+  virtual void sem() override { 
+    if (typ->get_type() == type_array) semanticError("Reference cannot be of type array");
+  }
+  virtual Type* getType() override {
+     return new Type_Ref(typ);
+  }
+  
 
 private:
   Type *typ;
