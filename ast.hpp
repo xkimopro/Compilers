@@ -377,6 +377,10 @@ public:
   {
     out << "Str_Expr(" << str << ")";
   }
+  virtual Type *getType() override
+  {
+    return new Type_Array(str.length() + 1, new Type_Char());
+  }
 
 private:
   std::string str;
@@ -434,6 +438,10 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Dim(" << ind << ", " << var << ")";
+  }
+  virtual Type *getType() override
+  {
+    return new Type_Int();
   }
 
 private:
