@@ -108,7 +108,7 @@ public:
   {
     return nullptr;
   }
-  virtual int getDimension()
+  virtual int getDimensions()
   {
     return 0;
   }
@@ -272,14 +272,14 @@ public:
   {
     return t;
   }
-  virtual int getDimension() override { return dim; }
+  virtual int getDimensions() override { return dim; }
   virtual bool equals(Type *other) override
   {
     if (other == nullptr)
       return false;
     if (this->get_type() != other->get_type())
       return false;
-    return t->equals(other->getChild1()) && dim == other->getDimension();
+    return t->equals(other->getChild1()) && dim == other->getDimensions();
   }
 
 private:
@@ -425,10 +425,35 @@ public:
   {
     out << "Array(" << var << ", [" << *expr_vec << "])";
   }
+  virtual void sem() override
+  {
+    SymbolEntry *se = st.lookup(var);
+    if (se == nullptr)
+      semanticError("Unknown variable " + var);
+    else
+    {
+      t = se->type;
+      if (t->get_type() != type_array)
+        semanticError("Type mismatch");
+      else if (t->getDimensions() != expr_vec->size())
+        semanticError("Array dimensions mismatch");
+      else
+        for (Expr *e : *expr_vec)
+        {
+          e->sem();
+          e->type_check(new Type_Int());
+        }
+    }
+  }
+  virtual Type *getType() override
+  {
+    return new Type_Ref(t->getChild1());
+  }
 
 private:
   std::string var;
   std::vector<Expr *> *expr_vec;
+  Type *t;
 };
 
 class Dim : public Expr
@@ -438,6 +463,16 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Dim(" << ind << ", " << var << ")";
+  }
+  virtual void sem() override
+  {
+    SymbolEntry *se = st.lookup(var);
+    if (se == nullptr)
+      semanticError("Unknown variable " + var);
+    else if (se->type->get_type() != type_array)
+      semanticError("Type mismatch");
+    else if (ind < 1 || ind > se->type->getDimensions())
+      semanticError("Array dimensions mismatch");
   }
   virtual Type *getType() override
   {
@@ -492,16 +527,16 @@ public:
   {
     out << "While(" << *cond << ", " << *stmt << ")";
   }
-  virtual void sem() override { 
+  virtual void sem() override
+  {
     cond->sem();
-    cond->type_check(new Type_Bool()); 
+    cond->type_check(new Type_Bool());
     stmt->sem();
   }
-
-  virtual Type* getType() override { 
+  virtual Type *getType() override
+  {
     return new Type_Unit();
   }
-
 
 private:
   Expr *cond, *stmt;
@@ -516,17 +551,19 @@ public:
     std::string for_str = down ? " down to " : " to ";
     out << "For(" << id << " from " << *start << for_str << *end << ") do (" << *do_stmt << ")";
   }
-
-  virtual void sem() override { 
-    if (st.lookup(id) != nullptr) semanticError("Loop variable " + id + " redeclared in the same scope");
+  virtual void sem() override
+  {
     start->sem();
     start->type_check(new Type_Int());
     end->sem();
     end->type_check(new Type_Int());
+    st.openScope();
+    st.insert(id, new Type_Int);
     do_stmt->sem();
+    st.closeScope();
   }
-
-  virtual Type* getType() override { 
+  virtual Type *getType() override
+  {
     return new Type_Unit();
   }
 
@@ -606,7 +643,6 @@ public:
   {
     out << "Unop(" << op << ", " << *e << ")";
   }
-
   virtual void sem() override
   {
     e->sem();
@@ -620,24 +656,24 @@ public:
     case unop_float_minus:
       e->type_check(new Type_Float());
       break;
-
     case unop_exclamation:
-      e->type_check(new Type_Ref(e->getType()));
+      if (e->getType()->get_type() != type_ref)
+        semanticError("Type mismatch");
       break;
     case unop_not:
       e->type_check(new Type_Bool());
       break;
     case unop_delete:
-      e->type_check(new Type_Ref(e->getType()));
+      if (e->getType()->get_type() != type_ref)
+        semanticError("Type mismatch");
       break;
-
-    default: 
+    default:
       semanticError("Unary operator not allowed for expression");
       break;
     }
   }
-
-  virtual Type *getType() override { 
+  virtual Type *getType() override
+  {
     switch (op)
     {
     case unop_plus:
@@ -649,7 +685,7 @@ public:
       return new Type_Float();
       break;
     case unop_exclamation:
-      return e->getType();
+      return e->getType()->getChild1();
       break;
     case unop_not:
       return new Type_Bool();
@@ -657,13 +693,11 @@ public:
     case unop_delete:
       return new Type_Unit();
       break;
-    default: 
+    default:
       semanticError("Unary operator not allowed. Cant read type.");
       break;
     }
   }
-
-
 
 private:
   unop_enum op;
@@ -818,14 +852,15 @@ public:
   {
     out << "New(" << *typ << ")";
   }
-
-  virtual void sem() override { 
-    if (typ->get_type() == type_array) semanticError("Reference cannot be of type array");
+  virtual void sem() override
+  {
+    if (typ->get_type() == type_array)
+      semanticError("Reference cannot be of type array");
   }
-  virtual Type* getType() override {
-     return new Type_Ref(typ);
+  virtual Type *getType() override
+  {
+    return new Type_Ref(typ);
   }
-  
 
 private:
   Type *typ;
@@ -833,6 +868,8 @@ private:
 
 class Pattern : public AST
 {
+public:
+  virtual void sem(Type *t) {}
 };
 
 class Pattern_Int_Expr : public Pattern
@@ -842,6 +879,11 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Pattern_Int_Expr(" << num << ")";
+  }
+  virtual void sem(Type *t) override
+  {
+    if (t->get_type() != type_int)
+      semanticError("Type mismatch");
   }
 
 private:
@@ -856,6 +898,11 @@ public:
   {
     out << "Pattern_Float_Expr(" << num << ")";
   }
+  virtual void sem(Type *t) override
+  {
+    if (t->get_type() != type_float)
+      semanticError("Type mismatch");
+  }
 
 private:
   float num;
@@ -868,6 +915,11 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Pattern_Char_Expr(" << chr << ")";
+  }
+  virtual void sem(Type *t) override
+  {
+    if (t->get_type() != type_char)
+      semanticError("Type mismatch");
   }
 
 private:
@@ -882,6 +934,11 @@ public:
   {
     out << "Pattern_Bool_Expr(" << var << ")";
   }
+  virtual void sem(Type *t) override
+  {
+    if (t->get_type() != type_bool)
+      semanticError("Type mismatch");
+  }
 
 private:
   bool var;
@@ -894,6 +951,10 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Pattern_id(" << var << ")";
+  }
+  virtual void sem(Type *t) override
+  {
+    st.insert(var, t);
   }
 
 private:
@@ -916,14 +977,14 @@ private:
 class Pattern_Call : public Pattern
 {
 public:
-  Pattern_Call(std::string s, std::vector<Pattern *> *v) : fun_name(s), pattern_vec(v) {}
+  Pattern_Call(std::string s, std::vector<Pattern *> *v) : Id(s), pattern_vec(v) {}
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Pattern_Call(" << fun_name << ", (" << *pattern_vec << "))";
+    out << "Pattern_Call(" << Id << ", (" << *pattern_vec << "))";
   }
 
 private:
-  std::string fun_name;
+  std::string Id;
   std::vector<Pattern *> *pattern_vec;
 };
 
@@ -936,7 +997,6 @@ public:
     out << "Clause(" << *p << ", " << *e << ")";
   }
 
-private:
   Pattern *p;
   Expr *e;
 };
@@ -948,6 +1008,21 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Match(" << *e << ", " << *vec << ")";
+  }
+  virtual void sem() override
+  {
+    e->sem();
+    Type *t1 = e->getType();
+    ((*vec)[0])->e->sem();
+    Type *t2 = ((*vec)[0])->e->getType();
+    st.openScope();
+    for (Clause *cl : *vec)
+    {
+      cl->p->sem(t1);
+      cl->e->sem();
+      cl->e->type_check(t2);
+    }
+    st.closeScope();
   }
 
 private:
@@ -976,7 +1051,6 @@ class Par : public AST
 {
 public:
   Par(std::string s, Type *t) : id(s), typ(t) {}
-
   virtual void printOn(std::ostream &out) const override
   {
     out << "Par(" << id;
@@ -984,7 +1058,6 @@ public:
       out << ", " << *typ;
     out << ")";
   }
-
   virtual void sem() override
   {
     if (typ == nullptr)
@@ -1005,7 +1078,6 @@ class TDef : public AST
 {
 public:
   TDef(std::string s, std::vector<Constr *> *v) : id(s), constr_vec(v) {}
-
   virtual void printOn(std::ostream &out) const override
   {
     out << "TDef(" << id << ", " << *constr_vec << ")";
@@ -1020,7 +1092,6 @@ class TypeDef : public Stmt
 {
 public:
   TypeDef(std::vector<TDef *> *v) : tdef_vec(v) {}
-
   virtual void sem() override
   {
     if (tdef_vec == nullptr)
@@ -1030,7 +1101,6 @@ public:
       tdef->sem();
     }
   }
-
   virtual void printOn(std::ostream &out) const override
   {
     out << "Typedef(" << *tdef_vec << ")";
@@ -1051,7 +1121,6 @@ class MutableDef : public Def
 {
 public:
   MutableDef(std::string s, std::vector<Expr *> *e, Type *t) : id(s), expr_vec(e), typ(t) {}
-
   virtual void printOn(std::ostream &out) const override
   {
     out << "MutableDef(" << id;
@@ -1060,6 +1129,22 @@ public:
     if (typ != nullptr)
       out << ", " << *typ;
     out << ")";
+  }
+  virtual void sem() override
+  {
+    if (typ == nullptr)
+      semanticError("Missing mutable type");
+    if (expr_vec == nullptr)
+      st.insert(id, new Type_Ref(typ));
+    else
+    {
+      for (Expr *e : *expr_vec)
+      {
+        e->sem();
+        e->type_check(new Type_Int());
+      }
+      st.insert(id, new Type_Array(expr_vec->size(), typ));
+    }
   }
 
 private:
@@ -1072,10 +1157,9 @@ class NormalDef : public Def
 {
 public:
   NormalDef(std::string id1, std::vector<Par *> *v, Type *t, Expr *e) : id(id1), par_vec(v), typ(t), expr(e) {}
-
   virtual void sem() override
   {
-    if (par_vec->empty()) //variable
+    if (par_vec->empty())
     {
       expr->sem();
       if (typ != nullptr)
@@ -1143,6 +1227,10 @@ class LetDef : public Stmt
 {
 public:
   LetDef(bool b, std::vector<Def *> *v) : rec(b), def_vec(v) {}
+  virtual void printOn(std::ostream &out) const override
+  {
+    out << "Letdef(" << rec << ", " << *def_vec << ")";
+  }
   virtual void sem() override
   {
     st.openScope();
@@ -1162,13 +1250,6 @@ public:
       {
         def->sem();
       }
-
-    // std::cout << "Letdef" << std::endl;
-  }
-
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Letdef(" << rec << ", " << *def_vec << ")";
   }
 
 private:
