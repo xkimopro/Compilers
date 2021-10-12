@@ -4,6 +4,8 @@
 #include "lexer.hpp"
 
 SymbolTable st;
+ConstrTable ct;
+TypeDefTable tt;
 %}
 
 %token T_and

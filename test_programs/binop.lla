@@ -1,11 +1,12 @@
- let a : float = 1.2 *. 1.1 and
- b : float = a *. 1.1 
+let a : float = 1.2 *. 1.1
 let rec even (n:int) : bool = if n = 0 then true else odd (n-1)
 and odd (n:int) : bool = if n = 0 then false else even (n-1)
 let f (inc:int->int) (x:int) :int = inc x
 and incr (y:int) :int = y + 1
-let f1 (x:int) = x + 1 and x = 3 and f2 (x:int) = x + 2
-let a = let f3 (x:int) :int = x + 2 in  f3 5
+let f1 (x:int) :int= x + 1 and x:int = 3 and f2 (x:int):int = x + 2
+let a : int = let f3 (x:int) :int = x + 2 in  f3 5
 let mutable x : int
 and mutable a [5, 3] : int
-let n = !a[1,2] == dim 1 a
+let n:bool = !a[1,2] == dim 1 a
+type tree = Nil | Node of int tree tree
+let a:tree = Nill

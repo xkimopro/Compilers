@@ -112,7 +112,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 80 "parser.y"
+#line 82 "parser.y"
 
   std::vector<Stmt *> *stmt_vec;
   Stmt *stmt;

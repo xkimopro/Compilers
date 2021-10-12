@@ -6,6 +6,8 @@
 #include "symbol.hpp"
 
 extern SymbolTable st;
+extern TypeDefTable tt;
+extern ConstrTable ct;
 
 template <typename T>
 inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v)
@@ -222,6 +224,11 @@ public:
       return false;
     return from->equals(other->getChild1()) && to->equals(other->getChild2());
   }
+  virtual void sem() override
+  {
+    from->sem();
+    to->sem();
+  }
 
 private:
   Type *from, *to;
@@ -250,6 +257,10 @@ public:
     if (this->get_type() != other->get_type())
       return false;
     return t->equals(other->getChild1());
+  }
+  virtual void sem() override
+  {
+    t->sem();
   }
 
 private:
@@ -282,6 +293,11 @@ public:
     return t->equals(other->getChild1()) && dim == other->getDimensions();
   }
 
+  virtual void sem() override
+  {
+    t->sem();
+  }
+
 private:
   int dim;
   Type *t;
@@ -290,18 +306,34 @@ private:
 class Type_id : public Type
 {
 public:
-  Type_id(std::string s) : var(s) {}
+  Type_id(std::string s) : id(s) {}
   virtual void printOn(std::ostream &out) const override
   {
-    out << "Type_id(" << var << ")";
+    out << "Type_id(" << id << ")";
   }
   virtual main_type get_type() override
   {
     return type_id;
   }
+  virtual std::string get_id() override
+  {
+    return id;
+  }
+  virtual bool equals(Type *other) override
+  {
+    if (other == nullptr)
+      return false;
+    if (this->get_type() != other->get_type())
+      return false;
+    return id == other->get_id();
+  }
+  virtual void sem() override
+  {
+    tt.lookup(id);
+  }
 
 private:
-  std::string var;
+  std::string id;
 };
 
 class Expr : public AST
@@ -434,7 +466,7 @@ public:
     {
       t = se->type;
       if (t->get_type() != type_array)
-        semanticError("Type mismatch");
+        semanticError("Array: Type mismatch");
       else if (t->getDimensions() != expr_vec->size())
         semanticError("Array dimensions mismatch");
       else
@@ -470,7 +502,7 @@ public:
     if (se == nullptr)
       semanticError("Unknown variable " + var);
     else if (se->type->get_type() != type_array)
-      semanticError("Type mismatch");
+      semanticError("Dim: Type mismatch");
     else if (ind < 1 || ind > se->type->getDimensions())
       semanticError("Array dimensions mismatch");
   }
@@ -513,6 +545,13 @@ public:
   virtual void printOn(std::ostream &out) const override
   {
     out << "Id(" << var << ")";
+  }
+  virtual Type *getType() override
+  {
+    return ct.lookup(var)->type;
+  }
+  virtual void sem() override {
+    ct.lookup(var);
   }
 
 private:
@@ -558,7 +597,7 @@ public:
     end->sem();
     end->type_check(new Type_Int());
     st.openScope();
-    st.insert(id, new Type_Int);
+    st.insert(id, new Type_Int());
     do_stmt->sem();
     st.closeScope();
   }
@@ -658,14 +697,14 @@ public:
       break;
     case unop_exclamation:
       if (e->getType()->get_type() != type_ref)
-        semanticError("Type mismatch");
+        semanticError("exclamation: Type mismatch");
       break;
     case unop_not:
       e->type_check(new Type_Bool());
       break;
     case unop_delete:
       if (e->getType()->get_type() != type_ref)
-        semanticError("Type mismatch");
+        semanticError("delete: Type mismatch");
       break;
     default:
       semanticError("Unary operator not allowed for expression");
@@ -856,6 +895,7 @@ public:
   {
     if (typ->get_type() == type_array)
       semanticError("Reference cannot be of type array");
+    typ->sem();
   }
   virtual Type *getType() override
   {
@@ -1041,6 +1081,10 @@ public:
       out << ", " << *type_vec;
     out << ")";
   }
+  virtual void sem(std::string id)
+  {
+    ct.insert(Id, new Type_id(id), type_vec);
+  }
 
 private:
   std::string Id;
@@ -1062,6 +1106,7 @@ public:
   {
     if (typ == nullptr)
       semanticError("No type specified for parameter " + id);
+    typ->sem();
     st.insert(id, typ);
   }
   virtual Type *getType()
@@ -1082,6 +1127,17 @@ public:
   {
     out << "TDef(" << id << ", " << *constr_vec << ")";
   }
+  virtual void sem() override
+  {
+    tt.insert(id);
+  }
+  virtual void sem2()
+  {
+    for (Constr *c : *constr_vec)
+    {
+      c->sem(id);
+    }
+  }
 
 private:
   std::string id;
@@ -1099,6 +1155,10 @@ public:
     for (TDef *tdef : *tdef_vec)
     {
       tdef->sem();
+    }
+    for (TDef *tdef : *tdef_vec)
+    {
+      tdef->sem2();
     }
   }
   virtual void printOn(std::ostream &out) const override
@@ -1130,10 +1190,11 @@ public:
       out << ", " << *typ;
     out << ")";
   }
-  virtual void sem() override
+  virtual void sem1() override
   {
     if (typ == nullptr)
       semanticError("Missing mutable type");
+    typ->sem();
     if (expr_vec == nullptr)
       st.insert(id, new Type_Ref(typ));
     else
@@ -1162,6 +1223,7 @@ public:
     if (par_vec->empty())
     {
       expr->sem();
+      typ->sem();
       if (typ != nullptr)
         expr->type_check(typ);
       st.insert(id, expr->getType());
@@ -1189,6 +1251,7 @@ public:
   {
     if (typ == nullptr)
       semanticError("Missing function type");
+    typ->sem();
     Type *tmp = typ;
     for (auto i = par_vec->rbegin(); i != par_vec->rend(); i++)
     {
@@ -1246,10 +1309,16 @@ public:
       }
     }
     else
+    {
       for (Def *def : *def_vec)
       {
-        def->sem();
+        def->sem2();
       }
+      for (Def *def : *def_vec)
+      {
+        def->sem1();
+      }
+    }
   }
 
 private:

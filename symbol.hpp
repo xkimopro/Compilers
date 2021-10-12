@@ -3,84 +3,125 @@
 #include <cstdlib>
 #include <vector>
 #include <map>
+#include <unordered_set>
 
 #include "ast.hpp"
 
 void semanticError(std::string msg);
-
 
 class Type;
 
 class SymbolEntry
 {
 public:
-    SymbolEntry(Type *t) : type(t) {}
-    SymbolEntry() {}
-    Type *type;
+  SymbolEntry(Type *t) : type(t) {}
+  SymbolEntry() {}
+  Type *type;
 };
 
-class Scope {
+class Scope
+{
 public:
   Scope() : locals() {}
-  SymbolEntry * lookup(std::string id) {
-    if (locals.find(id) == locals.end()) return nullptr;
+  SymbolEntry *lookup(std::string id)
+  {
+    if (locals.find(id) == locals.end())
+      return nullptr;
     return &locals[id];
   }
-  void insert(std::string id, Type *t) {
-    if (locals.find(id) != locals.end()) semanticError("Identifier " + id + " redeclared");
+  void insert(std::string id, Type *t)
+  {
+    if (locals.find(id) != locals.end())
+      semanticError("Identifier " + id + " redeclared");
     locals[id] = SymbolEntry(t);
   }
+
 private:
   std::map<std::string, SymbolEntry> locals;
 };
 
-class SymbolTable {
+class SymbolTable
+{
 public:
-  void openScope() {
+  void openScope()
+  {
     scopes.push_back(Scope());
   }
-  void closeScope() {
+  void closeScope()
+  {
     scopes.pop_back();
   }
-  SymbolEntry * lookup(std::string id) {
-    for (auto i = scopes.rbegin(); i != scopes.rend(); ++i) {
+  SymbolEntry *lookup(std::string id)
+  {
+    for (auto i = scopes.rbegin(); i != scopes.rend(); ++i)
+    {
       SymbolEntry *e = i->lookup(id);
-      if (e != nullptr) return e;
+      if (e != nullptr)
+        return e;
     }
-    semanticError("Variable " + id + "  not found");
+    semanticError("Variable " + id + " not found");
     return nullptr;
   }
-  void insert(std::string id, Type *t) {
+  void insert(std::string id, Type *t)
+  {
     scopes.back().insert(id, t);
   }
-  
+
 private:
   std::vector<Scope> scopes;
 };
 
-//class SymbolTable
-//{
-//public:
-//    SymbolTable() {}
-//    SymbolEntry *lookup(std::string id)
-//    {
-//        if (globals.find(id) != globals.end())
-//            return &globals[id];
-//        return nullptr;
-//    }
-//    void insert(std::string id, Type *t)
-//    {
-//        if (globals.find(id) != globals.end())
-//        {
-//            std::cerr << "Duplicate variable " << id << std::endl;
-//            exit(1);
-//        }
-//        globals[id] = SymbolEntry(t);
-//    }
-//
-//private:
-//    std::map<std::string, SymbolEntry> globals;
-//};
+class TypeDefTable
+{
+public:
+  void insert(std::string id)
+  {
+    if (types.count(id) > 0)
+      semanticError("User defined type " + id + " already declared");
+    types.insert(id);
+  }
+
+  void lookup(std::string id)
+  {
+    if (types.count(id) == 0)
+      semanticError("User defined type " + id + " has not been declared");
+  }
+
+private:
+  std::unordered_set<std::string> types = {};
+};
+
+class ConstrEntry
+{
+public:
+  ConstrEntry(Type *t, std::vector<Type *> *v) : type(t), type_vec(v) {}
+  ConstrEntry() {}
+  Type *type;
+  std::vector<Type *> *type_vec;
+};
+
+class ConstrTable
+{
+public:
+  ConstrEntry *lookup(std::string id)
+  {
+    if (locals.find(id) == locals.end())
+    {
+      semanticError("Constructor " + id + " not found");
+      return nullptr;
+    }
+    return &locals[id];
+  }
+  void insert(std::string id, Type *t, std::vector<Type *> *v)
+  {
+    if (locals.find(id) != locals.end())
+      semanticError("Constructor " + id + " redeclared");
+    locals[id] = ConstrEntry(t, v);
+  }
+
+private:
+  std::map<std::string, ConstrEntry> locals;
+};
 
 // struct SymbolEntry {
 //   Type *type;
