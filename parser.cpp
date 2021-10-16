@@ -1788,7 +1788,7 @@ yyreduce:
 
   case 27:
 #line 208 "parser.y"
-       { (yyval.constr) = new Constr((yyvsp[0].var), nullptr); }
+       { (yyval.constr) = new Constr((yyvsp[0].var), new std::vector<Type *>); }
 #line 1793 "parser.cpp"
     break;
 
@@ -2052,7 +2052,7 @@ yyreduce:
 
   case 71:
 #line 273 "parser.y"
-                 { (yyval.expr) = new Call((yyvsp[-1].var), (yyvsp[0].expr_vec)); }
+                 { (yyval.expr) = new call((yyvsp[-1].var), (yyvsp[0].expr_vec)); }
 #line 2057 "parser.cpp"
     break;
 

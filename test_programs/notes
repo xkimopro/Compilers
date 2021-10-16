@@ -1,0 +1,16 @@
+let x:t0  = 5
+let b:t1 = x
+t0:new int
+t1:new int
+
+
+
+
+
+
+
+T_id par_list '=' expr
+T_mutable T_id
+T_mutable T_id '[' comma_expr_list ']'
+par
+for

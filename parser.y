@@ -205,7 +205,7 @@ constr_list:
 ;
 
 constr:
-  T_Id { $$ = new Constr($1, nullptr); }
+  T_Id { $$ = new Constr($1, new std::vector<Type *>); }
 | T_Id T_of constr_type_list { $$ = new Constr($1, $3); }
 ;
 
@@ -270,7 +270,7 @@ expr1:
 expr2:
   expr1 { $$ = $1; }
 | T_id expr_list { $$ = new call($1, $2); }
-| T_Id expr_list { $$ = new Call($1, $2); }
+| T_Id expr_list { $$ = new call($1, $2); }
 ;
 
 expr3:

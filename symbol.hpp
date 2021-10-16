@@ -32,7 +32,7 @@ public:
   void insert(std::string id, Type *t)
   {
     if (locals.find(id) != locals.end())
-      semanticError("Identifier " + id + " redeclared");
+      semanticError("Redeclared identifier " + id);
     locals[id] = SymbolEntry(t);
   }
 
@@ -59,7 +59,7 @@ public:
       if (e != nullptr)
         return e;
     }
-    semanticError("Variable " + id + " not found");
+    semanticError("Unknown identifier " + id);
     return nullptr;
   }
   void insert(std::string id, Type *t)
@@ -74,17 +74,16 @@ private:
 class TypeDefTable
 {
 public:
-  void insert(std::string id)
-  {
-    if (types.count(id) > 0)
-      semanticError("User defined type " + id + " already declared");
-    types.insert(id);
-  }
-
   void lookup(std::string id)
   {
     if (types.count(id) == 0)
-      semanticError("User defined type " + id + " has not been declared");
+      semanticError("Unknown identifier " + id);
+  }
+  void insert(std::string id)
+  {
+    if (types.count(id) > 0)
+      semanticError("Redeclared identifier " + id);
+    types.insert(id);
   }
 
 private:
@@ -107,7 +106,7 @@ public:
   {
     if (locals.find(id) == locals.end())
     {
-      semanticError("Constructor " + id + " not found");
+      semanticError("Unknown identifier " + id);
       return nullptr;
     }
     return &locals[id];
@@ -115,7 +114,7 @@ public:
   void insert(std::string id, Type *t, std::vector<Type *> *v)
   {
     if (locals.find(id) != locals.end())
-      semanticError("Constructor " + id + " redeclared");
+      semanticError("Redeclared identifier " + id);
     locals[id] = ConstrEntry(t, v);
   }
 

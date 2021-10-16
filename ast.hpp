@@ -292,7 +292,6 @@ public:
       return false;
     return t->equals(other->getChild1()) && dim == other->getDimensions();
   }
-
   virtual void sem() override
   {
     t->sem();
@@ -344,7 +343,7 @@ public:
   {
     if (!t->equals(this->getType()))
     {
-      std::cout << *this;
+      std::cerr << *this;
       semanticError("Type mismatch");
     }
   };
@@ -460,22 +459,17 @@ public:
   virtual void sem() override
   {
     SymbolEntry *se = st.lookup(var);
-    if (se == nullptr)
-      semanticError("Unknown variable " + var);
+    t = se->type;
+    if (t->get_type() != type_array)
+      semanticError("Array: Type mismatch");
+    else if (t->getDimensions() != expr_vec->size())
+      semanticError("Array dimensions mismatch");
     else
-    {
-      t = se->type;
-      if (t->get_type() != type_array)
-        semanticError("Array: Type mismatch");
-      else if (t->getDimensions() != expr_vec->size())
-        semanticError("Array dimensions mismatch");
-      else
-        for (Expr *e : *expr_vec)
-        {
-          e->sem();
-          e->type_check(new Type_Int());
-        }
-    }
+      for (Expr *e : *expr_vec)
+      {
+        e->sem();
+        e->type_check(new Type_Int());
+      }
   }
   virtual Type *getType() override
   {
@@ -499,9 +493,7 @@ public:
   virtual void sem() override
   {
     SymbolEntry *se = st.lookup(var);
-    if (se == nullptr)
-      semanticError("Unknown variable " + var);
-    else if (se->type->get_type() != type_array)
+    if (se->type->get_type() != type_array)
       semanticError("Dim: Type mismatch");
     else if (ind < 1 || ind > se->type->getDimensions())
       semanticError("Array dimensions mismatch");
@@ -526,8 +518,7 @@ public:
   }
   virtual void sem() override
   {
-    if (st.lookup(var) == nullptr)
-      semanticError("Unknown variable " + var);
+    st.lookup(var);
   }
   virtual Type *getType() override
   {
@@ -546,12 +537,13 @@ public:
   {
     out << "Id(" << var << ")";
   }
+  virtual void sem() override
+  {
+    st.lookup(var);
+  }
   virtual Type *getType() override
   {
-    return ct.lookup(var)->type;
-  }
-  virtual void sem() override {
-    ct.lookup(var);
+    return st.lookup(var)->type;
   }
 
 private:
@@ -622,8 +614,6 @@ public:
   }
   virtual void sem() override
   {
-    if (st.lookup(fun_name) == nullptr)
-      semanticError("Call to Undefined function " + fun_name);
     Type *tmp = st.lookup(fun_name)->type;
     for (Expr *e : *expr_vec)
     {
@@ -645,8 +635,6 @@ public:
   }
   virtual Type *getType() override
   {
-    if (st.lookup(fun_name) == nullptr)
-      semanticError("Call to Undefined function " + fun_name);
     Type *tmp = st.lookup(fun_name)->type;
     while (tmp->get_type() == type_func)
     {
@@ -660,19 +648,19 @@ private:
   std::vector<Expr *> *expr_vec;
 };
 
-class Call : public Expr
-{
-public:
-  Call(std::string s, std::vector<Expr *> *v) : fun_name(s), expr_vec(v) {}
-  virtual void printOn(std::ostream &out) const override
-  {
-    out << "Call(" << fun_name << ", (" << *expr_vec << "))";
-  }
+// class Call : public Expr
+// {
+// public:
+//   Call(std::string s, std::vector<Expr *> *v) : fun_name(s), expr_vec(v) {}
+//   virtual void printOn(std::ostream &out) const override
+//   {
+//     out << "Call(" << fun_name << ", (" << *expr_vec << "))";
+//   }
 
-private:
-  std::string fun_name;
-  std::vector<Expr *> *expr_vec;
-};
+// private:
+//   std::string fun_name;
+//   std::vector<Expr *> *expr_vec;
+// };
 
 class UnOp : public Expr
 {
@@ -1036,7 +1024,6 @@ public:
   {
     out << "Clause(" << *p << ", " << *e << ")";
   }
-
   Pattern *p;
   Expr *e;
 };
@@ -1083,7 +1070,10 @@ public:
   }
   virtual void sem(std::string id)
   {
-    ct.insert(Id, new Type_id(id), type_vec);
+    Type *tmp = new Type_id(id);
+    for (auto i = type_vec->rbegin(); i != type_vec->rend(); i++)
+      tmp = new Type_Func(*i, tmp);
+    st.insert(Id, tmp);
   }
 
 private:
@@ -1173,7 +1163,6 @@ private:
 class Def : public AST
 {
 public:
-  virtual void sem1(){};
   virtual void sem2(){};
 };
 
@@ -1190,7 +1179,7 @@ public:
       out << ", " << *typ;
     out << ")";
   }
-  virtual void sem1() override
+  virtual void sem() override
   {
     if (typ == nullptr)
       semanticError("Missing mutable type");
@@ -1218,36 +1207,36 @@ class NormalDef : public Def
 {
 public:
   NormalDef(std::string id1, std::vector<Par *> *v, Type *t, Expr *e) : id(id1), par_vec(v), typ(t), expr(e) {}
+  // virtual void sem() override
+  // {
+  //   if (par_vec->empty())
+  //   {
+  //     expr->sem();
+  //     typ->sem();
+  //     if (typ != nullptr)
+  //       expr->type_check(typ);
+  //     st.insert(id, expr->getType());
+  //   }
+  //   else
+  //   {
+  //     st.openScope();
+  //     for (Par *par : *par_vec)
+  //     {
+  //       par->sem();
+  //     }
+  //     Type *tmp = expr->getType();
+  //     for (auto i = par_vec->rbegin(); i != par_vec->rend(); i++)
+  //     {
+  //       tmp = new Type_Func((*i)->getType(), tmp);
+  //     }
+  //     expr->sem();
+  //     if (typ != nullptr)
+  //       expr->type_check(typ);
+  //     st.closeScope();
+  //     st.insert(id, tmp);
+  //   }
+  // }
   virtual void sem() override
-  {
-    if (par_vec->empty())
-    {
-      expr->sem();
-      typ->sem();
-      if (typ != nullptr)
-        expr->type_check(typ);
-      st.insert(id, expr->getType());
-    }
-    else
-    {
-      st.openScope();
-      for (Par *par : *par_vec)
-      {
-        par->sem();
-      }
-      Type *tmp = expr->getType();
-      for (auto i = par_vec->rbegin(); i != par_vec->rend(); i++)
-      {
-        tmp = new Type_Func((*i)->getType(), tmp);
-      }
-      expr->sem();
-      if (typ != nullptr)
-        expr->type_check(typ);
-      st.closeScope();
-      st.insert(id, tmp);
-    }
-  }
-  virtual void sem1() override
   {
     if (typ == nullptr)
       semanticError("Missing function type");
@@ -1301,7 +1290,7 @@ public:
     {
       for (Def *def : *def_vec)
       {
-        def->sem1();
+        def->sem();
       }
       for (Def *def : *def_vec)
       {
@@ -1316,7 +1305,7 @@ public:
       }
       for (Def *def : *def_vec)
       {
-        def->sem1();
+        def->sem();
       }
     }
   }

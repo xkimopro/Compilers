@@ -9,4 +9,4 @@ let mutable x : int
 and mutable a [5, 3] : int
 let n:bool = !a[1,2] == dim 1 a
 type tree = Nil | Node of int tree tree
-let a:tree = Nill
+let a:tree = Nil
