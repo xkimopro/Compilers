@@ -4,7 +4,7 @@
 #include "lexer.hpp"
 
 SymbolTable st;
-ConstrTable ct;
+//ConstrTable ct;
 TypeDefTable tt;
 %}
 
@@ -80,6 +80,8 @@ TypeDefTable tt;
 %nonassoc T_new
 
 %union {
+
+  Program *program;
   std::vector<Stmt *> *stmt_vec;
   Stmt *stmt;
   std::vector<Def *> *def_vec;
@@ -108,7 +110,8 @@ TypeDefTable tt;
   std::vector<Pattern *> *pattern_vec;
 }
 
-%type<stmt_vec> program stmt_list
+%type<program> program
+%type<stmt_vec> stmt_list
 %type<stmt> stmt
 %type<def_vec> and_def_list
 %type<letdef> letdef
@@ -137,15 +140,7 @@ TypeDefTable tt;
 %%
 
 program:
-  stmt_list { 
-    // std::cout << "AST: " << *$1 << std::endl; 
-    
-    // Semantic analysis on each stmt
-    for (Stmt *stmt  : *$1){
-      stmt->sem();
-    }
-
-  }
+  stmt_list { $$ = new Program($1); $$->compile(); }
 ;
 
 stmt_list:
@@ -362,6 +357,6 @@ void yyerror(const char *msg) {
 
 int main() {
   int result = yyparse();
-  if (result == 0) printf("Success.\n");
+  // if (result == 0) printf("Success.\n");
   return result;
 }

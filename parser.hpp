@@ -114,6 +114,8 @@ union YYSTYPE
 {
 #line 82 "parser.y"
 
+
+  Program *program;
   std::vector<Stmt *> *stmt_vec;
   Stmt *stmt;
   std::vector<Def *> *def_vec;
@@ -141,7 +143,7 @@ union YYSTYPE
   std::vector<Clause *> *clause_vec;
   std::vector<Pattern *> *pattern_vec;
 
-#line 145 "parser.hpp"
+#line 147 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -7,6 +7,8 @@
 
 #include "ast.hpp"
 
+
+
 void semanticError(std::string msg);
 
 class Type;
