@@ -22,38 +22,46 @@ extern SymbolTable st;
 extern TypeDefTable tt;
 extern ConstrTable ct;
 
+using namespace llvm;
+
 class AST {
  public:
   virtual ~AST() {}
   virtual void printOn(std::ostream &out) const = 0;
   virtual void sem() {}
 
-  virtual void compile(){};
+  virtual Value* compile() const { return nullptr; }
 
-  void llvm_compile_and_dump(bool optimize);
 
  protected:
-  static llvm::LLVMContext TheContext;
-  static llvm::IRBuilder<> Builder;
+  static LLVMContext TheContext;
+  static IRBuilder<> Builder;
 
-  static std::unique_ptr<llvm::Module> TheModule;
-  static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
+  static std::unique_ptr<Module> TheModule;
+  static std::unique_ptr<legacy::FunctionPassManager> TheFPM;
 
-  static llvm::GlobalVariable *TheVars;
-  static llvm::GlobalVariable *TheNL;
+  static GlobalVariable *TheVars;
+  static GlobalVariable *TheNL;
 
-  static llvm::Function *TheWriteInteger;
-  static llvm::Function *TheWriteString;
+  static Function *TheWriteInteger;
+  static Function *TheWriteString;
+  static Function *TheWriteReal;
 
   static llvm::Type *i8;
   static llvm::Type *i32;
   static llvm::Type *i64;
 
-  static llvm::ConstantInt *c8(char c) {
-    return llvm::ConstantInt::get(TheContext, llvm::APInt(8, c, true));
+  static ConstantInt *c8(char c) {
+    return ConstantInt::get(TheContext, APInt(8, c, true));
   }
-  static llvm::ConstantInt *c32(int n) {
-    return llvm::ConstantInt::get(TheContext, llvm::APInt(32, n, true));
+  static ConstantInt *c32(int n) {
+    return ConstantInt::get(TheContext, APInt(32, n, true));
+  }
+  static ConstantInt *c64(int n) {
+    return ConstantInt::get(TheContext, APInt(64, n, true));
+  }
+  static ConstantFP *cfloat(double d) {
+    return ConstantFP::get(TheContext, APFloat(d));
   }
 };
 
@@ -69,8 +77,7 @@ class Program : public AST {
   Program(std::vector<Stmt *> *s) : statements(s) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
-  virtual void compile() override;
-
+  void llvm_compile_and_dump(bool optimize);
  private:
   std::vector<Stmt *> *statements;
 };
@@ -569,6 +576,9 @@ class LetDef : public Stmt {
   LetDef(bool b, std::vector<Def *> *v) : rec(b), def_vec(v) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value* compile() const override;
+
+
 
  private:
   bool rec;

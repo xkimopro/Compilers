@@ -3,8 +3,8 @@
 LLVMCONFIG=llvm-config
 
 CXX=c++
-CXXFLAGS=-Wall -std=c++11 -g `$(LLVMCONFIG) --cxxflags`
-LDFLAGS=`$(LLVMCONFIG) --ldflags --system-libs --libs all`
+CXXFLAGS=-Wall -std=c++11 `llvm-config --cxxflags`
+LDFLAGS=`llvm-config --ldflags --system-libs --libs all`
 
 
 default: parser

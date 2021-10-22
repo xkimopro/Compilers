@@ -94,9 +94,9 @@ TypeDefTable tt;
   TDef *tdef;
   std::vector<Constr *> *constr_vec;
   Constr *constr;
-  std::vector<Type *> *type_vec;
+  std::vector<::Type *> *type_vec;
   Par *par;
-  Type *type;
+  ::Type *type;
   int stars;
   Expr *expr;
   int int_expr;
@@ -140,7 +140,11 @@ TypeDefTable tt;
 %%
 
 program:
-  stmt_list { $$ = new Program($1); $$->printOn(std::cout); }
+  stmt_list { 
+    $$ = new Program($1); 
+    $$->sem();
+    $$->llvm_compile_and_dump(false);
+   }
 ;
 
 stmt_list:
@@ -200,12 +204,12 @@ constr_list:
 ;
 
 constr:
-  T_Id { $$ = new Constr($1, new std::vector<Type *>); }
+  T_Id { $$ = new Constr($1, new std::vector<::Type *>); }
 | T_Id T_of constr_type_list { $$ = new Constr($1, $3); }
 ;
 
 constr_type_list:
-  type { $$ = new std::vector<Type *>; $$->push_back($1); }
+  type { $$ = new std::vector<::Type *>; $$->push_back($1); }
 | constr_type_list type { $1->push_back($2); $$ = $1; }
 ;
 
