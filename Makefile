@@ -19,7 +19,7 @@ parser.hpp parser.cpp: parser.y
 
 parser.o: parser.cpp lexer.hpp ast.hpp symbol.hpp
 
-ast.o: ast.cpp ast.hpp sem.o utils.hpp
+ast.o: ast.cpp ast.hpp sem.cpp utils.hpp compile.cpp print.cpp 
 
 parser: lexer.o parser.o ast.o
 	$(CXX) $(CXXFLAGS) -o parser $^ $(LDFLAGS)

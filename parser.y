@@ -140,7 +140,7 @@ TypeDefTable tt;
 %%
 
 program:
-  stmt_list { $$ = new Program($1); $$->compile(); }
+  stmt_list { $$ = new Program($1); $$->printOn(std::cout); }
 ;
 
 stmt_list:

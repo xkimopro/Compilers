@@ -1,51 +1,34 @@
 #include "ast.hpp"
 
-void Program::printOn(std::ostream &out) const {
-  std::cout << "AST( " << *statements << ")";
-}
-void Program::sem() {
-  for (Stmt *stmt  : *statements) {
-       stmt->sem();
-     }
-}
+// class Program
 
-// Types Classes
+void Program::sem() {
+  for (Stmt *stmt : *statements) {
+    stmt->sem();
+  }
+}
 
 // Class Type_Unit
-
-void Type_Unit::printOn(std::ostream &out) const { out << "Type_Unit()"; }
 
 main_type Type_Unit::get_type() { return type_unit; }
 
 // Class Type_Int
 
-void Type_Int::printOn(std::ostream &out) const { out << "Type_Int()"; }
-
 main_type Type_Int::get_type() { return type_int; }
 
 // Class Type_Float
-
-void Type_Float::printOn(std::ostream &out) const { out << "Type_Float()"; }
 
 main_type Type_Float::get_type() { return type_float; }
 
 // Class Type_Char
 
-void Type_Char::printOn(std::ostream &out) const { out << "Type_Char()"; }
-
 main_type Type_Char::get_type() { return type_char; }
 
 // Class Type_Bool
 
-void Type_Bool::printOn(std::ostream &out) const { out << "Type_Bool()"; }
-
 main_type Type_Bool::get_type() { return type_bool; }
 
 // Class Type_Func
-
-void Type_Func::printOn(std::ostream &out) const {
-  out << "Type_Func(" << *from << ", " << *to << ")";
-}
 
 main_type Type_Func::get_type() { return type_func; }
 
@@ -66,10 +49,6 @@ void Type_Func::sem() {
 
 // Class Type_Ref
 
-void Type_Ref::printOn(std::ostream &out) const {
-  out << "Type_Ref(" << *t << ")";
-}
-
 main_type Type_Ref::get_type() { return type_ref; }
 
 ::Type *Type_Ref::getChild1() { return t; }
@@ -83,10 +62,6 @@ bool Type_Ref::equals(::Type *other) {
 void Type_Ref::sem() { t->sem(); }
 
 // Class Type_Array
-
-void Type_Array::printOn(std::ostream &out) const {
-  out << "Type_Array(" << dim << ", " << *t << ")";
-}
 
 main_type Type_Array::get_type() { return type_array; }
 
@@ -103,10 +78,6 @@ void Type_Array::sem() { t->sem(); }
 
 // Class Type_id
 
-void Type_id::printOn(std::ostream &out) const {
-  out << "Type_id(" << id << ")";
-}
-
 main_type Type_id::get_type() { return type_id; }
 
 std::string Type_id::get_id() { return id; }
@@ -121,33 +92,17 @@ void Type_id::sem() { tt.lookup(id); }
 
 // class Int_Expr
 
-void Int_Expr::printOn(std::ostream &out) const {
-  out << "Int_Expr(" << num << ")";
-}
-
 ::Type *Int_Expr::getType() { return new Type_Int(); }
 
 // class Float_Expr
-
-void Float_Expr::printOn(std::ostream &out) const {
-  out << "Float_Expr(" << num << ")";
-}
 
 ::Type *Float_Expr::getType() { return new Type_Float(); }
 
 // class Char_Expr
 
-void Char_Expr::printOn(std::ostream &out) const {
-  out << "Char_Expr(" << chr << ")";
-}
-
 ::Type *Char_Expr::getType() { return new Type_Char(); }
 
 // class Str_Expr
-
-void Str_Expr::printOn(std::ostream &out) const {
-  out << "Str_Expr(" << str << ")";
-}
 
 ::Type *Str_Expr::getType() {
   return new Type_Array(str.length() + 1, new Type_Char());
@@ -155,23 +110,13 @@ void Str_Expr::printOn(std::ostream &out) const {
 
 // class Bool_Expr
 
-void Bool_Expr::printOn(std::ostream &out) const {
-  out << "Bool_Expr(" << var << ")";
-}
-
 ::Type *Bool_Expr::getType() { return new Type_Bool(); }
 
 // class Unit_Expr
 
-void Unit_Expr::printOn(std::ostream &out) const { out << "Unit_Expr()"; }
-
 ::Type *Unit_Expr::getType() { return new Type_Unit(); }
 
 // class Array
-
-void Array::printOn(std::ostream &out) const {
-  out << "Array(" << var << ", [" << *expr_vec << "])";
-}
 
 void Array::sem() {
   SymbolEntry *se = st.lookup(var);
@@ -191,10 +136,6 @@ void Array::sem() {
 
 // class Dim
 
-void Dim::printOn(std::ostream &out) const {
-  out << "Dim(" << ind << ", " << var << ")";
-}
-
 void Dim::sem() {
   SymbolEntry *se = st.lookup(var);
   if (se->type->get_type() != type_array)
@@ -207,25 +148,17 @@ void Dim::sem() {
 
 // class id
 
-void id::printOn(std::ostream &out) const { out << "id(" << var << ")"; }
-
 void id::sem() { st.lookup(var); }
 
 ::Type *id::getType() { return st.lookup(var)->type; }
 
 // class Id
 
-void Id::printOn(std::ostream &out) const { out << "Id(" << var << ")"; }
-
 void Id::sem() { st.lookup(var); }
 
 ::Type *Id::getType() { return st.lookup(var)->type; }
 
 // class While
-
-void While::printOn(std::ostream &out) const {
-  out << "While(" << *cond << ", " << *stmt << ")";
-}
 
 void While::sem() {
   cond->sem();
@@ -236,12 +169,6 @@ void While::sem() {
 ::Type *While::getType() { return new Type_Unit(); }
 
 // class For
-
-void For::printOn(std::ostream &out) const {
-  std::string for_str = down ? " down to " : " to ";
-  out << "For(" << id << " from " << *start << for_str << *end << ") do ("
-      << *do_stmt << ")";
-}
 
 void For::sem() {
   start->sem();
@@ -257,10 +184,6 @@ void For::sem() {
 ::Type *For::getType() { return new Type_Unit(); }
 
 // class call
-
-void call::printOn(std::ostream &out) const {
-  out << "call(" << fun_name << ", (" << *expr_vec << "))";
-}
 
 void call::sem() {
   ::Type *tmp = st.lookup(fun_name)->type;
@@ -287,10 +210,6 @@ void call::sem() {
 }
 
 // class UnOp
-
-void UnOp::printOn(std::ostream &out) const {
-  out << "Unop(" << op << ", " << *e << ")";
-}
 
 void UnOp::sem() {
   e->sem();
@@ -347,10 +266,6 @@ void UnOp::sem() {
 }
 
 //  class BinOp
-
-void BinOp::printOn(std::ostream &out) const {
-  out << "Binop(" << *left << ", " << op << ", " << *right << ")";
-}
 
 void BinOp::sem() {
   left->sem();
@@ -445,17 +360,9 @@ void BinOp::sem() {
       return right->getType();
   }
   return nullptr;
-
 }
 
 // class If
-
-void If::printOn(std::ostream &out) const {
-  std::string ifelse = (expr3 != nullptr ? "If_Else(" : "If(");
-  out << ifelse << *expr1 << ", " << *expr2;
-  if (expr3 != nullptr) out << ", " << *expr3;
-  out << ")";
-}
 
 void If::sem() {
   expr1->sem();
@@ -471,8 +378,6 @@ void If::sem() {
 
 //   class New
 
-void New::printOn(std::ostream &out) const { out << "New(" << *typ << ")"; }
-
 void New::sem() {
   if (typ->get_type() == type_array)
     semanticError("Reference cannot be of Type array");
@@ -482,10 +387,6 @@ void New::sem() {
 ::Type *New::getType() { return new Type_Ref(typ); }
 
 //   class Pattern_Int_Expr
- 
-void Pattern_Int_Expr::printOn(std::ostream &out) const {
-  out << "Pattern_Int_Expr(" << num << ")";
-}
 
 void Pattern_Int_Expr::sem(::Type *t) {
   if (t->get_type() != type_int) semanticError("Type mismatch");
@@ -493,19 +394,11 @@ void Pattern_Int_Expr::sem(::Type *t) {
 
 //   class Pattern_Float_Expr
 
-void Pattern_Float_Expr::printOn(std::ostream &out) const {
-  out << "Pattern_Float_Expr(" << num << ")";
-}
-
 void Pattern_Float_Expr::sem(::Type *t) {
   if (t->get_type() != type_float) semanticError("Type mismatch");
 }
 
 //   class Pattern_Char_Expr
-
-void Pattern_Char_Expr::printOn(std::ostream &out) const {
-  out << "Pattern_Char_Expr(" << chr << ")";
-}
 
 void Pattern_Char_Expr::sem(::Type *t) {
   if (t->get_type() != type_char) semanticError("Type mismatch");
@@ -513,45 +406,21 @@ void Pattern_Char_Expr::sem(::Type *t) {
 
 // class Pattern_Bool_Expr
 
-void Pattern_Bool_Expr::printOn(std::ostream &out) const {
-  out << "Pattern_Bool_Expr(" << var << ")";
-}
-
 void Pattern_Bool_Expr::sem(::Type *t) {
   if (t->get_type() != type_bool) semanticError("Type mismatch");
 }
 
 // class Pattern_id
 
-void Pattern_id::printOn(std::ostream &out) const {
-  out << "Pattern_id(" << var << ")";
-}
-
 void Pattern_id::sem(::Type *t) { st.insert(var, t); }
 
 // class Pattern_Id
 
-void Pattern_Id::printOn(std::ostream &out) const {
-  out << "Pattern_Id(" << var << ")";
-}
-
 // class Pattern_Call
-
-void Pattern_Call::printOn(std::ostream &out) const {
-  out << "Pattern_Call(" << Id << ", (" << *pattern_vec << "))";
-}
 
 // class Clause
 
-void Clause::printOn(std::ostream &out) const {
-  out << "Clause(" << *p << ", " << *e << ")";
-}
-
 //   class Match
-
-void Match::printOn(std::ostream &out) const {
-  out << "Match(" << *e << ", " << *vec << ")";
-}
 
 void Match::sem() {
   e->sem();
@@ -569,12 +438,6 @@ void Match::sem() {
 
 // class Constr
 
-void Constr::printOn(std::ostream &out) const {
-  out << "Constr(" << Id;
-  if (type_vec != nullptr) out << ", " << *type_vec;
-  out << ")";
-}
-
 void Constr::sem(std::string id) {
   ::Type *tmp = new Type_id(id);
   for (auto i = type_vec->rbegin(); i != type_vec->rend(); i++)
@@ -583,12 +446,6 @@ void Constr::sem(std::string id) {
 }
 
 // class Par
-
-void Par::printOn(std::ostream &out) const {
-  out << "Par(" << id;
-  if (typ != nullptr) out << ", " << *typ;
-  out << ")";
-}
 
 void Par::sem() {
   if (typ == nullptr) semanticError("No Type specified for parameter " + id);
@@ -599,10 +456,6 @@ void Par::sem() {
 ::Type *Par::getType() { return typ; }
 
 // class TDef
-
-void TDef::printOn(std::ostream &out) const {
-  out << "TDef(" << id << ", " << *constr_vec << ")";
-}
 
 void TDef::sem() { tt.insert(id); }
 
@@ -624,18 +477,7 @@ void TypeDef::sem() {
   }
 }
 
-void TypeDef::printOn(std::ostream &out) const {
-  out << "Typedef(" << *tdef_vec << ")";
-}
-
 // class MutableDef
-
-void MutableDef::printOn(std::ostream &out) const {
-  out << "MutableDef(" << id;
-  if (expr_vec != nullptr) out << ", [" << *expr_vec << "]";
-  if (typ != nullptr) out << ", " << *typ;
-  out << ")";
-}
 
 void MutableDef::sem() {
   if (typ == nullptr) semanticError("Missing mutable type");
@@ -645,19 +487,13 @@ void MutableDef::sem() {
   else {
     for (Expr *e : *expr_vec) {
       e->sem();
-      e->type_check(new Type_Int()); 
+      e->type_check(new Type_Int());
     }
     st.insert(id, new Type_Array(expr_vec->size(), typ));
   }
 }
 
 // class NormalDef
-
-void NormalDef::printOn(std::ostream &out) const {
-  out << "Def(" << id << ", [" << *par_vec << "], ";
-  if (typ != nullptr) out << *typ << ", ";
-  out << *expr << ")";
-}
 
 void NormalDef::sem() {
   if (typ == nullptr) semanticError("Missing function type");
@@ -681,10 +517,6 @@ void NormalDef::sem2() {
 
 // class LetDef
 
-void LetDef::printOn(std::ostream &out) const {
-  out << "Letdef(" << rec << ", " << *def_vec << ")";
-}
-
 void LetDef::sem() {
   st.openScope();
   if (rec) {
@@ -705,10 +537,6 @@ void LetDef::sem() {
 }
 
 // class LetIn
-
-void LetIn::printOn(std::ostream &out) const {
-  out << "LetIn(" << *def << ", " << *expr << ")";
-}
 
 void LetIn::sem() {
   def->sem();
