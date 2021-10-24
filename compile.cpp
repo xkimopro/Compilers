@@ -104,7 +104,7 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
 Value *LetDef::compile() const {
   Value *n = c64(33);
   Value *f = cfloat(4.4);
-  Builder.CreateCall(TheWriteInteger, std::vector<Value *>{n});
+  //Builder.CreateCall(TheWriteInteger, std::vector<Value *>{n});
   Builder.CreateCall(TheWriteReal, std::vector<Value *>{f});
   Value *nl =
       Builder.CreateGEP(TheNL, std::vector<Value *>{c32(0), c32(0)}, "nl");

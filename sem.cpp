@@ -76,7 +76,7 @@ bool Type_Array::equals(::Type *other) {
 }
 void Type_Array::sem() { t->sem(); }
 
-// Class Type_id
+// class Type_id
 
 main_type Type_id::get_type() { return type_id; }
 
@@ -89,6 +89,16 @@ bool Type_id::equals(::Type *other) {
 }
 
 void Type_id::sem() { tt.lookup(id); }
+
+// class Expr
+
+::Type *Expr::getType() { return nullptr; };
+void Expr::type_check(::Type *t) {
+    if (!t->equals(this->getType())) {
+      std::cerr << *this;
+      semanticError("Type mismatch");
+    }
+  };
 
 // class Int_Expr
 

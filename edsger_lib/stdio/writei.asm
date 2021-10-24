@@ -3,7 +3,7 @@
 ; This function prints an integer to the standard output.
 
 
-                section .code
+                ;section .code
                 global  _writeInteger
                 extern  _formatInteger
                 extern  _writeString

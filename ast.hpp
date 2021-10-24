@@ -187,13 +187,8 @@ class Type_id : public ::Type {
 
 class Expr : public AST {
  public:
-  virtual ::Type *getType() { return nullptr; };
-  virtual void type_check(::Type *t) {
-    if (!t->equals(this->getType())) {
-      std::cerr << *this;
-      semanticError("Type mismatch");
-    }
-  };
+  virtual ::Type *getType();
+  virtual void type_check(::Type *t);
 };
 
 class Int_Expr : public Expr {

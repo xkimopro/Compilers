@@ -3,7 +3,7 @@
 ; This function prints a null terminated string to the standard output.
 
 
-            section .code
+            ;section .code
             global _writeString
 
 _writeString:

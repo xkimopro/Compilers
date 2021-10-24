@@ -13,8 +13,6 @@ main:                                   # @main
 # %bb.0:                                # %entry
 	pushq	%rax
 	.cfi_def_cfa_offset 16
-	movl	$33, %edi
-	callq	writeInteger
 	movsd	.LCPI0_0(%rip), %xmm0   # xmm0 = mem[0],zero
 	callq	writeReal
 	movl	$.Lnl, %edi

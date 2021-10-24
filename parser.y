@@ -361,6 +361,5 @@ void yyerror(const char *msg) {
 
 int main() {
   int result = yyparse();
-  // if (result == 0) printf("Success.\n");
   return result;
 }

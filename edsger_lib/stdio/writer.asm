@@ -3,31 +3,21 @@
 ; This function prints a real number to the standard output.
 
 
-section .code
+            ;section .code
             global  _writeReal
             extern  _formatReal
             extern  _writeString
-
+            extern printf
 _writeReal:
-            push    rbp
-            mov     rbp, rsp
-            push    rdi
-            push    rsi
-            mov [rbp+16], 0x3f8ccccd
-            movupd  xmm0, [rbp+16]
 
-            mov     r8, 0x00050000
-            lea     rdi, [buffer]
-            call    _formatReal
-            
-            lea     rdi, [buffer]
-            call    _writeString 
-            pop     rsi
-            pop     rdi
-            pop     rbp
-            ret
+    sub rsp, 8
+    ;movq xmm0, qword [rs]
+    mov rdi, string
+    mov rax, 1
+    call printf
+    add rsp, 8
 
+    ret
 
-            section .bss
-
-buffer  resb 32
+section .data
+    string db `%f`, 0

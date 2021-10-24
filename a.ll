@@ -12,7 +12,6 @@ declare void @writeString(i8*)
 
 define i64 @main() {
 entry:
-  call void @writeInteger(i64 33)
   call void @writeReal(double 4.400000e+00)
   call void @writeString(i8* getelementptr inbounds ([2 x i8], [2 x i8]* @nl, i32 0, i32 0))
   ret i64 0
