@@ -143,7 +143,7 @@ program:
   stmt_list { 
     $$ = new Program($1); 
     $$->sem();
-    $$->llvm_compile_and_dump(false);
+    //$$->llvm_compile_and_dump(false);
    }
 ;
 
@@ -168,10 +168,10 @@ and_def_list:
 ;
 
 def:
-  T_id par_list '=' expr  { $$ = new NormalDef($1, $2, nullptr, $4); }
+  T_id par_list '=' expr  { $$ = new NormalDef($1, $2, new Type_Undefined(), $4); }
 | T_id par_list ':' type '=' expr  { $$ = new NormalDef($1, $2, $4, $6); }
-| T_mutable T_id  { $$ = new MutableDef($2, nullptr, nullptr); }
-| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2, $4, nullptr); }
+| T_mutable T_id  { $$ = new MutableDef($2, nullptr, new Type_Undefined()); }
+| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2, $4, new Type_Undefined()); }
 | T_mutable T_id ':' type  { $$ = new MutableDef($2, nullptr, $4); }
 | T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2, $4, $7); }
 ;
@@ -214,7 +214,7 @@ constr_type_list:
 ;
 
 par:
-  T_id { $$ = new Par($1, nullptr); }
+  T_id { $$ = new Par($1, new Type_Undefined()); }
 | '(' T_id ':' type ')' { $$ = new Par($2, $4); }
 ;
 

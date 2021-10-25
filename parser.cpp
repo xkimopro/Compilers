@@ -1635,7 +1635,7 @@ yyreduce:
             { 
     (yyval.program) = new Program((yyvsp[0].stmt_vec)); 
     (yyval.program)->sem();
-    (yyval.program)->llvm_compile_and_dump(false);
+    //$$->llvm_compile_and_dump(false);
    }
 #line 1641 "parser.cpp"
     break;
@@ -1690,7 +1690,7 @@ yyreduce:
 
   case 11:
 #line 171 "parser.y"
-                          { (yyval.def) = new NormalDef((yyvsp[-3].var), (yyvsp[-2].par_vec), nullptr, (yyvsp[0].expr)); }
+                          { (yyval.def) = new NormalDef((yyvsp[-3].var), (yyvsp[-2].par_vec), new Type_Undefined(), (yyvsp[0].expr)); }
 #line 1695 "parser.cpp"
     break;
 
@@ -1702,13 +1702,13 @@ yyreduce:
 
   case 13:
 #line 173 "parser.y"
-                  { (yyval.def) = new MutableDef((yyvsp[0].var), nullptr, nullptr); }
+                  { (yyval.def) = new MutableDef((yyvsp[0].var), nullptr, new Type_Undefined()); }
 #line 1707 "parser.cpp"
     break;
 
   case 14:
 #line 174 "parser.y"
-                                          { (yyval.def) = new MutableDef((yyvsp[-3].var), (yyvsp[-1].expr_vec), nullptr); }
+                                          { (yyval.def) = new MutableDef((yyvsp[-3].var), (yyvsp[-1].expr_vec), new Type_Undefined()); }
 #line 1713 "parser.cpp"
     break;
 
@@ -1810,7 +1810,7 @@ yyreduce:
 
   case 31:
 #line 217 "parser.y"
-       { (yyval.par) = new Par((yyvsp[0].var), nullptr); }
+       { (yyval.par) = new Par((yyvsp[0].var), new Type_Undefined()); }
 #line 1815 "parser.cpp"
     break;
 
