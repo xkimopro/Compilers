@@ -152,8 +152,6 @@ bool Type_Undefined::equals(::Type *other)
 {
   if (t == nullptr)
   {
-    if (other->get_type() == type_undefined)
-      return 1;
     t = other;
     return 1;
   }
