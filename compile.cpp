@@ -1,5 +1,3 @@
-// #pragma once
-
 #include "ast.hpp"
 
 using namespace llvm;
@@ -15,13 +13,29 @@ GlobalVariable *AST::TheNL;
 // Write Functions
 Function *AST::TheWriteBoolean;
 Function *AST::TheWriteInteger;
-Function *AST::ThewriteChar;
+Function *AST::TheWriteChar;
 Function *AST::TheWriteString;
 Function *AST::TheWriteReal;
 
 // Read Functions
 
 Function *AST::TheReadInteger;
+Function *AST::TheReadBoolean;
+Function *AST::TheReadChar;
+Function *AST::TheReadReal;
+Function *AST::TheReadString;
+
+// Math Functions
+
+Function *AST::abs;
+Function *AST::fabs;
+Function *AST::sqrt;
+Function *AST::cos;
+Function *AST::tan;
+Function *AST::atan;
+Function *AST::exp;
+Function *AST::ln;
+Function *AST::pi;
 
 // Type Declarations
 
@@ -29,6 +43,7 @@ llvm::Type *AST::i1;
 llvm::Type *AST::i8;
 llvm::Type *AST::i32;
 llvm::Type *AST::i64;
+llvm::Type *AST::ifloat;
 
 void Program::llvm_compile_and_dump(bool optimize = false) {
   // Initialize
@@ -49,6 +64,7 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
   i8 = IntegerType::get(TheContext, 8);
   i32 = IntegerType::get(TheContext, 32);
   i64 = IntegerType::get(TheContext, 64);
+  ifloat = llvm::Type::getX86_FP80Ty(TheContext);
 
   // Initialize global variables
   ArrayType *vars_type = ArrayType::get(i32, 26);
@@ -56,10 +72,10 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
                                GlobalValue::PrivateLinkage,
                                ConstantAggregateZero::get(vars_type), "vars");
 
-  ArrayType *nl_type = ArrayType::get(i8, 2);
+  ArrayType *nl_type = ArrayType::get(i8, 3);
   TheNL = new GlobalVariable(
       *TheModule, nl_type, true, GlobalValue::PrivateLinkage,
-      ConstantArray::get(nl_type, {c8('\n'), c8('\0')}), "nl");
+      ConstantArray::get(nl_type, {c8('\n') , c8('\n'), c8('\0')}), "nl");
 
   // Initialize Write Library Functions
 
@@ -80,12 +96,12 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
   FunctionType *writeChar_type =
       FunctionType::get(llvm::Type::getVoidTy(TheContext), {i8}, false);
 
-  ThewriteChar = Function::Create(writeChar_type, Function::ExternalLinkage,
+  TheWriteChar = Function::Create(writeChar_type, Function::ExternalLinkage,
                                   "writeChar", TheModule.get());
 
   FunctionType *writeReal_type =
       FunctionType::get(llvm::Type::getVoidTy(TheContext),
-                        {llvm::Type::getX86_FP80Ty(TheContext)}, false);
+                        {ifloat}, false);
 
   TheWriteReal = Function::Create(writeReal_type, Function::ExternalLinkage,
                                   "writeReal", TheModule.get());
@@ -96,15 +112,42 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
   TheWriteString = Function::Create(writeString_type, Function::ExternalLinkage,
                                     "writeString", TheModule.get());
 
+  
+  
   // Initialize Read Library Functions
 
-  FunctionType *writeInteger_type =
-      FunctionType::get(llvm::Type::getVoidTy(TheContext), {i64}, false);
+  FunctionType *ReadInteger_type = FunctionType::get(i64, {}, false);
 
-  TheWriteInteger =
-      Function::Create(writeInteger_type, Function::ExternalLinkage,
-                       "writeInteger", TheModule.get());
+  TheReadInteger = Function::Create(ReadInteger_type, Function::ExternalLinkage,
+                                    "readInteger", TheModule.get());
+  
+  FunctionType *ReadBoolean_type = FunctionType::get(i1, {}, false);
 
+  TheReadBoolean = Function::Create(ReadBoolean_type, Function::ExternalLinkage,
+                                    "readBoolean", TheModule.get());
+  
+  FunctionType *ReadChar_type = FunctionType::get(i8, {}, false);
+
+  TheReadChar = Function::Create(ReadChar_type, Function::ExternalLinkage,
+                                    "readChar", TheModule.get()); ;;
+  
+  FunctionType *ReadReal_type = FunctionType::get(ifloat, {}, false);
+
+  TheReadReal = Function::Create(ReadReal_type, Function::ExternalLinkage,
+                                    "readReal", TheModule.get());
+
+  FunctionType *ReadString_type = FunctionType::get(PointerType::get(PointerType::get(i8, 0), 0), {}, false);
+
+  TheReadString = Function::Create(ReadString_type, Function::ExternalLinkage,
+                                    "readString", TheModule.get());
+
+
+  // Initialize Math Functions
+  
+  
+  
+  
+  
   // Defint and start the main function.
   FunctionType *main_type = FunctionType::get(i64, {}, false);
 
@@ -135,14 +178,18 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
 }
 
 Value *LetDef::compile() const {
-  Value *n = c64(33);
+  // Value *n = c64(33);
   Value *f = cfloat(4.4);
-  //Builder.CreateCall(TheWriteInteger, std::vector<Value *>{n});
+  // Builder.CreateCall(TheWriteInteger, std::vector<Value *>{n});
   Builder.CreateCall(TheWriteReal, std::vector<Value *>{f});
 
-  Value *nl =
-      Builder.CreateGEP(TheNL, std::vector<Value *>{c32(0), c32(0)}, "nl");
-  Builder.CreateCall(TheWriteString, std::vector<Value *>{nl});
+  // Value *nl =
+  //     Builder.CreateGEP(TheNL, std::vector<Value *>{c32(0), c32(0)}, "");
+  // Builder.CreateCall(TheWriteString, std::vector<Value *>{nl});
+
+  // Value *ret = Builder.CreateCall(TheReadString, std::vector<Value *>{}, "x");
+  // Value *ret_ptr =  Builder.CreateGEP(ret,   std::vector<Value *>{}  , "y");
+  // Builder.CreateCall(TheWriteString, std::vector<Value *>{ret_ptr});
 
   return nullptr;
 }

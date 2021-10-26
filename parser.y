@@ -142,8 +142,8 @@ TypeDefTable tt;
 program:
   stmt_list { 
     $$ = new Program($1); 
-    $$->sem();
-    //$$->llvm_compile_and_dump(false);
+    // $$->sem();
+    $$->llvm_compile_and_dump(false);
    }
 ;
 

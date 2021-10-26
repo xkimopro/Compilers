@@ -47,7 +47,7 @@ protected:
   // Write Functions
   static Function *TheWriteInteger;
   static Function *TheWriteBoolean;
-  static Function *ThewriteChar;
+  static Function *TheWriteChar;
   static Function *TheWriteReal;
   static Function *TheWriteString;
 
@@ -55,6 +55,24 @@ protected:
   // Read Functions
 
   static Function *TheReadInteger;
+  static Function *TheReadBoolean;
+  static Function *TheReadChar;
+  static Function *TheReadReal;
+  static Function *TheReadString;
+
+
+  // Math Functions
+  
+  static Function *abs;
+  static Function *fabs;
+  static Function *sqrt;
+  static Function *cos;
+  static Function *tan;
+  static Function *atan;
+  static Function *exp;
+  static Function *ln;
+  static Function *pi;
+
 
 
   // Type Shortcuts
@@ -62,6 +80,7 @@ protected:
   static llvm::Type *i8;
   static llvm::Type *i32;
   static llvm::Type *i64;
+  static llvm::Type *ifloat;
 
   static ConstantInt *c8(char c)
   {
