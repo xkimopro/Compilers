@@ -11,10 +11,21 @@ std::unique_ptr<legacy::FunctionPassManager> AST::TheFPM;
 
 GlobalVariable *AST::TheVars;
 GlobalVariable *AST::TheNL;
+
+// Write Functions
+Function *AST::TheWriteBoolean;
 Function *AST::TheWriteInteger;
+Function *AST::ThewriteChar;
 Function *AST::TheWriteString;
 Function *AST::TheWriteReal;
 
+// Read Functions
+
+Function *AST::TheReadInteger;
+
+// Type Declarations
+
+llvm::Type *AST::i1;
 llvm::Type *AST::i8;
 llvm::Type *AST::i32;
 llvm::Type *AST::i64;
@@ -32,7 +43,9 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
     TheFPM->add(createCFGSimplificationPass());
   }
   TheFPM->doInitialization();
+
   // Initialize types
+  i1 = IntegerType::get(TheContext, 1);
   i8 = IntegerType::get(TheContext, 8);
   i32 = IntegerType::get(TheContext, 32);
   i64 = IntegerType::get(TheContext, 64);
@@ -43,35 +56,55 @@ void Program::llvm_compile_and_dump(bool optimize = false) {
                                GlobalValue::PrivateLinkage,
                                ConstantAggregateZero::get(vars_type), "vars");
 
-  // TheVars->setAlignment(16);
-
   ArrayType *nl_type = ArrayType::get(i8, 2);
   TheNL = new GlobalVariable(
       *TheModule, nl_type, true, GlobalValue::PrivateLinkage,
       ConstantArray::get(nl_type, {c8('\n'), c8('\0')}), "nl");
 
-  // TheNL->setAlignment(1);
+  // Initialize Write Library Functions
 
-  // Initialize library functions
   FunctionType *writeInteger_type =
       FunctionType::get(llvm::Type::getVoidTy(TheContext), {i64}, false);
 
   TheWriteInteger =
       Function::Create(writeInteger_type, Function::ExternalLinkage,
                        "writeInteger", TheModule.get());
-                       
-  FunctionType *writeReal_type =
-      FunctionType::get(llvm::Type::getVoidTy(TheContext), {llvm::Type::getDoubleTy(TheContext)}, false);
 
-  TheWriteReal =
-      Function::Create(writeReal_type, Function::ExternalLinkage,
-                       "writeReal", TheModule.get());
+  FunctionType *writeBoolean_type =
+      FunctionType::get(llvm::Type::getVoidTy(TheContext), {i1}, false);
+
+  TheWriteBoolean =
+      Function::Create(writeBoolean_type, Function::ExternalLinkage,
+                       "writeBoolean", TheModule.get());
+
+  FunctionType *writeChar_type =
+      FunctionType::get(llvm::Type::getVoidTy(TheContext), {i8}, false);
+
+  ThewriteChar = Function::Create(writeChar_type, Function::ExternalLinkage,
+                                  "writeChar", TheModule.get());
+
+  FunctionType *writeReal_type =
+      FunctionType::get(llvm::Type::getVoidTy(TheContext),
+                        {llvm::Type::getX86_FP80Ty(TheContext)}, false);
+
+  TheWriteReal = Function::Create(writeReal_type, Function::ExternalLinkage,
+                                  "writeReal", TheModule.get());
 
   FunctionType *writeString_type = FunctionType::get(
       llvm::Type::getVoidTy(TheContext), {PointerType::get(i8, 0)}, false);
 
   TheWriteString = Function::Create(writeString_type, Function::ExternalLinkage,
                                     "writeString", TheModule.get());
+
+  // Initialize Read Library Functions
+
+  FunctionType *writeInteger_type =
+      FunctionType::get(llvm::Type::getVoidTy(TheContext), {i64}, false);
+
+  TheWriteInteger =
+      Function::Create(writeInteger_type, Function::ExternalLinkage,
+                       "writeInteger", TheModule.get());
+
   // Defint and start the main function.
   FunctionType *main_type = FunctionType::get(i64, {}, false);
 
@@ -106,8 +139,10 @@ Value *LetDef::compile() const {
   Value *f = cfloat(4.4);
   //Builder.CreateCall(TheWriteInteger, std::vector<Value *>{n});
   Builder.CreateCall(TheWriteReal, std::vector<Value *>{f});
+
   Value *nl =
       Builder.CreateGEP(TheNL, std::vector<Value *>{c32(0), c32(0)}, "nl");
   Builder.CreateCall(TheWriteString, std::vector<Value *>{nl});
+
   return nullptr;
 }

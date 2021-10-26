@@ -43,10 +43,22 @@ protected:
   static GlobalVariable *TheVars;
   static GlobalVariable *TheNL;
 
-  static Function *TheWriteInteger;
-  static Function *TheWriteString;
-  static Function *TheWriteReal;
 
+  // Write Functions
+  static Function *TheWriteInteger;
+  static Function *TheWriteBoolean;
+  static Function *ThewriteChar;
+  static Function *TheWriteReal;
+  static Function *TheWriteString;
+
+
+  // Read Functions
+
+  static Function *TheReadInteger;
+
+
+  // Type Shortcuts
+  static llvm::Type *i1;
   static llvm::Type *i8;
   static llvm::Type *i32;
   static llvm::Type *i64;
@@ -63,9 +75,9 @@ protected:
   {
     return ConstantInt::get(TheContext, APInt(64, n, true));
   }
-  static ConstantFP *cfloat(double d)
-  {
-    return ConstantFP::get(TheContext, APFloat(d));
+
+  static llvm::Constant *cfloat(float f) {
+    return llvm::ConstantFP::get(llvm::Type::getX86_FP80Ty(TheContext), f);
   }
 };
 
@@ -87,7 +99,7 @@ public:
   virtual void sem() override;
   void llvm_compile_and_dump(bool optimize);
 
-private:
+ private:
   std::vector<Stmt *> *statements;
 };
 
@@ -635,7 +647,7 @@ public:
   virtual void sem() override;
   virtual Value *compile() const override;
 
-private:
+ private:
   bool rec;
   std::vector<Def *> *def_vec;
 };
