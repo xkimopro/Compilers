@@ -4,7 +4,7 @@
 
 void Program::printOn(std::ostream &out) const
 {
-  std::cout << "AST( " << *statements << ")";
+  std::cout << "AST(" << *statements << ")";
 }
 
 // Class Type_Unit
@@ -62,7 +62,7 @@ void Type_Undefined::printOn(std::ostream &out) const
   if (t == nullptr)
     out << "Type_Undefined()";
   else
-    out << t;
+    out << *t;
 }
 
 // class Int_Expr

@@ -130,7 +130,7 @@ main_type Type_Undefined::get_type()
 
 ::Type *Type_Undefined::getChild1()
 {
-  return t == nullptr ? nullptr : t->getChild1();
+  return t == nullptr ? this : t->getChild1();
 }
 
 ::Type *Type_Undefined::getChild2()
@@ -150,9 +150,14 @@ std::string Type_Undefined::get_id()
 
 bool Type_Undefined::equals(::Type *other)
 {
+  //std::cerr << *this << " " << *other << std::endl;
+  if (other->get_type() == type_undefined)
+    other = other->getChild1();
+  if (this == other) return 1;
   if (t == nullptr)
   {
     t = other;
+    //std::cerr << *this << std::endl;
     return 1;
   }
   else

@@ -1633,9 +1633,9 @@ yyreduce:
   case 2:
 #line 143 "parser.y"
             { 
-    (yyval.program) = new Program((yyvsp[0].stmt_vec)); 
-    // $$->sem();
-    (yyval.program)->llvm_compile_and_dump(false);
+    (yyval.program) = new Program((yyvsp[0].stmt_vec));
+    (yyval.program)->sem();
+    //$$->llvm_compile_and_dump(false);
    }
 #line 1641 "parser.cpp"
     break;
@@ -1990,7 +1990,7 @@ yyreduce:
 
   case 61:
 #line 259 "parser.y"
-            { (yyval.expr) = new New((yyvsp[0].type)); }
+             { (yyval.expr) = new New((yyvsp[0].type)); }
 #line 1995 "parser.cpp"
     break;
 

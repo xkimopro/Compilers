@@ -141,9 +141,9 @@ TypeDefTable tt;
 
 program:
   stmt_list { 
-    $$ = new Program($1); 
-    // $$->sem();
-    $$->llvm_compile_and_dump(false);
+    $$ = new Program($1);
+    $$->sem();
+    //$$->llvm_compile_and_dump(false);
    }
 ;
 
@@ -256,7 +256,7 @@ expr1:
 | T_id '[' comma_expr_list ']' { $$ = new Array($1, $3); }
 | T_dim T_id { $$ = new Dim($2); }
 | T_dim T_int_expr T_id { $$ = new Dim($3, $2); }
-| T_new type{ $$ = new New($2); }
+| T_new type { $$ = new New($2); }
 | T_id { $$ = new id($1); }
 | T_Id { $$ = new Id($1); }
 | '!' expr1 { $$ = new UnOp(unop_exclamation, $2); }
