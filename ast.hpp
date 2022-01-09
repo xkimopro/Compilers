@@ -472,7 +472,8 @@ private:
 class Pattern : public AST
 {
 public:
-  virtual void sem(::Type *t) {}
+  virtual void sem() {}
+  ::Type *t;
 };
 
 class Pattern_Int_Expr : public Pattern
@@ -480,7 +481,7 @@ class Pattern_Int_Expr : public Pattern
 public:
   Pattern_Int_Expr(int n) : num(n) {}
   virtual void printOn(std::ostream &out) const override;
-  virtual void sem(::Type *t) override;
+  virtual void sem() override;
 
 private:
   int num;
@@ -491,7 +492,7 @@ class Pattern_Float_Expr : public Pattern
 public:
   Pattern_Float_Expr(float n) : num(n) {}
   virtual void printOn(std::ostream &out) const override;
-  virtual void sem(::Type *t) override;
+  virtual void sem() override;
 
 private:
   float num;
@@ -502,7 +503,7 @@ class Pattern_Char_Expr : public Pattern
 public:
   Pattern_Char_Expr(char c) : chr(c) {}
   virtual void printOn(std::ostream &out) const override;
-  virtual void sem(::Type *t) override;
+  virtual void sem() override;
 
 private:
   char chr;
@@ -513,7 +514,7 @@ class Pattern_Bool_Expr : public Pattern
 public:
   Pattern_Bool_Expr(bool b) : var(b) {}
   virtual void printOn(std::ostream &out) const override;
-  virtual void sem(::Type *t) override;
+  virtual void sem() override;
 
 private:
   bool var;
@@ -524,7 +525,7 @@ class Pattern_id : public Pattern
 public:
   Pattern_id(std::string s) : var(s) {}
   virtual void printOn(std::ostream &out) const override;
-  virtual void sem(::Type *t) override;
+  virtual void sem() override;
 
 private:
   std::string var;
@@ -535,6 +536,7 @@ class Pattern_Id : public Pattern
 public:
   Pattern_Id(std::string s) : var(s) {}
   virtual void printOn(std::ostream &out) const override;
+  virtual void sem() override;
 
 private:
   std::string var;
@@ -544,11 +546,12 @@ class Pattern_Call : public Pattern
 {
 public:
   Pattern_Call(std::string s, std::vector<Pattern *> *v)
-      : Id(s), pattern_vec(v) {}
+      : var(s), pattern_vec(v) {}
   virtual void printOn(std::ostream &out) const override;
+  virtual void sem() override;
 
 private:
-  std::string Id;
+  std::string var;
   std::vector<Pattern *> *pattern_vec;
 };
 

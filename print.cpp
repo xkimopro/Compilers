@@ -224,7 +224,7 @@ void Pattern_Id::printOn(std::ostream &out) const
 
 void Pattern_Call::printOn(std::ostream &out) const
 {
-  out << "Pattern_Call(" << Id << ", (" << *pattern_vec << "))";
+  out << "Pattern_Call(" << var << ", (" << *pattern_vec << "))";
 }
 
 // class Clause

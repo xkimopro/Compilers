@@ -435,43 +435,72 @@ void New::sem()
 
 //   class Pattern_Int_Expr
 
-void Pattern_Int_Expr::sem(::Type *t)
+void Pattern_Int_Expr::sem()
 {
-  if (t->get_type() != type_int)
-    semanticError("Type mismatch");
+  t = new Type_Int();
 }
 
 //   class Pattern_Float_Expr
 
-void Pattern_Float_Expr::sem(::Type *t)
+void Pattern_Float_Expr::sem()
 {
-  if (t->get_type() != type_float)
-    semanticError("Type mismatch");
+  t = new Type_Float();
 }
 
 //   class Pattern_Char_Expr
 
-void Pattern_Char_Expr::sem(::Type *t)
+void Pattern_Char_Expr::sem()
 {
-  if (t->get_type() != type_char)
-    semanticError("Type mismatch");
+  t = new Type_Char();
 }
 
 // class Pattern_Bool_Expr
 
-void Pattern_Bool_Expr::sem(::Type *t)
+void Pattern_Bool_Expr::sem()
 {
-  if (t->get_type() != type_bool)
-    semanticError("Type mismatch");
+  t = new Type_Bool();
 }
 
 // class Pattern_id
 
-void Pattern_id::sem(::Type *t) { st.insert(var, t); }
+void Pattern_id::sem()
+{
+  t = new Type_Undefined();
+  st.insert(var, t);
+}
 
 // class Pattern_Id
 
+void Pattern_Id::sem()
+{
+  t = st.lookup(var)->type;
+}
+
 // class Pattern_Call
+
+void Pattern_Call::sem()
+{
+  ::Type *tmp = st.lookup(var)->type;
+  for (Pattern *p : *pattern_vec)
+  {
+    p->sem();
+    if (tmp->get_type() != type_func)
+    {
+      semanticError("Parameter number mismatch");
+    }
+    else
+    {
+      if (!p->t->equals(tmp->getChild1()))
+        semanticError("Type mismatch");
+      tmp = tmp->getChild2();
+    }
+  }
+  if (tmp->get_type() == type_func)
+  {
+    semanticError("Parameter number mismatch");
+  }
+  t = tmp;
+}
 
 // class Clause
 
@@ -480,17 +509,17 @@ void Pattern_id::sem(::Type *t) { st.insert(var, t); }
 void Match::sem()
 {
   e->sem();
-  ::Type *t1 = e->t;
-  ((*vec)[0])->e->sem();
-  ::Type *t2 = ((*vec)[0])->e->t;
+  ::Type *typ = new Type_Undefined();
   st.openScope();
   for (Clause *cl : *vec)
   {
-    cl->p->sem(t1);
+    cl->p->sem();
+    e->type_check(cl->p->t);
     cl->e->sem();
-    cl->e->type_check(t2);
+    cl->e->type_check(typ);
   }
   st.closeScope();
+  t = ((*vec)[0])->e->t;
 }
 
 // class Constr
