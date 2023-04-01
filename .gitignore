@@ -1,0 +1,7 @@
+
+*.o
+lexer.cpp
+llama
+parser.cpp
+parser.hpp
+parser.output
