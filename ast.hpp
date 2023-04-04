@@ -242,7 +242,7 @@ private:
 class Type_Undefined : public ::Type
 {
 public:
-  Type_Undefined() {}
+  Type_Undefined() : t(nullptr) {}
   virtual void printOn(std::ostream &out) const override;
   virtual main_type get_type() override;
   virtual ::Type *getChild1() override;
