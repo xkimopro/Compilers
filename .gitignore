@@ -5,3 +5,7 @@ llama
 parser.cpp
 parser.hpp
 parser.output
+*.a
+a.ll
+a.out
+a.s
