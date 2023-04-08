@@ -1,14 +1,16 @@
-LLVMCONFIG=llvm-config-10
-CXXFLAGS=-Wall -std=c++11 `$(LLVMCONFIG) --cxxflags`
+.PHONY: llama clean distclean
+CXX=c++
+LLVMCONFIG=llvm-config-13
+CXXFLAGS=-Wall `$(LLVMCONFIG) --cxxflags` -g
 LDFLAGS=`$(LLVMCONFIG) --ldflags --system-libs --libs all`
 
 llama: lexer.o parser.o sem.o compile.o print.o
 	$(CXX) $(CXXFLAGS) -o llama $^ $(LDFLAGS)
 
-parser.hpp parser.cpp: parser.y
-	bison  -dv $(F) -o parser.cpp parser.y
+parser.hpp parser.cpp: parser.y lexer.hpp ast.hpp
+	bison -dv -o parser.cpp parser.y
 
-lexer.cpp: lexer.l parser.hpp
+lexer.cpp: lexer.l lexer.hpp parser.hpp ast.hpp
 	flex -s -o lexer.cpp lexer.l
 
 sem.o: ast.hpp

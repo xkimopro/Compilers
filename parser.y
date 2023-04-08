@@ -140,16 +140,17 @@ TypeDefTable tt;
 %%
 
 program:
-  stmt_list { 
+  stmt_list {
     $$ = new Program($1);
     $$->sem();
-    //$$->llvm_compile_and_dump(false);
+    // std::cout << *$$;
+    $$->llvm_compile_and_dump(false);
    }
 ;
 
 stmt_list:
-  %empty  { $$ = new std::vector<Stmt *>; }
-| stmt_list stmt  { $1->push_back($2); $$ = $1; }
+  %empty { $$ = new std::vector<Stmt *>; }
+| stmt_list stmt { $1->push_back($2); $$ = $1; }
 ;
 
 stmt:
@@ -158,8 +159,8 @@ stmt:
 ;
 
 letdef:
-  T_let and_def_list  { $$ = new LetDef(false, $2); }
-| T_let T_rec and_def_list  { $$ = new LetDef(true, $3); }
+  T_let and_def_list { $$ = new LetDef(false, $2); }
+| T_let T_rec and_def_list { $$ = new LetDef(true, $3); }
 ;
 
 and_def_list:
@@ -168,16 +169,16 @@ and_def_list:
 ;
 
 def:
-  T_id par_list '=' expr  { $$ = new NormalDef($1, $2, new Type_Undefined(), $4); }
-| T_id par_list ':' type '=' expr  { $$ = new NormalDef($1, $2, $4, $6); }
-| T_mutable T_id  { $$ = new MutableDef($2, nullptr, new Type_Undefined()); }
-| T_mutable T_id '[' comma_expr_list ']'  { $$ = new MutableDef($2, $4, new Type_Undefined()); }
-| T_mutable T_id ':' type  { $$ = new MutableDef($2, nullptr, $4); }
-| T_mutable T_id '[' comma_expr_list ']' ':' type  { $$ = new MutableDef($2, $4, $7); }
+  T_id par_list '=' expr { $$ = new NormalDef($1, $2, new Type_Undefined(), $4); }
+| T_id par_list ':' type '=' expr { $$ = new NormalDef($1, $2, $4, $6); }
+| T_mutable T_id { $$ = new MutableDef($2, nullptr, new Type_Undefined()); }
+| T_mutable T_id '[' comma_expr_list ']' { $$ = new MutableDef($2, $4, new Type_Undefined()); }
+| T_mutable T_id ':' type { $$ = new MutableDef($2, nullptr, $4); }
+| T_mutable T_id '[' comma_expr_list ']' ':' type { $$ = new MutableDef($2, $4, $7); }
 ;
 
 par_list:
-  %empty  { $$ = new std::vector<Par *>; }
+  %empty { $$ = new std::vector<Par *>; }
 | par_list par { $1->push_back($2); $$ = $1; }
 ;
 
@@ -199,7 +200,7 @@ tdef:
   T_id '=' constr_list { $$ = new TDef($1, $3); }
 ;
 constr_list:
-  constr  { $$ = new std::vector<Constr *>; $$->push_back($1); }
+  constr { $$ = new std::vector<Constr *>; $$->push_back($1); }
 | constr_list '|' constr { $1->push_back($3); $$ = $1; }
 ;
 
@@ -226,9 +227,9 @@ type:
 | T_float { $$ = new Type_Float(); }
 | '(' type ')' { $$ = $2; }
 | type T_arrow_op type { $$ = new Type_Func($1, $3); }
-| type T_ref  { $$ = new Type_Ref($1); }
-| T_array T_of type  { $$ = new Type_Array(1, $3); }
-| T_array '[' comma_star_list ']' T_of type  { $$ = new Type_Array($3, $6); }
+| type T_ref { $$ = new Type_Ref($1); }
+| T_array T_of type { $$ = new Type_Array(1, $3); }
+| T_array '[' comma_star_list ']' T_of type { $$ = new Type_Array($3, $6); }
 | T_id { $$ = new Type_id($1); }
 ;
 
@@ -248,7 +249,7 @@ expr1:
 | T_float_expr { $$ = new Float_Expr($1); }
 | T_char_expr { $$ = new Char_Expr($1); }
 | T_str_expr { $$ = new Str_Expr($1); }
-| T_true { $$ = new Bool_Expr(true); }  
+| T_true { $$ = new Bool_Expr(true); }
 | T_false { $$ = new Bool_Expr(false); }
 | '(' ')' { $$ = new Unit_Expr(); }
 | '(' expr ')' { $$ = $2; }
@@ -275,7 +276,7 @@ expr2:
 expr3:
   expr2 { $$ = $1; }
 | '+' expr2 { $$ = new UnOp(unop_plus, $2); }
-| '-' expr2  { $$ = new UnOp(unop_minus, $2); }
+| '-' expr2 { $$ = new UnOp(unop_minus, $2); }
 | T_plus_op expr2 { $$ = new UnOp(unop_float_plus, $2); }
 | T_minus_op expr2 { $$ = new UnOp(unop_float_minus, $2); }
 | T_not expr2 { $$ = new UnOp(unop_not, $2); }
@@ -355,8 +356,8 @@ pattern_list:
 %%
 
 void yyerror(const char *msg) {
-   fprintf (stderr, "Error: %s\n", msg);
-   exit(1);
+  fprintf (stderr, "Error: %s\n", msg);
+  exit(1);
 }
 
 int main() {

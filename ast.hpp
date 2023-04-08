@@ -8,7 +8,6 @@
 #include "utils.hpp"
 
 // llvm includes
-
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Value.h>
@@ -30,7 +29,6 @@ public:
   virtual ~AST() {}
   virtual void printOn(std::ostream &out) const = 0;
   virtual void sem() {}
-
   virtual Value *compile() const { return nullptr; }
 
 protected:
@@ -43,7 +41,6 @@ protected:
   static GlobalVariable *TheVars;
   static GlobalVariable *TheNL;
 
-
   // Write Functions
   static Function *TheWriteInteger;
   static Function *TheWriteBoolean;
@@ -51,18 +48,14 @@ protected:
   static Function *TheWriteReal;
   static Function *TheWriteString;
 
-
   // Read Functions
-
   static Function *TheReadInteger;
   static Function *TheReadBoolean;
   static Function *TheReadChar;
   static Function *TheReadReal;
   static Function *TheReadString;
 
-
   // Math Functions
-  
   static Function *abs;
   static Function *fabs;
   static Function *sqrt;
@@ -72,8 +65,6 @@ protected:
   static Function *exp;
   static Function *ln;
   static Function *pi;
-
-
 
   // Type Shortcuts
   static llvm::Type *i1;
@@ -116,6 +107,7 @@ public:
   Program(std::vector<Stmt *> *s) : statements(s) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
   void llvm_compile_and_dump(bool optimize);
 
  private:
