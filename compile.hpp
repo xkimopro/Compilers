@@ -153,6 +153,7 @@ Value *Program::compile() const {
   for (Stmt *stmt : *statements) {
     stmt->compile();
   }
+  return nullptr;
 }
 
 Value *LetDef::compile() const {

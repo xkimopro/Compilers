@@ -1,16 +1,9 @@
-#pragma once
-
 #include <cstdlib>
 #include <vector>
 #include <map>
 #include <unordered_set>
 
-#include "ast.hpp"
-
-
-
 void semanticError(std::string msg);
-
 class Type;
 
 class SymbolEntry
