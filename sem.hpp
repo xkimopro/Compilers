@@ -620,7 +620,7 @@ void NormalDef::sem2()
 
 void LetDef::sem()
 {
-  st.openScope();
+  // st.openScope();
   if (rec)
   {
     for (Def *def : *def_vec)
@@ -649,6 +649,7 @@ void LetDef::sem()
 
 void LetIn::sem()
 {
+  st.openScope();
   def->sem();
   expr->sem();
   t = expr->t;

@@ -143,8 +143,8 @@ program:
   stmt_list {
     $$ = new Program($1);
     $$->sem();
-    // std::cout << *$$;
-    $$->llvm_compile_and_dump(false);
+    std::cout << *$$;
+    // $$->llvm_compile_and_dump(false);
    }
 ;
 
