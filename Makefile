@@ -8,10 +8,10 @@ llama: lexer.o parser.o ast.o
 
 ast.o: ast.hpp symbol.hpp sem.hpp compile.hpp print.hpp
 
-parser.hpp parser.cpp: parser.y lexer.hpp ast.hpp
+parser.hpp parser.cpp: parser.y lexer.hpp ast.hpp symbol.hpp
 	bison -dv -o parser.cpp parser.y
 
-lexer.cpp: lexer.l lexer.hpp parser.hpp ast.hpp
+lexer.cpp: lexer.l lexer.hpp parser.hpp ast.hpp symbol.hpp
 	flex -s -o lexer.cpp lexer.l
 
 clean:

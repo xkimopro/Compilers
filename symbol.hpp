@@ -9,30 +9,37 @@ class Type;
 class SymbolEntry
 {
 public:
-  SymbolEntry(Type *t) : type(t) {}
+  SymbolEntry(Type *t, int ofs) : type(t), offset(ofs) {}
   SymbolEntry() {}
   Type *type;
+  int offset;
 };
 
 class Scope
 {
 public:
-  Scope() : locals() {}
-  SymbolEntry *lookup(std::string id)
+  Scope() : locals(), offset(-1), size(0) {}
+  Scope(int ofs) : locals(), offset(ofs), size(0) {}
+  SymbolEntry *lookup(std::string &id)
   {
     if (locals.find(id) == locals.end())
       return nullptr;
     return &locals[id];
   }
-  void insert(std::string id, Type *t)
+  void insert(std::string &id, Type *t)
   {
     if (locals.find(id) != locals.end())
       semanticError("Redeclared identifier " + id);
-    locals[id] = SymbolEntry(t);
+    locals[id] = SymbolEntry(t, offset++);
+    ++size;
   }
 
 private:
   std::map<std::string, SymbolEntry> locals;
+
+public:
+  int offset;
+  int size;
 };
 
 class SymbolTable
@@ -40,26 +47,33 @@ class SymbolTable
 public:
   void openScope()
   {
-    scopes.push_back(Scope());
+    int ofs = scopes.empty() ? 0 : scopes.back().offset;
+    scopes.push_back(Scope(ofs));
   }
   void closeScope()
   {
+    int ofs = scopes.back().offset;
     scopes.pop_back();
+    scopes.back().offset = ofs;
   }
-  SymbolEntry *lookup(std::string id)
+  SymbolEntry *lookup(std::string &id)
   {
     for (auto i = scopes.rbegin(); i != scopes.rend(); ++i)
     {
       SymbolEntry *e = i->lookup(id);
       if (e != nullptr)
+      {
+        id = id + "_" + std::to_string(e->offset);
         return e;
+      }
     }
     semanticError("Unknown identifier " + id);
     return nullptr;
   }
-  void insert(std::string id, Type *t)
+  void insert(std::string &id, Type *t)
   {
     scopes.back().insert(id, t);
+    id = id + "_" + std::to_string(scopes.back().offset - 1);
   }
 
 private:
@@ -69,12 +83,12 @@ private:
 class TypeDefTable
 {
 public:
-  void lookup(std::string id)
+  void lookup(std::string &id)
   {
     if (types.count(id) == 0)
       semanticError("Unknown identifier " + id);
   }
-  void insert(std::string id)
+  void insert(std::string &id)
   {
     if (types.count(id) > 0)
       semanticError("Redeclared identifier " + id);
@@ -85,85 +99,34 @@ private:
   std::unordered_set<std::string> types = {};
 };
 
-class ConstrEntry
-{
-public:
-  ConstrEntry(Type *t, std::vector<Type *> *v) : type(t), type_vec(v) {}
-  ConstrEntry() {}
-  Type *type;
-  std::vector<Type *> *type_vec;
-};
-
-class ConstrTable
-{
-public:
-  ConstrEntry *lookup(std::string id)
-  {
-    if (locals.find(id) == locals.end())
-    {
-      semanticError("Unknown identifier " + id);
-      return nullptr;
-    }
-    return &locals[id];
-  }
-  void insert(std::string id, Type *t, std::vector<Type *> *v)
-  {
-    if (locals.find(id) != locals.end())
-      semanticError("Redeclared identifier " + id);
-    locals[id] = ConstrEntry(t, v);
-  }
-
-private:
-  std::map<std::string, ConstrEntry> locals;
-};
-
-// struct SymbolEntry {
+// class ConstrEntry
+// {
+// public:
+//   ConstrEntry(Type *t, std::vector<Type *> *v) : type(t), type_vec(v) {}
+//   ConstrEntry() {}
 //   Type *type;
-//   int offset;
-//   SymbolEntry(Type t, int ofs) : type(t), offset(ofs) {}
+//   std::vector<Type *> *type_vec;
 // };
 
-// class Scope {
+// class ConstrTable
+// {
 // public:
-//   Scope() : locals(), offset(-1), size(0) {}
-//   Scope(int ofs) : locals(), offset(ofs), size(0) {}
-//   int getOffset() const { return offset; }
-//   int getSize() const { return size; }
-//   SymbolEntry *lookup(char c) {
-//     if (locals.find(c) == locals.end()) return nullptr;
-//     return &(locals[c]);
-//   }
-//   void insert(char c, Type t) {
-//     if (locals.find(c) != locals.end()) {
-//       std::cerr << "Duplicate variable " << c << std::endl;
-//       exit(1);
+//   ConstrEntry *lookup(std::string &id)
+//   {
+//     if (locals.find(id) == locals.end())
+//     {
+//       semanticError("Unknown identifier " + id);
+//       return nullptr;
 //     }
-//     locals[c] = SymbolEntry(t, offset++);
-//     ++size;
+//     return &locals[id];
 //   }
-// private:
-//   std::map<char, SymbolEntry> locals;
-//   int offset;
-//   int size;
-// };
+//   void insert(std::string &id, Type *t, std::vector<Type *> *v)
+//   {
+//     if (locals.find(id) != locals.end())
+//       semanticError("Redeclared identifier " + id);
+//     locals[id] = ConstrEntry(t, v);
+//   }
 
-// class SymbolTable {
-// public:
-//   void openScope() {
-//     int ofs = scopes.empty() ? 0 : scopes.back().getOffset();
-//     scopes.push_back(Scope(ofs));
-//   }
-//   void closeScope() { scopes.pop_back(); };
-//   SymbolEntry *lookup(char c) {
-//     for (auto i = scopes.rbegin(); i != scopes.rend(); ++i) {
-//       SymbolEntry *e = i->lookup(c);
-//       if (e != nullptr) return e;
-//     }
-//     std::cerr << "Unknown variable " << c << std::endl;
-//     exit(1);
-//   }
-//   int getSizeOfCurrentScope() const { return scopes.back().getSize(); }
-//   void insert(char c, Type t) { scopes.back().insert(c, t); }
 // private:
-//   std::vector<Scope> scopes;
+//   std::map<std::string, ConstrEntry> locals;
 // };

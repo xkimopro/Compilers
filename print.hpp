@@ -1,5 +1,3 @@
-#include "ast.hpp"
-
 template <typename T>
 inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
   bool first = true;
@@ -15,7 +13,7 @@ inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
 
 void Program::printOn(std::ostream &out) const
 {
-  std::cout << "AST(" << *statements << ")";
+  std::cout << "AST(" << *statements << ")" << std::endl;
 }
 
 // Class Type_Unit
@@ -119,14 +117,14 @@ void Unit_Expr::printOn(std::ostream &out) const { out << "Unit_Expr()"; }
 
 void Array::printOn(std::ostream &out) const
 {
-  out << "Array(" << var << ", [" << *expr_vec << "])";
+  out << "Array(" << id << ", [" << *expr_vec << "])";
 }
 
 // class Dim
 
 void Dim::printOn(std::ostream &out) const
 {
-  out << "Dim(" << ind << ", " << var << ")";
+  out << "Dim(" << ind << ", " << id << ")";
 }
 
 // class id
@@ -135,7 +133,7 @@ void id::printOn(std::ostream &out) const { out << "id(" << var << ")"; }
 
 // class Id
 
-void Id::printOn(std::ostream &out) const { out << "Id(" << var << ")"; }
+void Id::printOn(std::ostream &out) const { out << "Id(" << id << ")"; }
 
 // class While
 
@@ -157,7 +155,7 @@ void For::printOn(std::ostream &out) const
 
 void call::printOn(std::ostream &out) const
 {
-  out << "call(" << fun_name << ", (" << *expr_vec << "))";
+  out << "call(" << id << ", (" << *expr_vec << "))";
 }
 
 // class UnOp
@@ -221,21 +219,21 @@ void Pattern_Bool_Expr::printOn(std::ostream &out) const
 
 void Pattern_id::printOn(std::ostream &out) const
 {
-  out << "Pattern_id(" << var << ")";
+  out << "Pattern_id(" << id << ")";
 }
 
 // class Pattern_Id
 
 void Pattern_Id::printOn(std::ostream &out) const
 {
-  out << "Pattern_Id(" << var << ")";
+  out << "Pattern_Id(" << id << ")";
 }
 
 // class Pattern_Call
 
 void Pattern_Call::printOn(std::ostream &out) const
 {
-  out << "Pattern_Call(" << var << ", (" << *pattern_vec << "))";
+  out << "Pattern_Call(" << id << ", (" << *pattern_vec << "))";
 }
 
 // class Clause

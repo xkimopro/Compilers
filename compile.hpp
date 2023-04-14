@@ -1,5 +1,3 @@
-#include "ast.hpp"
-
 using namespace llvm;
 
 LLVMContext AST::TheContext;

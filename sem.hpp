@@ -1,22 +1,28 @@
-#include "ast.hpp"
-
 inline void semanticError(std::string msg) {
   std::cerr << msg << std::endl;
   exit(1);
 }
+
+std::string str_print_int = "print_int";
+std::string str_print_float = "print_float";
+std::string str_print_string = "print_string";
+std::string str_read_int = "read_int";
+std::string str_incr = "incr";
+std::string str_float_of_int = "float_of_int";
+std::string str_strlen = "strlen";
 
 // class Program
 
 void Program::sem()
 {
   st.openScope();
-  st.insert("print_int", new Type_Func(new Type_Int(), new Type_Unit()));
-  st.insert("print_float", new Type_Func(new Type_Float(), new Type_Unit()));
-  st.insert("print_string", new Type_Func(new Type_Array(1, new Type_Char()), new Type_Unit()));
-  st.insert("read_int", new Type_Func(new Type_Unit(), new Type_Int()));
-  st.insert("incr", new Type_Func(new Type_Ref(new Type_Int), new Type_Unit()));
-  st.insert("float_of_int", new Type_Func(new Type_Int(), new Type_Float()));
-  st.insert("strlen", new Type_Func(new Type_Array(1, new Type_Char()), new Type_Int()));
+  st.insert(str_print_int, new Type_Func(new Type_Int(), new Type_Unit()));
+  st.insert(str_print_float, new Type_Func(new Type_Float(), new Type_Unit()));
+  st.insert(str_print_string, new Type_Func(new Type_Array(1, new Type_Char()), new Type_Unit()));
+  st.insert(str_read_int, new Type_Func(new Type_Unit(), new Type_Int()));
+  st.insert(str_incr, new Type_Func(new Type_Ref(new Type_Int), new Type_Unit()));
+  st.insert(str_float_of_int, new Type_Func(new Type_Int(), new Type_Float()));
+  st.insert(str_strlen, new Type_Func(new Type_Array(1, new Type_Char()), new Type_Int()));
   for (Stmt *stmt : *statements)
   {
     stmt->sem();
@@ -211,7 +217,7 @@ void Unit_Expr::sem() { t = new Type_Unit(); }
 
 void Array::sem()
 {
-  SymbolEntry *se = st.lookup(var);
+  SymbolEntry *se = st.lookup(id);
   t = se->type;
   if (!t->equals(new Type_Array(expr_vec->size(), new Type_Undefined())))
     semanticError("Array: Type mismatch");
@@ -227,7 +233,7 @@ void Array::sem()
 
 void Dim::sem()
 {
-  SymbolEntry *se = st.lookup(var);
+  SymbolEntry *se = st.lookup(id);
   if (se->type->get_type() != type_undefined)
   {
     if (se->type->get_type() != type_array)
@@ -244,7 +250,7 @@ void id::sem() { t = st.lookup(var)->type; }
 
 // class Id
 
-void Id::sem() { t = st.lookup(var)->type; }
+void Id::sem() { t = st.lookup(id)->type; }
 
 // class While
 
@@ -275,7 +281,7 @@ void For::sem()
 
 void call::sem()
 {
-  ::Type *tmp = st.lookup(fun_name)->type;
+  ::Type *tmp = st.lookup(id)->type;
   for (Expr *e : *expr_vec)
   {
     e->sem();
@@ -471,21 +477,21 @@ void Pattern_Bool_Expr::sem()
 void Pattern_id::sem()
 {
   t = new Type_Undefined();
-  st.insert(var, t);
+  st.insert(id, t);
 }
 
 // class Pattern_Id
 
 void Pattern_Id::sem()
 {
-  t = st.lookup(var)->type;
+  t = st.lookup(id)->type;
 }
 
 // class Pattern_Call
 
 void Pattern_Call::sem()
 {
-  ::Type *tmp = st.lookup(var)->type;
+  ::Type *tmp = st.lookup(id)->type;
   for (Pattern *p : *pattern_vec)
   {
     p->sem();
@@ -620,7 +626,6 @@ void NormalDef::sem2()
 
 void LetDef::sem()
 {
-  // st.openScope();
   if (rec)
   {
     for (Def *def : *def_vec)

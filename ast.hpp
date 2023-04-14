@@ -1,5 +1,3 @@
-#pragma once
-
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -18,7 +16,7 @@
 
 extern SymbolTable st;
 extern TypeDefTable tt;
-extern ConstrTable ct;
+// extern ConstrTable ct;
 
 using namespace llvm;
 
@@ -367,24 +365,24 @@ public:
 class Array : public Expr
 {
 public:
-  Array(std::string s, std::vector<Expr *> *v) : var(s), expr_vec(v) {}
+  Array(std::string s, std::vector<Expr *> *v) : id(s), expr_vec(v) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string var;
+  std::string id;
   std::vector<Expr *> *expr_vec;
 };
 
 class Dim : public Expr
 {
 public:
-  Dim(std::string s, unsigned long int i = 1) : var(s), ind(i) {}
+  Dim(std::string s, unsigned long int i = 1) : id(s), ind(i) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string var;
+  std::string id;
   unsigned long int ind;
 };
 
@@ -402,12 +400,12 @@ private:
 class Id : public Expr
 {
 public:
-  Id(std::string s) : var(s) {}
+  Id(std::string s) : id(s) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string var;
+  std::string id;
 };
 
 class While : public Expr
@@ -438,12 +436,12 @@ private:
 class call : public Expr
 {
 public:
-  call(std::string s, std::vector<Expr *> *v) : fun_name(s), expr_vec(v) {}
+  call(std::string s, std::vector<Expr *> *v) : id(s), expr_vec(v) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string fun_name;
+  std::string id;
   std::vector<Expr *> *expr_vec;
 };
 
@@ -562,35 +560,35 @@ private:
 class Pattern_id : public Pattern
 {
 public:
-  Pattern_id(std::string s) : var(s) {}
+  Pattern_id(std::string s) : id(s) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string var;
+  std::string id;
 };
 
 class Pattern_Id : public Pattern
 {
 public:
-  Pattern_Id(std::string s) : var(s) {}
+  Pattern_Id(std::string s) : id(s) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string var;
+  std::string id;
 };
 
 class Pattern_Call : public Pattern
 {
 public:
   Pattern_Call(std::string s, std::vector<Pattern *> *v)
-      : var(s), pattern_vec(v) {}
+      : id(s), pattern_vec(v) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 
 private:
-  std::string var;
+  std::string id;
   std::vector<Pattern *> *pattern_vec;
 };
 
