@@ -1,3 +1,5 @@
+#include "ast.hpp"
+
 template <typename T>
 inline std::ostream &operator<<(std::ostream &out, const std::vector<T> &v) {
   bool first = true;

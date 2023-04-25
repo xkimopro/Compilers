@@ -1,3 +1,5 @@
+#include "ast.hpp"
+
 inline void semanticError(std::string msg) {
   std::cerr << msg << std::endl;
   exit(1);

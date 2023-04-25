@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -20,7 +22,8 @@ extern TypeDefTable tt;
 
 using namespace llvm;
 
-typedef enum {
+typedef enum
+{
   unop_plus,
   unop_minus,
   unop_float_plus,
@@ -30,7 +33,8 @@ typedef enum {
   unop_delete
 } unop_enum;
 
-typedef enum {
+typedef enum
+{
   binop_plus,
   binop_minus,
   binop_mult,
@@ -55,7 +59,8 @@ typedef enum {
   binop_assign
 } binop_enum;
 
-typedef enum {
+typedef enum
+{
   type_unit,
   type_int,
   type_char,
@@ -131,7 +136,8 @@ protected:
     return ConstantInt::get(TheContext, APInt(64, n, true));
   }
 
-  static llvm::Constant *cfloat(float f) {
+  static llvm::Constant *cfloat(float f)
+  {
     return llvm::ConstantFP::get(llvm::Type::getX86_FP80Ty(TheContext), f);
   }
 };
@@ -155,7 +161,7 @@ public:
   virtual Value *compile() const override;
   void llvm_compile_and_dump(bool optimize);
 
- private:
+private:
   std::vector<Stmt *> *statements;
 };
 
@@ -305,6 +311,7 @@ public:
   Int_Expr(int n) : num(n) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 
 private:
   int num;
@@ -316,6 +323,7 @@ public:
   Float_Expr(float n) : num(n) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 
 private:
   float num;
@@ -327,6 +335,7 @@ public:
   Char_Expr(char c) : chr(c) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 
 private:
   char chr;
@@ -335,9 +344,67 @@ private:
 class Str_Expr : public Expr
 {
 public:
-  Str_Expr(std::string s) : str(s.substr(1, s.size() - 2)) {}
+  Str_Expr(std::string s) : str("")
+  {
+    for (std::size_t i = 1; i < s.size() - 1; i++)
+    {
+      if (s[i] == '\\' && i + 1 < s.size())
+      {
+        i++;
+        switch (s[i])
+        {
+        case 'n':
+          str += '\n';
+          break;
+        case 't':
+          str += '\t';
+          break;
+        case 'r':
+          str += '\r';
+          break;
+        case '0':
+          str += '\0';
+          break;
+        case '\\':
+          str += '\\';
+          break;
+        case '\'':
+          str += '\'';
+          break;
+        case '\"':
+          str += '\"';
+          break;
+        case 'x':
+        {
+          // hexadecimal escape sequence
+          std::string hex_str;
+          while (i + 1 < s.size() && std::isxdigit(s[i + 1]) && hex_str.size() < 2)
+          {
+            hex_str += s[i + 1];
+            i++;
+          }
+          int hex_value = std::stoi(hex_str, nullptr, 16);
+          str += static_cast<char>(hex_value);
+          break;
+        }
+        default:
+        {
+          // unrecognized escape sequence, treat as literal
+          str += '\\';
+          str += s[i];
+          break;
+        }
+        }
+      }
+      else
+      {
+        str += s[i];
+      }
+    }
+  }
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 
 private:
   std::string str;
@@ -349,6 +416,7 @@ public:
   Bool_Expr(bool b) : var(b) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 
 private:
   bool var;
@@ -360,6 +428,7 @@ public:
   Unit_Expr() {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 };
 
 class Array : public Expr
@@ -439,6 +508,7 @@ public:
   call(std::string s, std::vector<Expr *> *v) : id(s), expr_vec(v) {}
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
+  virtual Value *compile() const override;
 
 private:
   std::string id;
@@ -690,6 +760,7 @@ public:
   virtual void sem() override;
   virtual void sem2() override;
   virtual void printOn(std::ostream &out) const override;
+  virtual Value *compile() const override;
 
 private:
   std::string id;
@@ -706,7 +777,7 @@ public:
   virtual void sem() override;
   virtual Value *compile() const override;
 
- private:
+private:
   bool rec;
   std::vector<Def *> *def_vec;
 };

@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void writeInteger(int n) {
+void print_int(int n) {
     printf("%d", n);
 }
 
-void writeBoolean(bool b) {
+void print_bool(bool b) {
     if (b) {
         printf("true");
     } else {
@@ -13,15 +13,14 @@ void writeBoolean(bool b) {
     }
 }
 
-void writeChar(char c) {
+void print_char(char c) {
     printf("%c", c);
 }
 
-void writeReal(float f) {
+void print_float(float f) {
     printf("%f", f);
 }
 
-void writeString(char* s) {
+void print_string(char* s) {
     printf("%s", s);
 }
-
