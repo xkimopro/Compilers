@@ -130,7 +130,7 @@ TypeDefTable tt;
 %type<expr> expr expr1 expr2 expr3 expr4 expr5
 %type<int_expr> T_int_expr
 %type<float_expr> T_float_expr
-%type<char_expr> T_char_expr
+%type<str_expr> T_char_expr
 %type<str_expr> T_str_expr
 %type<var> T_id T_Id
 %type<pattern> pattern pattern1

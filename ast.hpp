@@ -138,7 +138,7 @@ protected:
 
   static llvm::Constant *cfloat(float f)
   {
-    return llvm::ConstantFP::get(llvm::Type::getX86_FP80Ty(TheContext), f);
+    return ConstantFP::get(ifloat, f);
   }
 };
 
@@ -332,7 +332,45 @@ private:
 class Char_Expr : public Expr
 {
 public:
-  Char_Expr(char c) : chr(c) {}
+  Char_Expr(std::string s) : chr(s[1])
+  {
+    if (s[1] == '\\')
+    {
+      switch (s[2])
+      {
+      case 'n':
+        chr = '\n';
+        break;
+      case 't':
+        chr = '\t';
+        break;
+      case 'r':
+        chr = '\r';
+        break;
+      case '0':
+        chr = '\0';
+        break;
+      case '\\':
+        chr = '\\';
+        break;
+      case '\'':
+        chr = '\'';
+        break;
+      case '\"':
+        chr = '\"';
+        break;
+      case 'x':
+      {
+        std::string hex_str;
+        hex_str += s[3];
+        hex_str += s[4];
+        char hex_value = std::stoi(hex_str, nullptr, 16);
+        chr = hex_value;
+        break;
+      }
+      }
+    }
+  }
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
   virtual Value *compile() const override;
@@ -348,7 +386,7 @@ public:
   {
     for (std::size_t i = 1; i < s.size() - 1; i++)
     {
-      if (s[i] == '\\' && i + 1 < s.size())
+      if (s[i] == '\\')
       {
         i++;
         switch (s[i])
@@ -376,22 +414,11 @@ public:
           break;
         case 'x':
         {
-          // hexadecimal escape sequence
           std::string hex_str;
-          while (i + 1 < s.size() && std::isxdigit(s[i + 1]) && hex_str.size() < 2)
-          {
-            hex_str += s[i + 1];
-            i++;
-          }
-          int hex_value = std::stoi(hex_str, nullptr, 16);
-          str += static_cast<char>(hex_value);
-          break;
-        }
-        default:
-        {
-          // unrecognized escape sequence, treat as literal
-          str += '\\';
-          str += s[i];
+          hex_str += s[++i];
+          hex_str += s[++i];
+          char hex_value = std::stoi(hex_str, nullptr, 16);
+          str += hex_value;
           break;
         }
         }
@@ -608,7 +635,45 @@ private:
 class Pattern_Char_Expr : public Pattern
 {
 public:
-  Pattern_Char_Expr(char c) : chr(c) {}
+  Pattern_Char_Expr(std::string s) : chr(s[1])
+  {
+    if (s[1] == '\\')
+    {
+      switch (s[2])
+      {
+      case 'n':
+        chr = '\n';
+        break;
+      case 't':
+        chr = '\t';
+        break;
+      case 'r':
+        chr = '\r';
+        break;
+      case '0':
+        chr = '\0';
+        break;
+      case '\\':
+        chr = '\\';
+        break;
+      case '\'':
+        chr = '\'';
+        break;
+      case '\"':
+        chr = '\"';
+        break;
+      case 'x':
+      {
+        std::string hex_str;
+        hex_str += s[3];
+        hex_str += s[4];
+        char hex_value = std::stoi(hex_str, nullptr, 16);
+        chr = hex_value;
+        break;
+      }
+      }
+    }
+  }
   virtual void printOn(std::ostream &out) const override;
   virtual void sem() override;
 

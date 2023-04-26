@@ -3,6 +3,8 @@ OBJ=$(SRC:.c=.o)
 
 lib : $(OBJ)
 	ar -rcs lib.a $^
+	objcopy --redefine-syms=redefine_syms lib.a
+
 
 %.o : %.c
 	gcc -c lib.c

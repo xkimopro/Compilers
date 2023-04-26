@@ -67,7 +67,7 @@ CHAR {SIMPLE_CHAR}|{ESC_CHAR}
 [a-z][A-Za-z_0-9]*   { yylval.var = strdup(yytext); return T_id; }
 [0-9]+\.[0-9]+([eE][\-+][0-9]+)? { yylval.float_expr = atof(yytext); return T_float_expr; }
 
-\'{CHAR}\' { yylval.char_expr = yytext[1]; return T_char_expr; }
+\'{CHAR}\' { yylval.str_expr = strdup(yytext); return T_char_expr; }
 
 \"{CHAR}*\" { yylval.str_expr = strdup(yytext); return T_str_expr; }
 

@@ -8,14 +8,6 @@
 void semanticError(std::string msg);
 class Type;
 
-// extern std::string str_print_int;
-// extern std::string str_print_float;
-// extern std::string str_print_string;
-// extern std::string str_read_int;
-// extern std::string str_incr;
-// extern std::string str_float_of_int;
-// extern std::string str_strlen;
-
 class SymbolEntry
 {
 public:
