@@ -5,6 +5,10 @@ inline void semanticError(std::string msg) {
   exit(1);
 }
 
+extern SymbolTable st;
+extern TypeDefTable tt;
+// extern ConstrTable ct;
+
 std::string str_print_int = "print_int";
 std::string str_print_bool = "print_bool";
 std::string str_print_char = "print_char";

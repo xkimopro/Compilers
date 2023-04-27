@@ -16,10 +16,6 @@
 #include <llvm/Transforms/Scalar/GVN.h>
 #include <llvm/Transforms/Utils.h>
 
-extern SymbolTable st;
-extern TypeDefTable tt;
-// extern ConstrTable ct;
-
 using namespace llvm;
 
 typedef enum
@@ -117,7 +113,6 @@ protected:
   static Function *pi;
 
   // Type Shortcuts
-  static llvm::Type *i1;
   static llvm::Type *i8;
   static llvm::Type *i32;
   static llvm::Type *i64;
