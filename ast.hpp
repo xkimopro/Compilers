@@ -78,6 +78,38 @@ public:
   virtual Value *compile() const { return nullptr; }
 
 protected:
+  static std::string str_print_int;
+  static std::string str_print_bool;
+  static std::string str_print_char;
+  static std::string str_print_float;
+  static std::string str_print_string;
+  static std::string str_read_int;
+  static std::string str_read_bool;
+  static std::string str_read_char;
+  static std::string str_read_float;
+  static std::string str_read_string;
+  static std::string str_abs;
+  static std::string str_fabs;
+  static std::string str_sqrt;
+  static std::string str_sin;
+  static std::string str_cos;
+  static std::string str_tan;
+  static std::string str_atan;
+  static std::string str_exp;
+  static std::string str_ln;
+  static std::string str_pi;
+  static std::string str_incr;
+  static std::string str_decr;
+  static std::string str_float_of_int;
+  static std::string str_int_of_float;
+  static std::string str_round;
+  static std::string str_int_of_char;
+  static std::string str_char_of_int;
+  static std::string str_strlen;
+  static std::string str_strcmp;
+  static std::string str_strcpy;
+  static std::string str_strcat;
+
   static LLVMContext TheContext;
   static IRBuilder<> Builder;
 
@@ -116,8 +148,10 @@ protected:
   static llvm::Type *i8;
   static llvm::Type *i32;
   static llvm::Type *i64;
-  static llvm::Type *ifloat;
+  static llvm::Type *flo;
+  static llvm::Type *voi;
 
+  // LLVM helper functions
   static ConstantInt *c8(char c)
   {
     return ConstantInt::get(TheContext, APInt(8, c, true));
@@ -130,10 +164,9 @@ protected:
   {
     return ConstantInt::get(TheContext, APInt(64, n, true));
   }
-
-  static llvm::Constant *cfloat(float f)
+  static Constant *cfloat(float f)
   {
-    return ConstantFP::get(ifloat, f);
+    return ConstantFP::get(flo, f);
   }
 };
 

@@ -1,6 +1,7 @@
 #include "ast.hpp"
 
-inline void semanticError(std::string msg) {
+inline void semanticError(std::string msg)
+{
   std::cerr << msg << std::endl;
   exit(1);
 }
@@ -9,42 +10,73 @@ extern SymbolTable st;
 extern TypeDefTable tt;
 // extern ConstrTable ct;
 
-std::string str_print_int = "print_int";
-std::string str_print_bool = "print_bool";
-std::string str_print_char = "print_char";
-std::string str_print_float = "print_float";
-std::string str_print_string = "print_string";
-std::string str_read_int = "read_int";
-std::string str_read_bool = "read_bool";
-std::string str_read_char = "read_char";
-std::string str_read_float = "read_float";
-std::string str_read_string = "read_string";
-std::string str_abs = "abs";
-std::string str_fabs = "fabs";
-std::string str_sqrt = "sqrt";
-std::string str_sin = "sin";
-std::string str_cos = "cos";
-std::string str_tan = "tan";
-std::string str_atan = "atan";
-std::string str_exp = "exp";
-std::string str_ln = "ln";
-std::string str_pi = "pi";
-std::string str_incr = "incr";
-std::string str_decr = "decr";
-std::string str_float_of_int = "float_of_int";
-std::string str_int_of_float = "int_of_float";
-std::string str_round = "round";
-std::string str_int_of_char = "int_of_char";
-std::string str_char_of_int = "char_of_int";
-std::string str_strlen = "strlen";
-std::string str_strcmp = "strcmp";
-std::string str_strcpy = "strcpy";
-std::string str_strcat = "strcat";
+std::string AST::str_print_int;
+std::string AST::str_print_bool;
+std::string AST::str_print_char;
+std::string AST::str_print_float;
+std::string AST::str_print_string;
+std::string AST::str_read_int;
+std::string AST::str_read_bool;
+std::string AST::str_read_char;
+std::string AST::str_read_float;
+std::string AST::str_read_string;
+std::string AST::str_abs;
+std::string AST::str_fabs;
+std::string AST::str_sqrt;
+std::string AST::str_sin;
+std::string AST::str_cos;
+std::string AST::str_tan;
+std::string AST::str_atan;
+std::string AST::str_exp;
+std::string AST::str_ln;
+std::string AST::str_pi;
+std::string AST::str_incr;
+std::string AST::str_decr;
+std::string AST::str_float_of_int;
+std::string AST::str_int_of_float;
+std::string AST::str_round;
+std::string AST::str_int_of_char;
+std::string AST::str_char_of_int;
+std::string AST::str_strlen;
+std::string AST::str_strcmp;
+std::string AST::str_strcpy;
+std::string AST::str_strcat;
 
 // class Program
 
 void Program::sem()
 {
+  str_print_int = "print_int";
+  str_print_bool = "print_bool";
+  str_print_char = "print_char";
+  str_print_float = "print_float";
+  str_print_string = "print_string";
+  str_read_int = "read_int";
+  str_read_bool = "read_bool";
+  str_read_char = "read_char";
+  str_read_float = "read_float";
+  str_read_string = "read_string";
+  str_abs = "abs";
+  str_fabs = "fabs";
+  str_sqrt = "sqrt";
+  str_sin = "sin";
+  str_cos = "cos";
+  str_tan = "tan";
+  str_atan = "atan";
+  str_exp = "exp";
+  str_ln = "ln";
+  str_pi = "pi";
+  str_incr = "incr";
+  str_decr = "decr";
+  str_float_of_int = "float_of_int";
+  str_int_of_float = "int_of_float";
+  str_round = "round";
+  str_int_of_char = "int_of_char";
+  str_char_of_int = "char_of_int";
+  str_strlen = "strlen";
+  str_strcmp = "strcmp";
+  str_strcpy = "strcpy";
+  str_strcat = "strcat";
   st.openScope();
   st.insert(str_print_int, new Type_Func(new Type_Int(), new Type_Unit()));
   st.insert(str_print_bool, new Type_Func(new Type_Bool(), new Type_Unit()));
@@ -193,14 +225,15 @@ std::string Type_Undefined::get_id()
 
 bool Type_Undefined::equals(::Type *other)
 {
-  //std::cerr << *this << " " << *other << std::endl;
+  // std::cerr << *this << " " << *other << std::endl;
   if (other->get_type() == type_undefined)
     other = other->getChild1();
-  if (this == other) return 1;
+  if (this == other)
+    return 1;
   if (t == nullptr)
   {
     t = other;
-    //std::cerr << *this << std::endl;
+    // std::cerr << *this << std::endl;
     return 1;
   }
   else
