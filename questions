@@ -13,9 +13,3 @@ t := Nil
 2) f σε ref
 
 3) lineno
-
-4) types και vars με ιδιο όνομα
-
-5) f x y = x == y
-f 1 1
-f 'a' 'a'
